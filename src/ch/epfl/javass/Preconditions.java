@@ -1,19 +1,24 @@
 package ch.epfl.javass;
 
 /**
- * @author jonjb
+ * @author Jonathan Bereyziat (282962)
  *
  */
 public final class Preconditions {
 
     /**
-     * 
+     * private constructor you can't instantiate
      */
     private Preconditions() {
     }
     
     /**
-     * @param b
+     * Check if the condition passed to the method is True or False
+     * 
+     * @param b 
+     *              the boolean condition to check
+     * @throws IllegalArgumentException
+     *              if the boolean is false
      */
     public static void checkArgument(boolean b) {
         if (!b) {
@@ -23,8 +28,10 @@ public final class Preconditions {
     
     /**
      * @param index
+     *          the index to check   
      * @param size
-     * @return
+     *          the size of the entity to check
+     * @return the index if it's not negative and not smaller than the size
      */
     public static int checkIndex(int index, int size) {
         if (index < 0 || index >= size) {
