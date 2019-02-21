@@ -8,10 +8,7 @@ import ch.epfl.javass.bits.Bits32;
 import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.Card.Rank;
 
-/**
- * @author astra
- *
- */
+
 public class PackedCard {
     
     public static int INVALID = 63; 
@@ -28,22 +25,41 @@ public class PackedCard {
         return (rank <=8 && rank>=0)&&(color>=0 && color<=3)&&(rest==0); 
     }
     
+    /**
+     * @param c Color of the card
+     * @param r Rank of the card 
+     * @return  An int that represents the card 
+     */
     public static int pack(Card.Color c, Card.Rank r) {
         
         return Bits32.pack(r.ordinal(), 4, c.ordinal(), 2); 
     }
+    
+    /**
+     * @param pkCard    packed representation of a card
+     * @return  Color of the card 
+     */
     public static Card.Color color(int pkCard) {
         assert isValid(pkCard);
         int color = Bits32.extract(pkCard, 4, 2); 
         return Color.values()[color]; 
     }
-    
+    /**
+     * @param pkCard    packed representation of a card
+     * @return  Rank of the card 
+     */
     public static Card.Rank rank(int pkCard) {
         assert isValid(pkCard);
         int rank = Bits32.extract(pkCard, 0, 4); 
         return Rank.values()[rank];  
     }
     
+    /**
+     * @param trump     The color that is trump 
+     * @param pkCardL   The card we wish to compare
+     * @param pkCardR   The card we wish to compare TO 
+     * @return  true if pkCardL is better than pkCardR
+     */
     public static boolean isBetter(Card.Color trump, int pkCardL, int pkCardR) {
         assert isValid(pkCardL)&& isValid(pkCardR);
         int LValue, RValue; 
@@ -62,6 +78,11 @@ public class PackedCard {
             return Bits32.extract(pkCardL, 0, 4)>Bits32.extract(pkCardR, 0, 4); 
     }
     
+    /**
+     * @param trump     The color that is currently trump
+     * @param pkCard    The card in packed representation
+     * @return          The points that card gives 
+     */
     public static int points(Card.Color trump, int pkCard) {
         int rank = Bits32.extract(pkCard, 0, 4); 
         
@@ -79,6 +100,10 @@ public class PackedCard {
             default : return 0;   // For all the other cards 
         }
     }
+    /**
+     * @param pkCard    The card in packed form
+     * @return          The appearance of the card
+     */
     public static String toString(int pkCard) {
         return color(pkCard).toString() + rank(pkCard).toString(); 
     }
