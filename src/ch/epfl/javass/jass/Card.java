@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Collections; 
 import java.util.Arrays; 
 
+/**
+ * @author astra
+ *
+ */
 public final class Card {
     
     // IS THAT ALLOWED ? 
@@ -20,34 +24,40 @@ public final class Card {
     }
     
     static Card ofPacked(int packed) {
-        //TODO 
-        return new Card(Color.CLUB,Rank.AS); 
+        Color c = PackedCard.color(packed); 
+        Rank r = PackedCard.rank(packed); 
+        
+        return new Card(c,r); 
     }
     
     //Methodes de la classe Packed 
     
+    /**
+     * @return The packed version of the card
+     */
     int packed() {
-        //TODO
-        return 0; 
+        return PackedCard.pack(this.color, this.rank); 
     }
     
+    /**
+     * @return  The color of the card 
+     */
     Color color() {
-        //TODO
-        return Color.CLUB; 
+        return this.color; 
     }
     
+    /**
+     * @return  The rank of the card 
+     */
     Rank rank() {
-        //TODO
-        return Rank.AS; 
+        return this.rank; 
     }
     
     boolean isBetter(Color trump, Card that) {
-        //TODO 
-        return true; 
+        return PackedCard.isBetter(trump, this.packed(), that.packed()); 
     }
     int points(Color trump) {
-        //TODO
-        return 0; 
+        return PackedCard.points(trump, this.packed()); 
     }
     
     //METHODES AUTRE 

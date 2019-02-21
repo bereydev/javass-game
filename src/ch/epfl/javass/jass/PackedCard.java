@@ -4,44 +4,83 @@
 */
 package ch.epfl.javass.jass;
 
+import ch.epfl.javass.bits.Bits32;
 import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.Card.Rank;
 
+/**
+ * @author astra
+ *
+ */
 public class PackedCard {
     
     public static int INVALID = 63; 
     
+    
+    /**
+     * @param pkCard    A card in packed representation 
+     * @return true if the packed card corresponds to a card 
+     */
     public static boolean isValid(int pkCard) {
-        // TODO 
-        return true; 
+        int rank = Bits32.extract(pkCard, 0, 4); 
+        int color = Bits32.extract(pkCard, 4, 2); 
+        int rest = Bits32.extract(pkCard, 6, Integer.SIZE-6); //Bits that should be 0
+        return (rank <=8 && rank>=0)&&(color>=0 && color<=3)&&(rest==0); 
     }
     
     public static int pack(Card.Color c, Card.Rank r) {
-        //TODO
-        return 0; 
+        
+        return Bits32.pack(r.ordinal(), 4, c.ordinal(), 2); 
     }
     public static Card.Color color(int pkCard) {
-        //TODO
-        return Color.CLUB; 
+        assert isValid(pkCard);
+        int color = Bits32.extract(pkCard, 4, 2); 
+        return Color.values()[color]; 
     }
     
     public static Card.Rank rank(int pkCard) {
-        //TODO
-        return Rank.JACK;  
+        assert isValid(pkCard);
+        int rank = Bits32.extract(pkCard, 0, 4); 
+        return Rank.values()[rank];  
     }
     
     public static boolean isBetter(Card.Color trump, int pkCardL, int pkCardR) {
-        //TODO 
-        return true; 
+        assert isValid(pkCardL)&& isValid(pkCardR);
+        int LValue, RValue; 
+        
+        if(color(pkCardL)==trump || color(pkCardR) == trump) {
+            if(color(pkCardL)==trump) LValue = rank(pkCardL).trumpOrdinal(); 
+            else LValue = rank(pkCardL).ordinal(); 
+            if(color(pkCardR)==trump) RValue = rank(pkCardR).trumpOrdinal(); 
+            else RValue = rank(pkCardR).ordinal(); 
+            
+            return LValue > RValue; 
+        }
+        else if(Bits32.extract(pkCardR, 4, 2)!=Bits32.extract(pkCardL, 4, 2))
+            return false; //Not comparable as they are not of the same kind and not trump 
+        else 
+            return Bits32.extract(pkCardL, 0, 4)>Bits32.extract(pkCardR, 0, 4); 
     }
     
     public static int points(Card.Color trump, int pkCard) {
-        //TODO 
-        return 0; 
+        int rank = Bits32.extract(pkCard, 0, 4); 
+        
+        if(trump.ordinal() == Bits32.extract(pkCard, 4, 2)) {    //Card has trump color 
+           if(rank==3) return 14; 
+           else if(rank ==5) return 20; 
+        }
+        switch(rank) {
+            case 4 : return 10; 
+            case 5 : return 2; 
+            case 6 : return 3; 
+            case 7 : return 4; 
+            case 8 : return 11; 
+            
+            default : return 0;   // For all the other cards 
+        }
     }
     public static String toString(int pkCard) {
-        //TODO 
-        return "Not implemented"; 
+        return color(pkCard).toString() + rank(pkCard).toString(); 
     }
 
 }
