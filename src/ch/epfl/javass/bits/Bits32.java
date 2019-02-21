@@ -44,7 +44,9 @@ public final class Bits32 {
      * @return the processed integer
      */
     public static int mask(int start, int size) {
-        Preconditions.checkArgument(size <= Integer.SIZE && start >= 0 && start <= size);
+        Preconditions.checkArgument(start >= 0 && start <= Integer.SIZE);
+        Preconditions.checkArgument(size >= 0 && size <= Integer.SIZE - start);
+        if (size == 0) return 0;
         int result = ~0;
         result = result >>> Integer.SIZE - size;
         result = result << start;
@@ -63,9 +65,11 @@ public final class Bits32 {
      * @return
      */
     public static int extract(int bits, int start, int size) {
-        Preconditions.checkArgument(size <= Integer.SIZE && start >= 0 && start <= size);
+        Preconditions.checkArgument(start >= 0 && start <= Integer.SIZE);
+        Preconditions.checkArgument(size >= 0 && size <= Integer.SIZE - start);
+        if (size == 0) return 0;
         int result = bits;
-        result = result << Integer.SIZE - size + start;
+        result = result << Integer.SIZE - size - start;
         result = result >>> Integer.SIZE - size;
         return result;
     }
