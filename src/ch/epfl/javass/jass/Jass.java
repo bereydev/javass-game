@@ -7,7 +7,10 @@ package ch.epfl.javass.jass;
  *
  */
 public interface Jass {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0138783debf1dc98bc05f611c0d7b3a343793b1e
  
         public static final int HAND_SIZE = 9;
         public static final int TRICKS_PER_TURN = 9;
