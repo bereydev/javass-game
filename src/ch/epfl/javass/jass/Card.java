@@ -158,6 +158,7 @@ public final class Card {
             }
             return trumpOrdinal;
         }
+
         private Rank(String symbol) {
             this.symbol = symbol; 
         }
