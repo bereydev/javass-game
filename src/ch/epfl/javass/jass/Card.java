@@ -125,11 +125,11 @@ public final class Card {
         JACK("J"), 
         QUEEN("Q"), 
         KING("K"), 
-        AS("A"); 
+        ACE("A"); 
         
         static final List<Rank> ALL = 
                 Collections.unmodifiableList(Arrays.asList(values())); 
-        static final int COUNT = 8; 
+        static final int COUNT = 9; 
         
         private String symbol; 
     
@@ -138,9 +138,25 @@ public final class Card {
          */
         public  int trumpOrdinal() {
             int num = this.ordinal(); 
-            if(num==3) return 7; 
-            else if(num==5) return 8; 
-            return this.ordinal(); 
+            int trumpOrdinal;
+            switch (num) {
+            case 3: trumpOrdinal = 7;
+              break;
+            case 4: trumpOrdinal = 3;
+              break;
+            case 5: trumpOrdinal = 8;
+                break;
+            case 6: trumpOrdinal = 4;
+                break;
+            case 7: trumpOrdinal = 5;
+                break;
+            case 8: trumpOrdinal = 6;
+                break;
+            //the 3 first cards don't change of value when trump
+            default: trumpOrdinal = this.ordinal();
+                break;
+            }
+            return trumpOrdinal;
         }
         private Rank(String symbol) {
             this.symbol = symbol; 
