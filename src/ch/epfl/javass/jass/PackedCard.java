@@ -1,5 +1,5 @@
-/*
- *	Author : Alexandre Santangelo 
+/**
+ *	@author : Alexandre Santangelo 
  *	Date   : Feb 19, 2019	
 */
 package ch.epfl.javass.jass;
@@ -61,16 +61,17 @@ public class PackedCard {
      * @return  true if pkCardL is better than pkCardR
      */
     public static boolean isBetter(Card.Color trump, int pkCardL, int pkCardR) {
-        assert isValid(pkCardL)&& isValid(pkCardR);
+        assert isValid(pkCardL) && isValid(pkCardR);
         int LValue, RValue; 
         
-        if(color(pkCardL)==trump || color(pkCardR) == trump) {
-            if(color(pkCardL)==trump) LValue = rank(pkCardL).trumpOrdinal(); 
-            else LValue = rank(pkCardL).ordinal(); 
-            if(color(pkCardR)==trump) RValue = rank(pkCardR).trumpOrdinal(); 
-            else RValue = rank(pkCardR).ordinal(); 
-            
-            return LValue > RValue; 
+        if(color(pkCardL)==trump && color(pkCardR)==trump) {
+            LValue = rank(pkCardL).trumpOrdinal();
+            RValue = rank(pkCardR).trumpOrdinal();
+            return LValue > RValue;
+        }
+        else if(color(pkCardL)==trump || color(pkCardR) == trump) {
+            if(color(pkCardL)==trump) return true; 
+            else return false;
         }
         else if(Bits32.extract(pkCardR, 4, 2)!=Bits32.extract(pkCardL, 4, 2))
             return false; //Not comparable as they are not of the same kind and not trump 
