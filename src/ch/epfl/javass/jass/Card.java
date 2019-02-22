@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 public final class Card {
     
-    // IS THAT ALLOWED ? 
     private Color color; 
     private Rank rank; 
 
@@ -15,55 +14,87 @@ public final class Card {
         color = c; 
     }
     
+    /**
+     * @param c The color of the card 
+     * @param r The rank of the card 
+     * @return  The card 
+     */
     static Card of(Color c, Rank r) {
         return new Card(c,r); 
     }
     
+    /**
+     * @param packed    Packed Card you want to create
+     * @return  A card 
+     */
     static Card ofPacked(int packed) {
-        //TODO 
-        return new Card(Color.CLUB,Rank.AS); 
+        Color c = PackedCard.color(packed); 
+        Rank r = PackedCard.rank(packed); 
+        
+        return new Card(c,r); 
     }
     
-    //Methodes de la classe Packed 
     
+    /**
+     * @return The packed version of the card
+     */
     int packed() {
-        //TODO
-        return 0; 
+        return PackedCard.pack(this.color, this.rank); 
     }
     
+    /**
+     * @return  The color of the card 
+     */
     Color color() {
-        //TODO
-        return Color.CLUB; 
+        return this.color; 
     }
     
+    /**
+     * @return  The rank of the card 
+     */
     Rank rank() {
-        //TODO
-        return Rank.AS; 
+        return this.rank; 
     }
     
+    /**
+     * @param trump The trump color 
+     * @param that  The card you wish to compare to
+     * @return  True if the card you applied the method to is better than the other one 
+     */
     boolean isBetter(Color trump, Card that) {
-        //TODO 
-        return true; 
+        return PackedCard.isBetter(trump, this.packed(), that.packed()); 
     }
+    
+    /**
+     * @param trump The trump color 
+     * @return  The points assigned to that card 
+     */
     int points(Color trump) {
-        //TODO
-        return 0; 
+        return PackedCard.points(trump, this.packed()); 
     }
     
-    //METHODES AUTRE 
-    
-   public boolean equals(Object thatO) {
-        // TODO 
-        return true; 
+       /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object thatO) {
+        if(thatO.getClass() == this.getClass()) {
+            if(((Card)thatO).packed()==this.packed())
+                return true; 
+        }
+        return false; 
     }
-   public int hashCode() {
-       //TODO 
-       return 0; 
+       /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+       return this.packed(); 
    }
-   public String toString() {
-       //TODO 
-       return "lol"; 
-   }
+       /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+           return PackedCard.toString(this.packed()); 
+       }
     
     public enum Color{
         SPADE("\u2660"),
@@ -101,8 +132,10 @@ public final class Card {
         static final int COUNT = 8; 
         
         private String symbol; 
-        
-        //CHECK !!! 
+    
+        /**
+         * @return  The ordinal of a card whose color is the same as the trump 
+         */
         public  int trumpOrdinal() {
             int num = this.ordinal(); 
             if(num==3) return 7; 
