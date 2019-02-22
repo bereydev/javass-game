@@ -62,12 +62,9 @@ public class PackedCard {
      */
     public static boolean isBetter(Card.Color trump, int pkCardL, int pkCardR) {
         assert isValid(pkCardL) && isValid(pkCardR);
-        int LValue, RValue; 
         
         if(color(pkCardL)==trump && color(pkCardR)==trump) {
-            LValue = rank(pkCardL).trumpOrdinal();
-            RValue = rank(pkCardR).trumpOrdinal();
-            return LValue > RValue;
+            return rank(pkCardL).trumpOrdinal() > rank(pkCardR).trumpOrdinal();
         }
         else if(color(pkCardL)==trump || color(pkCardR) == trump) {
             if(color(pkCardL)==trump) return true; 
@@ -76,7 +73,7 @@ public class PackedCard {
         else if(Bits32.extract(pkCardR, 4, 2)!=Bits32.extract(pkCardL, 4, 2))
             return false; //Not comparable as they are not of the same kind and not trump 
         else 
-            return Bits32.extract(pkCardL, 0, 4)>Bits32.extract(pkCardR, 0, 4); 
+            return Bits32.extract(pkCardL, 0, 4)> Bits32.extract(pkCardR, 0, 4); 
     }
     
     /**
