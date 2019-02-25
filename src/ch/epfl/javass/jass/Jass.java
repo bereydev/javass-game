@@ -32,6 +32,9 @@ public interface Jass {
             
             public static final int COUNT = 4;
             
+//            /**
+//             * @return    The team a player belongs to 
+//             */
 //            public TeamId team() {
 //                if(this.ordinal()%2 == 0) return TeamId.TEAM_1 ; 
 //                return   TeamId.TEAM_2 ; 
