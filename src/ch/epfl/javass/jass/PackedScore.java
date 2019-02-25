@@ -1,7 +1,6 @@
 
 package ch.epfl.javass.jass;
 
-import ch.epfl.javass.jass.Jass.TeamId;
 
 public final class PackedScore {
 
