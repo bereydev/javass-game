@@ -44,7 +44,7 @@ public final class PackedScore {
      * @param t
      * @return
      */
-    int turnPoints(long pkScore, TeamId t) {
+    public static int turnPoints(long pkScore, TeamId t) {
         return 0;
     }
 
@@ -53,7 +53,7 @@ public final class PackedScore {
      * @param t
      * @return
      */
-    int gamePoints(long pkScore, TeamId t) {
+    public static int gamePoints(long pkScore, TeamId t) {
         return 0;
     }
 
@@ -62,7 +62,7 @@ public final class PackedScore {
      * @param t
      * @return
      */
-    int totalPoints(long pkScore, TeamId t) {
+    public static int totalPoints(long pkScore, TeamId t) {
         return 0;
     }
 
@@ -72,7 +72,7 @@ public final class PackedScore {
      * @param trickPoints
      * @return
      */
-    long withAdditionalTrick(long pkScore, TeamId winningTeam,
+    public static long withAdditionalTrick(long pkScore, TeamId winningTeam,
             int trickPoints) {
         return 0;
     }
@@ -81,7 +81,7 @@ public final class PackedScore {
      * @param pkScore
      * @return
      */
-    long nextTurn(long pkScore) {
+    public static long nextTurn(long pkScore) {
         return 0;
     }
 
