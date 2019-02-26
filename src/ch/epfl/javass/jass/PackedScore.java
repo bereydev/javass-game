@@ -23,7 +23,7 @@ public final class PackedScore {
      * @param gamePoints2
      * @return
      */
-    long pack(int turnTricks1, int turnPoints1, int gamePoints1,
+   public static long pack(int turnTricks1, int turnPoints1, int gamePoints1,
             int turnTricks2, int turnPoints2, int gamePoints2) {
 
         return 1L;
@@ -34,7 +34,7 @@ public final class PackedScore {
      * @param t
      * @return
      */
-    int turnTricks(long pkScore, TeamId t) {
+    public static int turnTricks(long pkScore, TeamId t) {
         return 0;
 
     }
