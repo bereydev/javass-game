@@ -44,7 +44,7 @@ public final class Score {
      *            The packed version of the score
      * @return The unpacked version of the score
      */
-    public Score ofPacked(long pkScore) {
+    public static Score ofPacked(long pkScore) {
         if (!PackedScore.isValid(pkScore))
             throw new IllegalArgumentException();
 

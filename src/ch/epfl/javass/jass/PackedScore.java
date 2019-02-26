@@ -89,7 +89,7 @@ public final class PackedScore {
      * @param pkScore
      * @return
      */
-    String toString(long pkScore) {
+    public static String toString(long pkScore) {
         return "Hello Jon";
     }
 
