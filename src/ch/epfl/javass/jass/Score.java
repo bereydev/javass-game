@@ -3,9 +3,9 @@
  *	Date   : Feb 25, 2019	
 */
 
-
 package ch.epfl.javass.jass;
 
+import ch.epfl.javass.Preconditions;
 import ch.epfl.javass.bits.Bits64;
 import ch.epfl.javass.jass.PackedScore;
 
@@ -45,8 +45,7 @@ public final class Score {
      * @return The unpacked version of the score
      */
     public static Score ofPacked(long pkScore) {
-        if (!PackedScore.isValid(pkScore))
-            throw new IllegalArgumentException();
+        Preconditions.checkArgument(PackedScore.isValid(pkScore));
 
         int nbP1 = (int) Bits64.extract(pkScore, 0, 4);
         int tP1 = (int) Bits64.extract(pkScore, 4, 9);
@@ -110,8 +109,7 @@ public final class Score {
      * @return The score of both teams after this trick
      */
     public Score withAdditionalTrick(TeamId winningTeam, int trickPoints) {
-        if (trickPoints < 0)
-            throw new IllegalArgumentException();
+        Preconditions.checkArgument(trickPoints >= 0);
 
         return ofPacked(PackedScore.withAdditionalTrick(this.packed(),
                 winningTeam, trickPoints));

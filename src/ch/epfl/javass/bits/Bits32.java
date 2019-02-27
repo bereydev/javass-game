@@ -45,10 +45,10 @@ public final class Bits32 {
     public static int mask(int start, int size) {
         Preconditions.checkArgument(start >= 0 && start <= Integer.SIZE);
         Preconditions.checkArgument(size >= 0 && size <= Integer.SIZE - start);
-        if (size == 0)
-            return 0;
-        int result = ~0;
-        result = result >>> Integer.SIZE - size;
+        if (size == Integer.SIZE)
+            return ~0;
+        int result = 1 << size;
+        result -= 1;
         result = result << start;
         return result;
     }
@@ -69,10 +69,9 @@ public final class Bits32 {
         Preconditions.checkArgument(size >= 0 && size <= Integer.SIZE - start);
         if (size == 0)
             return 0;
-        int result = bits;
-        result = result << Integer.SIZE - size - start;
-        result = result >>> Integer.SIZE - size;
-        return result;
+        bits = bits << Integer.SIZE - size - start;
+        bits = bits >>> Integer.SIZE - size;
+        return bits;
     }
 
     /**
@@ -94,10 +93,8 @@ public final class Bits32 {
         Preconditions.checkArgument(
                 s2 > 0 && s2 < Integer.SIZE && bitsSize(v2) <= s2);
         Preconditions.checkArgument(s1 + s2 <= Integer.SIZE);
-        int bits1 = v1;
-        int bits2 = v2 << s1;
-        int result = bits1 | bits2;
-        return result;
+        int bits = v2 << s1;
+        return v1 | bits;
     }
 
     /**
@@ -118,18 +115,9 @@ public final class Bits32 {
      * @return the concatenated integer 'v1 + v2 + v3'
      */
     public static int pack(int v1, int s1, int v2, int s2, int v3, int s3) {
-        Preconditions.checkArgument(
-                s1 > 0 && s1 < Integer.SIZE && bitsSize(v1) <= s1);
-        Preconditions.checkArgument(
-                s2 > 0 && s2 < Integer.SIZE && bitsSize(v2) <= s2);
-        Preconditions.checkArgument(
-                s3 > 0 && s3 < Integer.SIZE && bitsSize(v3) <= s3);
-        Preconditions.checkArgument(s1 + s2 + s3 <= Integer.SIZE);
-        int bits1 = v1;
-        int bits2 = v2 << s1;
-        int bits3 = v3 << s2 + s1;
-        int result = bits1 | bits2 | bits3;
-        return result;
+        int bits = pack(v1, s1, v2, s2);
+        
+        return pack(bits, s1+s2, v3, s3);
     }
 
     /**
@@ -167,32 +155,11 @@ public final class Bits32 {
      */
     public static int pack(int v1, int s1, int v2, int s2, int v3, int s3,
             int v4, int s4, int v5, int s5, int v6, int s6, int v7, int s7) {
-        Preconditions.checkArgument(
-                s1 > 0 && s1 < Integer.SIZE && bitsSize(v1) <= s1);
-        Preconditions.checkArgument(
-                s2 > 0 && s2 < Integer.SIZE && bitsSize(v2) <= s2);
-        Preconditions.checkArgument(
-                s3 > 0 && s3 < Integer.SIZE && bitsSize(v3) <= s3);
-        Preconditions.checkArgument(
-                s4 > 0 && s4 < Integer.SIZE && bitsSize(v4) <= s4);
-        Preconditions.checkArgument(
-                s5 > 0 && s5 < Integer.SIZE && bitsSize(v5) <= s5);
-        Preconditions.checkArgument(
-                s6 > 0 && s6 < Integer.SIZE && bitsSize(v6) <= s6);
-        Preconditions.checkArgument(
-                s7 > 0 && s7 < Integer.SIZE && bitsSize(v7) <= s7);
-        Preconditions.checkArgument(
-                s1 + s2 + s3 + s4 + s5 + s6 + s7 <= Integer.SIZE);
-        int bits1 = v1;
-        int bits2 = v2 << s1;
-        int bits3 = v3 << s1 + s2;
-        int bits4 = v4 << s1 + s2 + s3;
-        int bits5 = v5 << s1 + s2 + s3 + s4;
-        int bits6 = v6 << s1 + s2 + s3 + s4 + s5;
-        int bits7 = v7 << s1 + s2 + s3 + s4 + s5 + s6;
-        int result = bits1 | bits2 | bits3 | bits4 | bits5 | bits6 | bits7;
+        int bits1 = pack(v1, s1, v2, s2, v3, s3);
+        int bits2 = pack(v4, s4, v5, s5, v6, s6);
+        int bits3 = pack(bits1, s1+s2+s3, bits2, s4+s5+s6);
 
-        return result;
+        return pack(bits3, s1+s2+s3+s4+s5+s6, v7, s7);
     }
 
 }

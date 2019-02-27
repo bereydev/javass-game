@@ -1,12 +1,5 @@
 package ch.epfl.javass.jass;
 
-import java.util.Arrays;
-
-import java.util.Collections;
-import java.util.List;
-
-import ch.epfl.javass.jass.Card.Color;
-
 /**
  * Interface that store the constants values concerning the Jass game
  * 

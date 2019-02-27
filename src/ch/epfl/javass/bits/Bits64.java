@@ -38,7 +38,7 @@ public class Bits64 {
             return Long.MAX_VALUE;
 
         long num = 1L << size;
-        num = num - 1L;
+        num -= 1L;
         num = num << start;
         return num;
     }
