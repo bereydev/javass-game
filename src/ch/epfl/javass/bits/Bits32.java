@@ -69,8 +69,10 @@ public final class Bits32 {
         Preconditions.checkArgument(size >= 0 && size <= Integer.SIZE - start);
         if (size == 0)
             return 0;
-        bits = bits << Integer.SIZE - size - start;
-        bits = bits >>> Integer.SIZE - size;
+        bits = bits & mask(start, size);
+        bits = bits >>> start;
+//        bits = bits << Integer.SIZE - size - start;
+//        bits = bits >>> Integer.SIZE - size;
         return bits;
     }
 

@@ -91,9 +91,9 @@ public final class PackedScore {
     public static int gamePoints(long pkScore, TeamId t) {
         assert isValid(pkScore);
         if (t == TeamId.TEAM_1) {
-            return (int) Bits64.extract(pkScore, 4, 9);
+            return (int) Bits64.extract(pkScore, 13, 11);
         } else {
-            return (int) Bits64.extract(pkScore, 36, 9);
+            return (int) Bits64.extract(pkScore, 45, 11);
         }
     }
 
@@ -143,21 +143,14 @@ public final class PackedScore {
      */
     public static long nextTurn(long pkScore) {
         assert isValid(pkScore);
-        int turnTricks1 = turnTricks(pkScore, TeamId.TEAM_1);
         int turnPoints1 = turnPoints(pkScore, TeamId.TEAM_1);
         int gamePoints1 = gamePoints(pkScore, TeamId.TEAM_1);
-        int turnTricks2 = turnTricks(pkScore, TeamId.TEAM_2);
         int turnPoints2 = turnPoints(pkScore, TeamId.TEAM_2);
         int gamePoints2 = gamePoints(pkScore, TeamId.TEAM_2);
         gamePoints1 += turnPoints1;
-        turnPoints1 = 0;
-        turnTricks1 = 0;
         gamePoints2 += turnPoints2;
-        turnPoints2 = 0;
-        turnTricks2 = 0;
 
-        return pack(turnTricks1, turnPoints1, gamePoints1, turnTricks2,
-                turnPoints2, gamePoints2);
+        return pack(0, 0, gamePoints1, 0, 0, gamePoints2);
     }
 
     /**

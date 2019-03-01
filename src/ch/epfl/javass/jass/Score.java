@@ -89,7 +89,7 @@ public final class Score {
      * @return The amount of points the team has until before the current turn
      */
     public int gamePoints(TeamId t) {
-        return PackedScore.turnPoints(this.packed(), t);
+        return PackedScore.gamePoints(this.packed(), t);
     }
 
     /**
@@ -138,8 +138,7 @@ public final class Score {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return "(" + turnTricks1 + "," + turnPoints1 + "," + gamePoints1 + ")/("
-                + turnTricks2 + "," + turnPoints2 + "," + gamePoints2 + ")";
+        return PackedScore.toString(this.packed());
     }
 
     /*

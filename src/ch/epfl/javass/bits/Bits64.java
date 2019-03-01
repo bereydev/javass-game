@@ -35,7 +35,7 @@ public class Bits64 {
         Preconditions.checkArgument(start >= 0 && start <= Long.SIZE);
         Preconditions.checkArgument(size >= 0 && size <= Long.SIZE - start);
         if (size == Long.SIZE)
-            return Long.MAX_VALUE;
+            return ~0L;
 
         long num = 1L << size;
         num -= 1L;
@@ -56,8 +56,8 @@ public class Bits64 {
         Preconditions.checkArgument(start >= 0 && start <= Long.SIZE);
         Preconditions.checkArgument(size >= 0 && size <= Long.SIZE - start);
 
-        bits = bits << (Long.SIZE - (start + size));
-        bits = bits >>> Long.SIZE - size;
+        bits = bits & mask(start, size);
+        bits = bits >>> start;
 
         return bits;
     }
