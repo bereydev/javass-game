@@ -147,9 +147,13 @@ public final class Score {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object other) {
-        if (other.getClass() != this.getClass())
-            return false;
+        try {
+            if (other.getClass() == this.getClass())
+                return this.packed() == ((Score) other).packed();
 
-        return this.packed() == ((Score) other).packed();
+            return false;
+        } catch (NullPointerException E) {
+            return false;
+        }
     }
 }
