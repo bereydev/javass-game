@@ -107,6 +107,7 @@ public final class PackedScore {
         return gamePoints(pkScore, t) + turnPoints(pkScore, t);
     }
 
+  
     /**
      * @param pkScore
      * @param winningTeam

@@ -88,7 +88,8 @@ public final class Card {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object thatO) {
-        if (thatO.getClass() == this.getClass()) {
+        
+        if (thatO instanceof Card) {
             if (((Card) thatO).packed() == this.packed())
                 return true;
         }
