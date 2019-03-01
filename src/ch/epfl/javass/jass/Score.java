@@ -147,9 +147,9 @@ public final class Score {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object other) {
-        if (other.getClass() != this.getClass())
-            return false;
-
-        return this.packed() == ((Score) other).packed();
+        if (other instanceof Score)
+            return this.packed() == ((Score) other).packed();
+        return false;
+        
     }
 }

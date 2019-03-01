@@ -71,8 +71,6 @@ public final class Bits32 {
             return 0;
         bits = bits & mask(start, size);
         bits = bits >>> start;
-//        bits = bits << Integer.SIZE - size - start;
-//        bits = bits >>> Integer.SIZE - size;
         return bits;
     }
 
