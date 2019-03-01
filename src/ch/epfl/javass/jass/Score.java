@@ -147,9 +147,16 @@ public final class Score {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object other) {
+<<<<<<< HEAD
             if (other instanceof Score )
                 return this.packed() == ((Score) other).packed();
 
             return false;
+=======
+        if (other instanceof Score)
+            return this.packed() == ((Score) other).packed();
+        return false;
+        
+>>>>>>> jon
     }
 }
