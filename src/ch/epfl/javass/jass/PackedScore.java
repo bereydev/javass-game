@@ -2,6 +2,7 @@
 package ch.epfl.javass.jass;
 
 import ch.epfl.javass.bits.Bits64;
+
 /**
  * @author Jonathan Bereyziat (282962)
  *
@@ -12,7 +13,9 @@ public final class PackedScore {
 
     /**
      * @param pkScore
-     * @return
+     *            the Long that represent the score informations about the two
+     *            teams
+     * @return true if the pkScore is valid and false otherwise
      */
     public static boolean isValid(long pkScore) {
         long score1 = Bits64.extract(pkScore, 0, 32);
@@ -35,12 +38,19 @@ public final class PackedScore {
 
     /**
      * @param turnTricks1
+     *            the number of tricks won by the Team 1 during the current turn
      * @param turnPoints1
+     *            the points won by the Team 1 during the current turn
      * @param gamePoints1
+     *            the total points of the Team 1 during the game
      * @param turnTricks2
+     *            the number of tricks won by the Team 2 during the current turn
      * @param turnPoints2
+     *            the points won by the Team 2 during the current turn
      * @param gamePoints2
-     * @return
+     *            the total points of the Team 2 during the game
+     * @return all the informations about the scores of the game packed in a
+     *         Long number
      */
     public static long pack(int turnTricks1, int turnPoints1, int gamePoints1,
             int turnTricks2, int turnPoints2, int gamePoints2) {
@@ -56,8 +66,11 @@ public final class PackedScore {
 
     /**
      * @param pkScore
+     *            the Long that represent the score informations about the two
+     *            teams
      * @param t
-     * @return
+     *            the Team you want to get the number of tricks
+     * @return the number of tricks won by the Team t during the turn
      */
     public static int turnTricks(long pkScore, TeamId t) {
         assert isValid(pkScore);
@@ -71,8 +84,11 @@ public final class PackedScore {
 
     /**
      * @param pkScore
+     *            the Long that represent the score informations about the two
+     *            teams
      * @param t
-     * @return
+     *            the Team you want to get the points of the turn
+     * @return the points won by the Team t during the turn
      */
     public static int turnPoints(long pkScore, TeamId t) {
         assert isValid(pkScore);
@@ -85,8 +101,11 @@ public final class PackedScore {
 
     /**
      * @param pkScore
+     *            the Long that represent the score informations about the two
+     *            teams
      * @param t
-     * @return
+     *            the Team you want to get the points of the game
+     * @return the total points won by the Team t during the game
      */
     public static int gamePoints(long pkScore, TeamId t) {
         assert isValid(pkScore);
@@ -99,8 +118,13 @@ public final class PackedScore {
 
     /**
      * @param pkScore
+     *            the Long that represent the score informations about the two
+     *            teams
      * @param t
-     * @return
+     *            the Team you want to get the total points (from the game +
+     *            from the current turn)
+     * @return the total points won by the Team t during the game and the
+     *         current turn
      */
     public static int totalPoints(long pkScore, TeamId t) {
         assert isValid(pkScore);
@@ -109,9 +133,13 @@ public final class PackedScore {
 
     /**
      * @param pkScore
+     *            the Long that represent the score informations about the two
+     *            teams
      * @param winningTeam
+     *            the team that has won the current trick
      * @param trickPoints
-     * @return
+     *            the number of points that are given by the current trick
+     * @return the packed score with updated data after the end of a trick
      */
     public static long withAdditionalTrick(long pkScore, TeamId winningTeam,
             int trickPoints) {
@@ -139,7 +167,10 @@ public final class PackedScore {
 
     /**
      * @param pkScore
-     * @return
+     *            the Long that represent the score informations about the two
+     *            teams
+     * @return the packed score with reinitialized turn tricks and turn points
+     *         and updated game score
      */
     public static long nextTurn(long pkScore) {
         assert isValid(pkScore);
@@ -154,8 +185,12 @@ public final class PackedScore {
     }
 
     /**
+     *Used to debug purpose
      * @param pkScore
+     *            the Long that represent the score informations about the two
+     *            teams
      * @return
+     * the String that represent the pkScore with decimal numbers in a custom layout
      */
     public static String toString(long pkScore) {
         assert isValid(pkScore);
