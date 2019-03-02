@@ -1,5 +1,6 @@
 package ch.epfl.javass.jass;
 
+import ch.epfl.javass.Preconditions;
 import ch.epfl.javass.bits.Bits32;
 import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.Card.Rank;
@@ -8,6 +9,12 @@ import ch.epfl.javass.jass.Card.Rank;
  * @author : Alexandre Santangelo Date : Feb 19, 2019
  */
 public class PackedCard {
+    
+    /**
+     * Private constructor you can't instantiate
+     */
+    private PackedCard() {
+    }
 
     public static int INVALID = 63;
 
@@ -43,7 +50,7 @@ public class PackedCard {
      * @return Color of the card
      */
     public static Card.Color color(int pkCard) {
-        assert isValid(pkCard);
+        Preconditions.checkArgument(isValid(pkCard));
         int color = Bits32.extract(pkCard, 4, 2);
         return Color.values()[color];
     }
@@ -54,7 +61,7 @@ public class PackedCard {
      * @return Rank of the card
      */
     public static Card.Rank rank(int pkCard) {
-        assert isValid(pkCard);
+        Preconditions.checkArgument(isValid(pkCard));
         int rank = Bits32.extract(pkCard, 0, 4);
         return Rank.values()[rank];
     }
@@ -69,7 +76,7 @@ public class PackedCard {
      * @return true if pkCardL is better than pkCardR
      */
     public static boolean isBetter(Card.Color trump, int pkCardL, int pkCardR) {
-        assert isValid(pkCardL) && isValid(pkCardR);
+        Preconditions.checkArgument(isValid(pkCardL) && isValid(pkCardR));
 
         if (color(pkCardL) == trump && color(pkCardR) == trump) {
             return rank(pkCardL).trumpOrdinal() > rank(pkCardR).trumpOrdinal();
@@ -95,6 +102,7 @@ public class PackedCard {
      * @return The points that card gives
      */
     public static int points(Card.Color trump, int pkCard) {
+        Preconditions.checkArgument(isValid(pkCard));
         int rank = Bits32.extract(pkCard, 0, 4);
 
         if (trump.ordinal() == Bits32.extract(pkCard, 4, 2)) { // Card has trump
@@ -127,6 +135,7 @@ public class PackedCard {
      * @return The appearance of the card
      */
     public static String toString(int pkCard) {
+        Preconditions.checkArgument(isValid(pkCard));
         return color(pkCard).toString() + rank(pkCard).toString();
     }
 

@@ -4,6 +4,12 @@ package ch.epfl.javass.bits;
 import ch.epfl.javass.Preconditions;
 
 public class Bits64 {
+    
+    /**
+     * Private constructor you can't instantiate
+     */
+    private Bits64() {
+    }
 
     /**
      * Private method that find the "size" of an integer bit string

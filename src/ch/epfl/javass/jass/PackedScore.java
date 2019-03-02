@@ -1,6 +1,7 @@
 
 package ch.epfl.javass.jass;
 
+import ch.epfl.javass.Preconditions;
 import ch.epfl.javass.bits.Bits64;
 
 /**
@@ -8,6 +9,12 @@ import ch.epfl.javass.bits.Bits64;
  *
  */
 public final class PackedScore {
+    
+    /**
+     * Private constructor you can't instantiate
+     */
+    private PackedScore() {
+    }
 
     public static final long INITIAL = 0;
 
@@ -73,7 +80,7 @@ public final class PackedScore {
      * @return the number of tricks won by the Team t during the turn
      */
     public static int turnTricks(long pkScore, TeamId t) {
-        assert isValid(pkScore);
+        Preconditions.checkArgument(isValid(pkScore));
         if (t == TeamId.TEAM_1) {
             return (int) Bits64.extract(pkScore, 0, 4);
         } else {
@@ -91,7 +98,7 @@ public final class PackedScore {
      * @return the points won by the Team t during the turn
      */
     public static int turnPoints(long pkScore, TeamId t) {
-        assert isValid(pkScore);
+        Preconditions.checkArgument(isValid(pkScore));
         if (t == TeamId.TEAM_1) {
             return (int) Bits64.extract(pkScore, 4, 9);
         } else {
@@ -108,7 +115,7 @@ public final class PackedScore {
      * @return the total points won by the Team t during the game
      */
     public static int gamePoints(long pkScore, TeamId t) {
-        assert isValid(pkScore);
+        Preconditions.checkArgument(isValid(pkScore));
         if (t == TeamId.TEAM_1) {
             return (int) Bits64.extract(pkScore, 13, 11);
         } else {
@@ -127,11 +134,10 @@ public final class PackedScore {
      *         current turn
      */
     public static int totalPoints(long pkScore, TeamId t) {
-        assert isValid(pkScore);
+        Preconditions.checkArgument(isValid(pkScore));
         return gamePoints(pkScore, t) + turnPoints(pkScore, t);
     }
 
-  
     /**
      * @param pkScore
      *            the Long that represent the score informations about the two
@@ -144,7 +150,7 @@ public final class PackedScore {
      */
     public static long withAdditionalTrick(long pkScore, TeamId winningTeam,
             int trickPoints) {
-        assert isValid(pkScore);
+        Preconditions.checkArgument(isValid(pkScore));
         int turnTricksWin = turnTricks(pkScore, winningTeam);
         int turnPointsWin = turnPoints(pkScore, winningTeam);
         int gamePointsWin = gamePoints(pkScore, winningTeam);
@@ -174,7 +180,7 @@ public final class PackedScore {
      *         and updated game score
      */
     public static long nextTurn(long pkScore) {
-        assert isValid(pkScore);
+        Preconditions.checkArgument(isValid(pkScore));
         int turnPoints1 = turnPoints(pkScore, TeamId.TEAM_1);
         int gamePoints1 = gamePoints(pkScore, TeamId.TEAM_1);
         int turnPoints2 = turnPoints(pkScore, TeamId.TEAM_2);
@@ -186,15 +192,16 @@ public final class PackedScore {
     }
 
     /**
-     *Used to debug purpose
+     * Used to debug purpose
+     * 
      * @param pkScore
      *            the Long that represent the score informations about the two
      *            teams
-     * @return
-     * the String that represent the pkScore with decimal numbers in a custom layout
+     * @return the String that represent the pkScore with decimal numbers in a
+     *         custom layout
      */
     public static String toString(long pkScore) {
-        assert isValid(pkScore);
+        Preconditions.checkArgument(isValid(pkScore));
 
         return "(" + turnTricks(pkScore, TeamId.TEAM_1) + ","
                 + turnPoints(pkScore, TeamId.TEAM_1) + ","

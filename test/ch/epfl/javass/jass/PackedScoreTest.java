@@ -147,10 +147,10 @@ class PackedScoreTest {
                 (int gamePoints1, int turnPoints1, int turnTricks1,
                         int gamePoints2, int turnPoints2, int turnTricks2,
                         long rd, long invalidCard, int trickPoints) -> {
-                    assertThrows(AssertionError.class, () -> {
+                    assertThrows(IllegalArgumentException.class, () -> {
                         PackedScore.turnTricks(invalidCard, TeamId.TEAM_1);
                     });
-                    assertThrows(AssertionError.class, () -> {
+                    assertThrows(IllegalArgumentException.class, () -> {
                         PackedScore.turnTricks(invalidCard, TeamId.TEAM_2);
                     });
                 });
@@ -174,10 +174,10 @@ class PackedScoreTest {
                 (int gamePoints1, int turnPoints1, int turnTricks1,
                         int gamePoints2, int turnPoints2, int turnTricks2,
                         long rd, long invalidCard, int trickPoints) -> {
-                    assertThrows(AssertionError.class, () -> {
+                    assertThrows(IllegalArgumentException.class, () -> {
                         PackedScore.turnPoints(invalidCard, TeamId.TEAM_1);
                     });
-                    assertThrows(AssertionError.class, () -> {
+                    assertThrows(IllegalArgumentException.class, () -> {
                         PackedScore.turnPoints(invalidCard, TeamId.TEAM_2);
                     });
                 });
@@ -201,10 +201,10 @@ class PackedScoreTest {
                 (int gamePoints1, int turnPoints1, int turnTricks1,
                         int gamePoints2, int turnPoints2, int turnTricks2,
                         long rd, long invalidCard, int trickPoints) -> {
-                    assertThrows(AssertionError.class, () -> {
+                    assertThrows(IllegalArgumentException.class, () -> {
                         PackedScore.gamePoints(invalidCard, TeamId.TEAM_1);
                     });
-                    assertThrows(AssertionError.class, () -> {
+                    assertThrows(IllegalArgumentException.class, () -> {
                         PackedScore.gamePoints(invalidCard, TeamId.TEAM_2);
                     });
                 });
@@ -228,10 +228,10 @@ class PackedScoreTest {
                 (int gamePoints1, int turnPoints1, int turnTricks1,
                         int gamePoints2, int turnPoints2, int turnTricks2,
                         long rd, long invalidCard, int trickPoints) -> {
-                    assertThrows(AssertionError.class, () -> {
+                    assertThrows(IllegalArgumentException.class, () -> {
                         PackedScore.totalPoints(invalidCard, TeamId.TEAM_1);
                     });
-                    assertThrows(AssertionError.class, () -> {
+                    assertThrows(IllegalArgumentException.class, () -> {
                         PackedScore.totalPoints(invalidCard, TeamId.TEAM_2);
                     });
                 });
@@ -271,11 +271,11 @@ class PackedScoreTest {
                 (int gamePoints1, int turnPoints1, int turnTricks1,
                         int gamePoints2, int turnPoints2, int turnTricks2,
                         long rd, long invalidCard, int trickPoints) -> {
-                    assertThrows(AssertionError.class, () -> {
+                    assertThrows(IllegalArgumentException.class, () -> {
                         PackedScore.withAdditionalTrick(invalidCard,
                                 TeamId.TEAM_1, trickPoints);
                     });
-                    assertThrows(AssertionError.class, () -> {
+                    assertThrows(IllegalArgumentException.class, () -> {
                         PackedScore.withAdditionalTrick(invalidCard,
                                 TeamId.TEAM_2, trickPoints);
                     });
@@ -303,7 +303,7 @@ class PackedScoreTest {
                 (int gamePoints1, int turnPoints1, int turnTricks1,
                         int gamePoints2, int turnPoints2, int turnTricks2,
                         long rd, long invalidCard, int trickPoints) -> {
-                    assertThrows(AssertionError.class, () -> {
+                    assertThrows(IllegalArgumentException.class, () -> {
                         PackedScore.nextTurn(invalidCard);
                     });
                 });
