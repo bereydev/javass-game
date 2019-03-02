@@ -131,6 +131,7 @@ public final class PackedScore {
         return gamePoints(pkScore, t) + turnPoints(pkScore, t);
     }
 
+  
     /**
      * @param pkScore
      *            the Long that represent the score informations about the two
