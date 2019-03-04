@@ -3,7 +3,6 @@
  */
 package ch.epfl.javass.jass;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.javass.Preconditions;
@@ -14,27 +13,17 @@ import ch.epfl.javass.Preconditions;
  */
 public class CardSet {
 
-    private List<Card> cardList;
+    private long pkCardSet;
 
     /**
      * private constructor you can't instantiate
      */
-    private CardSet(List<Card> cards) {
-        cardList = cards;
+    private CardSet(long pkCards) {
+        pkCardSet = pkCards;
     }
 
-    public static final CardSet EMPTY = new CardSet(new ArrayList<Card>());
-    public static final CardSet ALL_CARDS = new CardSet(allCardsList());
-
-    private static ArrayList<Card> allCardsList() {
-        long allCards = PackedCardSet.ALL_CARDS;
-        ArrayList<Card> allCardsList = new ArrayList<Card>();
-        for (int i = 0; i < 36; i++) {
-            int card = PackedCardSet.get(allCards, i);
-            allCardsList.add(Card.ofPacked(card));
-        }
-        return allCardsList;
-    }
+    public static final long EMPTY = PackedCardSet.EMPTY;
+    public static final long ALL_CARDS = PackedCardSet.ALL_CARDS;
 
     /**
      * @param cards
@@ -43,7 +32,11 @@ public class CardSet {
      * A new CardSet 
      */
     public static CardSet of(List<Card> cards) {
-        return new CardSet(cards);
+        long pkCardSet = EMPTY;
+        for (Card card : cards) {
+            PackedCardSet.add(pkCardSet, card.packed());
+        }
+        return new CardSet(pkCardSet);
     }
 
     /**
@@ -54,14 +47,7 @@ public class CardSet {
      */
     public static CardSet ofPacked(long packed) {
         Preconditions.checkArgument(PackedCardSet.isValid(packed));
-        ArrayList<Card> cardsList = new ArrayList<Card>();
-        int length = PackedCardSet.size(packed);
-        for (int i = 0; i < length; i++) {
-            int card = PackedCardSet.get(packed, 0);
-            cardsList.add(Card.ofPacked(card));
-            PackedCardSet.remove(packed, card);
-        }
-        return new CardSet(cardsList);
+        return new CardSet(packed);
     }
 
     /**
@@ -69,10 +55,6 @@ public class CardSet {
      * the packed version of the CardSet
      */
     public long packed() {
-        long pkCardSet = 0L;
-        for (Card c : cardList) {
-            pkCardSet = PackedCardSet.add(pkCardSet, c.packed());
-        }
         return pkCardSet;
     }
 
@@ -81,8 +63,7 @@ public class CardSet {
      * True if there is no card in the CardSet
      */
     public boolean isEmpty() {
-        return cardList.isEmpty();
-        // methode de Arraylist ou de PackedCardSet ?
+        return PackedCardSet.isEmpty(pkCardSet);
     }
 
     /**
@@ -90,7 +71,7 @@ public class CardSet {
      * The number of card in the CardSet
      */
     public int size() {
-        return cardList.size();
+        return PackedCardSet.size(pkCardSet);
     }
 
     /**
@@ -99,8 +80,7 @@ public class CardSet {
      * @return
      */
     public Card get(int index) {
-        int card = PackedCardSet.get(this.packed(), index);
-        return Card.ofPacked(card);
+        return Card.ofPacked(PackedCardSet.get(pkCardSet, index));
     }
 
     /**
@@ -109,11 +89,8 @@ public class CardSet {
      * @return
      * the CardSet with the added Card
      */
-    public CardSet add(Card card) {
-//        this.cardList.add(card);
-        
-        return ofPacked(PackedCardSet.add(this.packed(), card.packed()));
-//        Changer la valeur ou retourner une autre ?
+    public CardSet add(Card card) { 
+        return ofPacked(PackedCardSet.add(pkCardSet, card.packed()));
     }
 
     /**
@@ -123,7 +100,7 @@ public class CardSet {
      * the CardSet withe the removed Card
      */
     public CardSet remove(Card card) {
-        return ofPacked(PackedCardSet.remove(this.packed(), card.packed()));
+        return ofPacked(PackedCardSet.remove(pkCardSet, card.packed()));
     }
 
     /**
@@ -133,7 +110,7 @@ public class CardSet {
      * True if the card is in the CardSet
      */
     public boolean contains(Card card) {
-        return PackedCardSet.contains(this.packed(), card.packed());
+        return PackedCardSet.contains(pkCardSet, card.packed());
     }
 
     /**
@@ -141,7 +118,7 @@ public class CardSet {
      * the complement of the CardSet
      */
     public CardSet complement() {
-        return ofPacked(PackedCardSet.complement(this.packed()));
+        return ofPacked(PackedCardSet.complement(pkCardSet));
     }
 
     /**
@@ -151,7 +128,7 @@ public class CardSet {
      * the logical union of that and the CardSet
      */
     public CardSet union(CardSet that) {
-        return ofPacked(PackedCardSet.union(this.packed(), that.packed()));
+        return ofPacked(PackedCardSet.union(pkCardSet, that.packed()));
     }
 
     /**
@@ -161,7 +138,7 @@ public class CardSet {
      * the logical intersection of that and the CardSet
      */
     public CardSet intersection(CardSet that) {
-        return ofPacked(PackedCardSet.intersection(this.packed(), that.packed()));
+        return ofPacked(PackedCardSet.intersection(pkCardSet, that.packed()));
     }
 
     /**
@@ -171,7 +148,7 @@ public class CardSet {
      * the difference between the CardSet and that
      */
     public CardSet difference(CardSet that) {
-        return ofPacked(PackedCardSet.difference(this.packed(), that.packed()));
+        return ofPacked(PackedCardSet.difference(pkCardSet, that.packed()));
     }
 
     /**
@@ -181,7 +158,7 @@ public class CardSet {
      * the subset of the color "color"
      */
     public CardSet subsetOfColor(Card.Color color) {
-        return ofPacked(PackedCardSet.subsetOfColor(this.packed(), color));
+        return ofPacked(PackedCardSet.subsetOfColor(pkCardSet, color));
     }
 
 }

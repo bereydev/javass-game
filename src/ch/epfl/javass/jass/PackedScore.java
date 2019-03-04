@@ -1,7 +1,6 @@
 
 package ch.epfl.javass.jass;
 
-import ch.epfl.javass.Preconditions;
 import ch.epfl.javass.bits.Bits64;
 
 /**
@@ -80,7 +79,7 @@ public final class PackedScore {
      * @return the number of tricks won by the Team t during the turn
      */
     public static int turnTricks(long pkScore, TeamId t) {
-        Preconditions.checkArgument(isValid(pkScore));
+        assert (isValid(pkScore));
         if (t == TeamId.TEAM_1) {
             return (int) Bits64.extract(pkScore, 0, 4);
         } else {
@@ -98,7 +97,7 @@ public final class PackedScore {
      * @return the points won by the Team t during the turn
      */
     public static int turnPoints(long pkScore, TeamId t) {
-        Preconditions.checkArgument(isValid(pkScore));
+        assert (isValid(pkScore));
         if (t == TeamId.TEAM_1) {
             return (int) Bits64.extract(pkScore, 4, 9);
         } else {
@@ -115,7 +114,7 @@ public final class PackedScore {
      * @return the total points won by the Team t during the game
      */
     public static int gamePoints(long pkScore, TeamId t) {
-        Preconditions.checkArgument(isValid(pkScore));
+        assert (isValid(pkScore));
         if (t == TeamId.TEAM_1) {
             return (int) Bits64.extract(pkScore, 13, 11);
         } else {
@@ -134,7 +133,7 @@ public final class PackedScore {
      *         current turn
      */
     public static int totalPoints(long pkScore, TeamId t) {
-        Preconditions.checkArgument(isValid(pkScore));
+        assert (isValid(pkScore));
         return gamePoints(pkScore, t) + turnPoints(pkScore, t);
     }
 
@@ -150,7 +149,7 @@ public final class PackedScore {
      */
     public static long withAdditionalTrick(long pkScore, TeamId winningTeam,
             int trickPoints) {
-        Preconditions.checkArgument(isValid(pkScore));
+        assert (isValid(pkScore));
         int turnTricksWin = turnTricks(pkScore, winningTeam);
         int turnPointsWin = turnPoints(pkScore, winningTeam);
         int gamePointsWin = gamePoints(pkScore, winningTeam);
@@ -180,7 +179,7 @@ public final class PackedScore {
      *         and updated game score
      */
     public static long nextTurn(long pkScore) {
-        Preconditions.checkArgument(isValid(pkScore));
+        assert (isValid(pkScore));
         int turnPoints1 = turnPoints(pkScore, TeamId.TEAM_1);
         int gamePoints1 = gamePoints(pkScore, TeamId.TEAM_1);
         int turnPoints2 = turnPoints(pkScore, TeamId.TEAM_2);
@@ -201,7 +200,7 @@ public final class PackedScore {
      *         custom layout
      */
     public static String toString(long pkScore) {
-        Preconditions.checkArgument(isValid(pkScore));
+        assert (isValid(pkScore));
 
         return "(" + turnTricks(pkScore, TeamId.TEAM_1) + ","
                 + turnPoints(pkScore, TeamId.TEAM_1) + ","
