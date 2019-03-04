@@ -22,8 +22,8 @@ public class CardSet {
         pkCardSet = pkCards;
     }
 
-    public static final long EMPTY = PackedCardSet.EMPTY;
-    public static final long ALL_CARDS = PackedCardSet.ALL_CARDS;
+    public static final CardSet EMPTY = new CardSet(PackedCardSet.EMPTY);
+    public static final CardSet ALL_CARDS = new CardSet(PackedCardSet.ALL_CARDS);
 
     /**
      * @param cards
@@ -32,11 +32,11 @@ public class CardSet {
      * A new CardSet 
      */
     public static CardSet of(List<Card> cards) {
-        long pkCardSet = EMPTY;
+        CardSet cardSet = EMPTY;
         for (Card card : cards) {
-            PackedCardSet.add(pkCardSet, card.packed());
+            cardSet.add(card);
         }
-        return new CardSet(pkCardSet);
+        return cardSet;
     }
 
     /**

@@ -86,10 +86,9 @@ public final class PackedCardSet {
      * @return A singleton containing only pkCard
      */
     public static long singleton(int pkCard) {
-        assert ((PackedCard.isValid(pkCard)));
-        long rank = (long) Bits32.extract(pkCard, 0, 4);
+        assert (PackedCard.isValid(pkCard));
 
-        return rank << Bits32.extract(pkCard, 4, 2) * 16;
+        return 1L << pkCard;
     }
 
     /**
@@ -120,7 +119,7 @@ public final class PackedCardSet {
      * @return The packed card version of the card at position index
      */
     public static int get(long pkCardSet, int index) {
-        assert (isValid(pkCardSet) && size(pkCardSet) < index);
+        assert (isValid(pkCardSet) && size(pkCardSet) > index);
         for (int i = 0; i < index; i++) {
             pkCardSet = pkCardSet & ~Long.lowestOneBit(pkCardSet);
         }
