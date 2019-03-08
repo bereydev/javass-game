@@ -24,49 +24,49 @@ public final class Trick {
     public static Trick ofPacked(int packed) {
         return null; 
     }
-    public static int packed() {
+    public int packed() {
         return 0; 
     }
-    public static Trick nextEmpty() {
+    public Trick nextEmpty() {
         return null; 
     }
-    public static boolean isEmpty() {
+    public boolean isEmpty() {
         return false; 
     }
-    public static boolean isFull() {
+    public boolean isFull() {
         return false; 
     }
-    public static boolean isLast() {
+    public boolean isLast() {
         return false; 
     }
-    public static int size() {
+    public int size() {
         return 0; 
     }
-    public static Color trump() {
+    public Color trump() {
         return null; 
     }
-    public static int index() {
+    public int index() {
         return 0; 
     }
-    public static PlayerId player(int index) {
+    public PlayerId player(int index) {
         return null; 
     }
-    public static Card card(int index) {
+    public Card card(int index) {
         return null; 
     }
-    public static Trick withAddedCard(Card c) {
+    public Trick withAddedCard(Card c) {
         return null; 
     }
-    public static Color baseColor() {
+    public Color baseColor() {
         return null; 
     }
-    public static CardSet playableCards(CardSet hand) {
+    public CardSet playableCards(CardSet hand) {
         return null; 
     }
-    public static int points() {
+    public int points() {
         return 0; 
     }
-    public static PlayerId winningPlayer() {
+    public PlayerId winningPlayer() {
         return null; 
     }
 }

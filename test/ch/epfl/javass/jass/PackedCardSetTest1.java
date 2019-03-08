@@ -14,10 +14,6 @@ import org.junit.jupiter.api.Test;
 
 import ch.epfl.javass.jass.Card.Color;
 
-interface PackedCardSetTestValid {
-    void test(Card[] lc, int size, long validCardSet);
-}
-
 class PackedCardSetTest {
 
     long mask = 0b0000000_111111111_0000000_111111111_0000000_111111111_0000000_111111111L;
@@ -134,7 +130,8 @@ class PackedCardSetTest {
         for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
             long pkCardSet = rng.nextLong() & mask;
             for(int pkCard : singletonList.keySet())
-                assertEquals(pkCardSet | (long)singletonList.get(pkCard), PackedCardSet.add(pkCardSet, pkCard));
+                if((pkCardSet | (long)singletonList.get(pkCard)) != pkCardSet)
+                    assertEquals(pkCardSet | (long)singletonList.get(pkCard), PackedCardSet.add(pkCardSet, pkCard));
         }
     }
 
@@ -144,7 +141,8 @@ class PackedCardSetTest {
         for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
             long pkCardSet = rng.nextLong() & mask;
             for(int pkCard : singletonList.keySet())
-                assertEquals(pkCardSet & ~(long)singletonList.get(pkCard), PackedCardSet.remove(pkCardSet, pkCard));
+                if((pkCardSet & ~(long)singletonList.get(pkCard)) != pkCardSet)
+                    assertEquals(pkCardSet & ~(long)singletonList.get(pkCard), PackedCardSet.remove(pkCardSet, pkCard));
         }
     }
 
