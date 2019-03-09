@@ -11,6 +11,7 @@ package ch.epfl.javass.jass;
 import java.util.StringJoiner;
 import ch.epfl.javass.bits.Bits32;
 import ch.epfl.javass.jass.Card.Color;
+import ch.epfl.javass.jass.Card.Rank;
 
 public final class PackedTrick {
 
@@ -216,7 +217,54 @@ public final class PackedTrick {
      * @return A collection of all the playable cards
      */
     public static long playableCards(int pkTrick, long pkHand) {
-        return 0;
+        long playableCardSet = PackedCardSet.EMPTY;
+        long trickColorInHand = PackedCardSet.subsetOfColor(pkHand,
+                baseColor(pkTrick));
+        if (baseColor(pkTrick) == trump(pkTrick)) {
+            if (PackedCardSet.size(trickColorInHand) == 0 || (PackedCardSet
+                    .size(trickColorInHand) == 1
+                    && PackedCardSet.contains(trickColorInHand,
+                            PackedCard.pack(trump(pkTrick), Rank.JACK)))) {
+                playableCardSet = pkHand;
+            } else {
+                playableCardSet = trickColorInHand;
+            }
+        } else {
+            if (PackedCardSet.size(trickColorInHand) == 0) {
+                if (PackedCard.color(winningCard(pkTrick)) == trump(pkTrick)) {
+                    playableCardSet = PackedCardSet.union(
+                            PackedCardSet.difference(pkHand,
+                                    PackedCardSet.subsetOfColor(pkHand,
+                                            trump(pkTrick))),
+                            PackedCardSet.trumpAbove(winningCard(pkTrick)));
+                } else {
+                    playableCardSet = pkHand;
+                }
+            } else {
+                if (PackedCard.color(winningCard(pkTrick)) == trump(pkTrick)) {
+                    playableCardSet = PackedCardSet.union(trickColorInHand,
+                            PackedCardSet.trumpAbove(winningCard(pkTrick)));
+                } else {
+                    playableCardSet = trickColorInHand;
+                }
+            }
+        }
+        return playableCardSet;
+    }
+
+    /**
+     * @param pkTrick
+     * @return the winning card of the pkTrick
+     */
+    private static int winningCard(int pkTrick) {
+        int winningCard = card(pkTrick, 0);
+        for (int i = 0; i < size(pkTrick); i++) {
+            int pkCard = card(pkTrick, i);
+            if (PackedCard.isBetter(trump(pkTrick), pkCard, winningCard)) {
+                winningCard = pkCard;
+            }
+        }
+        return winningCard;
     }
 
     /**
@@ -249,7 +297,7 @@ public final class PackedTrick {
             int pkCard = card(pkTrick, i);
             if (PackedCard.isBetter(trump(pkTrick), pkCard, winningCard)) {
                 winningCard = pkCard;
-                winningPosition ++;
+                winningPosition++;
             }
         }
         return player(pkTrick, winningPosition);
