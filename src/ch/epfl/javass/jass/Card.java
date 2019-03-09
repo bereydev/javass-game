@@ -1,6 +1,9 @@
 package ch.epfl.javass.jass;
 
 import java.util.List;
+
+import ch.epfl.javass.bits.Bits32;
+
 import java.util.Collections;
 import java.util.Arrays;
 
@@ -9,12 +12,13 @@ import java.util.Arrays;
  */
 public final class Card {
 
-    private Color color;
-    private Rank rank;
+    private int pkCard; 
+    
+    private static final int RANK_SIZE =4; 
+    private static final int COLOR_SIZE =2; 
 
     private Card(Color c, Rank r) {
-        rank = r;
-        color = c;
+        pkCard = PackedCard.pack(c, r);  
     }
 
     /**
@@ -44,21 +48,21 @@ public final class Card {
      * @return The packed version of the card
      */
     public int packed() {
-        return PackedCard.pack(this.color, this.rank);
+        return pkCard; 
     }
 
     /**
      * @return The color of the card
      */
     public Color color() {
-        return this.color;
+        return PackedCard.color(pkCard);
     }
 
     /**
      * @return The rank of the card
      */
     public Rank rank() {
-       return this.rank;
+       return PackedCard.rank(pkCard); 
     }
 
     /**

@@ -54,7 +54,7 @@ public final class PackedTrick {
      *            The trump color of the trick
      * @param firstPlayer
      *            The given player
-     * @return
+     * @return  An empty trick (no cards and index is zero) 
      */
     public static int firstEmpty(Color trump, PlayerId firstPlayer) {
 
