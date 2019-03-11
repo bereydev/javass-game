@@ -128,6 +128,7 @@ public final class Score {
      * 
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return Long.hashCode(this.packed());
     }
@@ -137,6 +138,7 @@ public final class Score {
      * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return PackedScore.toString(this.packed());
     }
@@ -146,6 +148,7 @@ public final class Score {
      * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object other) {
 
         if (other instanceof Score)

@@ -34,7 +34,7 @@ public class CardSet {
     public static CardSet of(List<Card> cards) {
         CardSet cardSet = EMPTY;
         for (Card card : cards) {
-            cardSet.add(card);
+            cardSet = cardSet.add(card);
         }
         return cardSet;
     }
@@ -97,7 +97,7 @@ public class CardSet {
      * @param card
      * the Card you want to remove
      * @return
-     * the CardSet withe the removed Card
+     * the CardSet with the removed Card
      */
     public CardSet remove(Card card) {
         return ofPacked(PackedCardSet.remove(pkCardSet, card.packed()));
@@ -159,6 +159,40 @@ public class CardSet {
      */
     public CardSet subsetOfColor(Card.Color color) {
         return ofPacked(PackedCardSet.subsetOfColor(pkCardSet, color));
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return Long.hashCode(pkCardSet);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return PackedCardSet.toString(pkCardSet);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        if (other instanceof CardSet)
+            return pkCardSet == ((CardSet) other).packed();
+        return false;
+        
     }
 
 }
