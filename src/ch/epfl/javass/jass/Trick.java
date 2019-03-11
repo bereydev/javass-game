@@ -3,71 +3,160 @@
  *	Date   : Mar 4, 2019	
 */
 
-/**
- * 
- */
+
 package ch.epfl.javass.jass;
 
 import ch.epfl.javass.jass.Card.Color;
 
 public final class Trick {
 
-    public final static Trick INVALID = new Trick(); 
-    
-    public Trick() {
-        //TODO (remember : class is immutable) 
+    public final static Trick INVALID = new Trick(PackedTrick.INVALID);
+
+    private int pkTrick;
+
+    private Trick(int pkTrick) {
+        this.pkTrick = pkTrick;
+
     }
-    
+
+    /**
+     * @param trump
+     * @param firstPlayer
+     * @return Same behavior as PackedTrick's functions
+     */
     public static Trick firstEmpty(Color trump, PlayerId firstPlayer) {
-        return null; 
+        return new Trick(PackedTrick.firstEmpty(trump, firstPlayer));
     }
+
+    /**
+     * @param packed
+     *            A Packed Trick
+     * @return The unpacked version of the trick
+     */
     public static Trick ofPacked(int packed) {
-        return null; 
+        return new Trick(packed);
     }
+
+    /**
+     * @return The unpacked version of the trick
+     */
     public int packed() {
-        return 0; 
+        return pkTrick;
     }
+
+    /**
+     * @return Same behavior as PackedTrick's functions
+     */
     public Trick nextEmpty() {
-        return null; 
+        return new Trick(PackedTrick.nextEmpty(pkTrick));
     }
+
+    /**
+     * @return Same behavior as PackedTrick's functions
+     */
     public boolean isEmpty() {
-        return false; 
+        return PackedTrick.isEmpty(pkTrick);
     }
+
+    /**
+     * @return Same behavior as PackedTrick's functions
+     */
     public boolean isFull() {
-        return false; 
+        return PackedTrick.isFull(pkTrick);
     }
+
+    /**
+     * @return Same behavior as PackedTrick's functions
+     */
     public boolean isLast() {
+        return PackedTrick.isLast(pkTrick);
+    }
+
+    /**
+     * @return Same behavior as PackedTrick's functions
+     */
+    public int size() {
+        return PackedTrick.size(pkTrick);
+    }
+
+    /**
+     * @return Same behavior as PackedTrick's functions
+     */
+    public Color trump() {
+        return PackedTrick.trump(pkTrick);
+    }
+
+    /**
+     * @return Same behavior as PackedTrick's functions
+     */
+    public int index() {
+        return PackedTrick.index(pkTrick);
+    }
+
+    /**
+     * @param index
+     * @return Same behavior as PackedTrick's functions
+     */
+    public PlayerId player(int index) {
+        return PackedTrick.player(pkTrick, index);
+    }
+
+    /**
+     * @param index
+     * @return Same behavior as PackedTrick's functions
+     */
+    public Card card(int index) {
+        return Card.ofPacked(PackedTrick.card(pkTrick, index));
+    }
+
+    /**
+     * @param c
+     * @return Same behavior as PackedTrick's functions
+     */
+    public Trick withAddedCard(Card c) {
+        return new Trick(PackedTrick.withAddedCard(pkTrick, c.packed()));
+    }
+
+    /**
+     * @return Same behavior as PackedTrick's functions
+     */
+    public Color baseColor() {
+        return PackedTrick.baseColor(pkTrick);
+    }
+
+    /**
+     * @param hand
+     * @return Same behavior as PackedTrick's functions
+     */
+    public CardSet playableCards(CardSet hand) {
+
+        return CardSet
+                .ofPacked(PackedTrick.playableCards(pkTrick, hand.packed()));
+    }
+
+    /**
+     * @return Same behavior as PackedTrick's functions
+     */
+    public int points() {
+        return PackedTrick.points(pkTrick);
+    }
+
+    /**
+     * @return Same behavior as PackedTrick's functions
+     */
+    public PlayerId winningPlayer() {
+        return PackedTrick.winningPlayer(pkTrick);
+    }
+    
+    public boolean equals(Object other) {
+        if(other instanceof Trick) {
+            if(((Trick) other).pkTrick == pkTrick)
+                return true; 
+        }
         return false; 
     }
-    public int size() {
-        return 0; 
-    }
-    public Color trump() {
-        return null; 
-    }
-    public int index() {
-        return 0; 
-    }
-    public PlayerId player(int index) {
-        return null; 
-    }
-    public Card card(int index) {
-        return null; 
-    }
-    public Trick withAddedCard(Card c) {
-        return null; 
-    }
-    public Color baseColor() {
-        return null; 
-    }
-    public CardSet playableCards(CardSet hand) {
-        return null; 
-    }
-    public int points() {
-        return 0; 
-    }
-    public PlayerId winningPlayer() {
-        return null; 
+    
+    public int hashCode() {
+        return pkTrick; 
     }
 }
-

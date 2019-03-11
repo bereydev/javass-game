@@ -1,6 +1,6 @@
 /*
- *	Author : Alexandre Santangelo 
- *	Date   : Mar 4, 2019	
+ *  Author : Alexandre Santangelo 
+ *  Date   : Mar 4, 2019    
 */
 
 /**
@@ -29,21 +29,21 @@ public final class PackedTrick {
      * @return True if the trick is correctly packed.
      */
     public static boolean isValid(int pkTrick) {
-        for (int i = 0; i < CARD_SIZE; i++) {
-            boolean aCardIsInvalid = false;
+        
+        boolean aCardIsInvalid = true;
+        
+        for (int i = 0; i <4 ; i++) {
             int card = Bits32.extract(pkTrick, CARD_SIZE * i, CARD_SIZE);
 
-            // INVALID CARD CASE
-            if (!PackedCard.isValid(card)) {
-                if (card == PackedCard.INVALID)
-                    aCardIsInvalid = true;
-                else
-                    return false;
-            }
             // VALID CARD CASE
-            else if (aCardIsInvalid) // Checks if there is an invalid card
-                                     // before a valid one.
-                return false;
+            if (card != PackedCard.INVALID) {
+                if (!aCardIsInvalid)
+                    return false; 
+            }
+            // INVALID CARD CASE
+            else{ 
+                aCardIsInvalid = false; 
+            }
         }
         int index = Bits32.extract(pkTrick, 24, 3);
 
