@@ -245,7 +245,8 @@ public final class PackedTrick {
                     playableCardSet = PackedCardSet.union(trickColorInHand,
                             PackedCardSet.trumpAbove(winningCard(pkTrick)));
                 } else {
-                    playableCardSet = trickColorInHand;
+                    playableCardSet = PackedCardSet.union(trickColorInHand, PackedCardSet.subsetOfColor(pkHand,
+                            trump(pkTrick)));
                 }
             }
         }
