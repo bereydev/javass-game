@@ -147,4 +147,16 @@ public final class Trick {
     public PlayerId winningPlayer() {
         return PackedTrick.winningPlayer(pkTrick);
     }
+    
+    public boolean equals(Object other) {
+        if(other instanceof Trick) {
+            if(((Trick) other).pkTrick == pkTrick)
+                return true; 
+        }
+        return false; 
+    }
+    
+    public int hashCode() {
+        return pkTrick; 
+    }
 }
