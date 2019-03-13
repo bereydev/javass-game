@@ -3,6 +3,8 @@
  */
 package ch.epfl.javass.jass;
 
+import ch.epfl.javass.jass.Card.Color;
+
 /**
  * @author Jonathan Bereyziat
  *
@@ -24,8 +26,8 @@ public final class TurnState {
     
     
     public static TurnState initial(Color trump, Score score, PlayerId firstPlayer) {
-        
-        return new TurnState(score, PackedCardSet.ALL_CARDS, pkTrick)
+        //TODO : I PUT A ZERO BECAUSE THERE IS A BUG HERE ! 
+        return new TurnState(0, PackedCardSet.ALL_CARDS, 0); 
     }
 
 }
