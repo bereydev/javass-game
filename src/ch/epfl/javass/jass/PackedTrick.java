@@ -69,10 +69,11 @@ public final class PackedTrick {
      * @return The next trick, with no cards
      */
     public static int nextEmpty(int pkTrick) {
-
         assert(isValid(pkTrick)); 
+        
         if (isLast(pkTrick))
             return INVALID;
+        
         return Bits32.pack(PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID,
                 CARD_SIZE, PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID,
                 CARD_SIZE, Bits32.extract(pkTrick, 24, 4) + 1, 4,
@@ -305,7 +306,10 @@ public final class PackedTrick {
                 index = i; 
             }
         }
-        return PlayerId.values()[(Bits32.extract(pkTrick, 28, 2) + index)%4];
+        int number = Bits32.extract(pkTrick, 28, 2) + index; 
+        if(number>3)
+            number= number%4; 
+        return PlayerId.values()[number];
     }
 
     /**
