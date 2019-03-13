@@ -159,4 +159,8 @@ public final class Trick {
     public int hashCode() {
         return pkTrick; 
     }
+    
+    public String toString() {
+        return PackedTrick.toString(pkTrick); 
+    }
 }
