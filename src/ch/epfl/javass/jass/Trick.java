@@ -6,6 +6,7 @@
 
 package ch.epfl.javass.jass;
 
+import ch.epfl.javass.Preconditions;
 import ch.epfl.javass.jass.Card.Color;
 
 public final class Trick {
@@ -34,6 +35,7 @@ public final class Trick {
      * @return The unpacked version of the trick
      */
     public static Trick ofPacked(int packed) {
+        Preconditions.checkArgument(PackedTrick.isValid(packed));
         return new Trick(packed);
     }
 
@@ -48,6 +50,9 @@ public final class Trick {
      * @return Same behavior as PackedTrick's functions
      */
     public Trick nextEmpty() {
+        if (!isFull()) {
+            throw new IllegalStateException();
+        }
         return new Trick(PackedTrick.nextEmpty(pkTrick));
     }
 
@@ -98,6 +103,9 @@ public final class Trick {
      * @return Same behavior as PackedTrick's functions
      */
     public PlayerId player(int index) {
+        if (!(index >=0 && index < 4)) {
+            throw new IndexOutOfBoundsException();
+        }
         return PackedTrick.player(pkTrick, index);
     }
 
@@ -106,6 +114,9 @@ public final class Trick {
      * @return Same behavior as PackedTrick's functions
      */
     public Card card(int index) {
+        if (!(index >=0 && index < 4)) {
+            throw new IndexOutOfBoundsException();
+        }
         return Card.ofPacked(PackedTrick.card(pkTrick, index));
     }
 
@@ -145,9 +156,13 @@ public final class Trick {
      * @return Same behavior as PackedTrick's functions
      */
     public PlayerId winningPlayer() {
+        if (isEmpty()) {
+            throw new IllegalStateException();
+        }
         return PackedTrick.winningPlayer(pkTrick);
     }
     
+    @Override
     public boolean equals(Object other) {
         if(other instanceof Trick) {
             if(((Trick) other).pkTrick == pkTrick)
@@ -156,11 +171,13 @@ public final class Trick {
         return false; 
     }
     
+    @Override
     public int hashCode() {
         return pkTrick; 
     }
     
     public String toString() {
         return PackedTrick.toString(pkTrick); 
+
     }
 }

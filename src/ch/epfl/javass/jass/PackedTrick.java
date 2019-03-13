@@ -9,6 +9,7 @@
 package ch.epfl.javass.jass;
 
 import java.util.StringJoiner;
+
 import ch.epfl.javass.bits.Bits32;
 import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.Card.Rank;
@@ -29,20 +30,20 @@ public final class PackedTrick {
      * @return True if the trick is correctly packed.
      */
     public static boolean isValid(int pkTrick) {
-        
+
         boolean aCardIsInvalid = true;
-        
-        for (int i = 0; i <4 ; i++) {
+
+        for (int i = 0; i < 4; i++) {
             int card = Bits32.extract(pkTrick, CARD_SIZE * i, CARD_SIZE);
 
             // VALID CARD CASE
             if (card != PackedCard.INVALID) {
                 if (!aCardIsInvalid)
-                    return false; 
+                    return false;
             }
             // INVALID CARD CASE
             else
-                aCardIsInvalid = false; 
+                aCardIsInvalid = false;
         }
         int index = Bits32.extract(pkTrick, 24, 4);
 
@@ -69,8 +70,7 @@ public final class PackedTrick {
      * @return The next trick, with no cards
      */
     public static int nextEmpty(int pkTrick) {
-        assert(isValid(pkTrick)); 
-        
+        assert (isValid(pkTrick));
         if (isLast(pkTrick))
             return INVALID;
         
@@ -125,7 +125,8 @@ public final class PackedTrick {
         assert (isValid(pkTrick));
         int nbrOfCards = 0;
         for (int i = 0; i < 4; i++) {
-            if (Bits32.extract(pkTrick, CARD_SIZE * i, CARD_SIZE) != PackedCard.INVALID)
+            if (Bits32.extract(pkTrick, CARD_SIZE * i,
+                    CARD_SIZE) != PackedCard.INVALID)
                 nbrOfCards += 1;
         }
         return nbrOfCards;
@@ -149,8 +150,7 @@ public final class PackedTrick {
      */
     public static PlayerId player(int pkTrick, int index) {
         assert (isValid(pkTrick));
-        // a checker si c'est bien ça
-        return PlayerId.values()[(Bits32.extract(pkTrick, 28, 2) + index)%4];
+        return PlayerId.values()[(Bits32.extract(pkTrick, 28, 2) + index) % 4];
     }
 
     /**
@@ -224,7 +224,10 @@ public final class PackedTrick {
             }
         } else {
             if (PackedCardSet.size(trickColorInHand) == 0) {
-                if (PackedCard.color(winningCard(pkTrick)) == trump(pkTrick)) {
+                if (PackedCardSet.size(pkHand)== 1) {
+                    playableCardSet = pkHand;
+                }
+                else if (PackedCard.color(winningCard(pkTrick)) == trump(pkTrick)) {
                     playableCardSet = PackedCardSet.union(
                             PackedCardSet.difference(pkHand,
                                     PackedCardSet.subsetOfColor(pkHand,
@@ -238,8 +241,9 @@ public final class PackedTrick {
                     playableCardSet = PackedCardSet.union(trickColorInHand,
                             PackedCardSet.trumpAbove(winningCard(pkTrick)));
                 } else {
-                    playableCardSet = PackedCardSet.union(trickColorInHand, PackedCardSet.subsetOfColor(pkHand,
-                            trump(pkTrick)));
+                    playableCardSet = PackedCardSet.union(trickColorInHand,
+                            PackedCardSet.subsetOfColor(pkHand,
+                                    trump(pkTrick)));
                 }
             }
         }
@@ -268,12 +272,11 @@ public final class PackedTrick {
      * @return The points of the trick
      */
     public static int points(int pkTrick) {
-        assert(isValid(pkTrick)); 
+        assert (isValid(pkTrick));
         int total = 0;
         Color trump = trump(pkTrick);
-        for (int i = 0; i <size(pkTrick) ; i++) {
-            total += PackedCard.points(trump,
-                    Bits32.extract(pkTrick, i * CARD_SIZE, CARD_SIZE));
+        for (int i = 0; i < size(pkTrick); i++) {
+            total += PackedCard.points(trump, card(pkTrick, i));
         }
         if (isLast(pkTrick))
             total += 5;
@@ -288,28 +291,15 @@ public final class PackedTrick {
      */
     public static PlayerId winningPlayer(int pkTrick) {
 
-//        int winningCard = Bits32.extract(pkTrick, 0, CARD_SIZE);
-//        int winningPosition = 0;
-//        for (int i = 0; i < size(pkTrick); i++) {
-//            int pkCard = card(pkTrick, i);
-//            if (PackedCard.isBetter(trump(pkTrick), pkCard, winningCard)) {
-//                winningCard = pkCard;
-//                winningPosition++;
-//            }
-//        }
-       // return player(pkTrick, winningPosition);
-        assert(isValid(pkTrick)); 
-        int winningCard = winningCard(pkTrick); 
-        int index =0; 
-        for(int i=0; i<size(pkTrick); i++) {
-            if(Bits32.extract(pkTrick, i,CARD_SIZE*i)==winningCard) {
-                index = i; 
+        assert isValid(pkTrick);
+        int winningCard = winningCard(pkTrick);
+        int index = 0;
+        for (int i = 0; i < size(pkTrick); i++) {
+            if (card(pkTrick, i) == winningCard) {
+                index = i;
             }
         }
-        int number = Bits32.extract(pkTrick, 28, 2) + index; 
-        if(number>3)
-            number= number%4; 
-        return PlayerId.values()[number];
+        return player(pkTrick, index);
     }
 
     /**
