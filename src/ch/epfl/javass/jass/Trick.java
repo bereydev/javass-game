@@ -10,14 +10,14 @@ import ch.epfl.javass.jass.Card.Color;
 
 public final class Trick {
 
-    public final static Trick INVALID = new Trick(PackedTrick.INVALID);
-
-    private int pkTrick;
-
     private Trick(int pkTrick) {
         this.pkTrick = pkTrick;
 
     }
+    
+    public final static Trick INVALID = new Trick(PackedTrick.INVALID);
+
+    private int pkTrick;
 
     /**
      * @param trump
