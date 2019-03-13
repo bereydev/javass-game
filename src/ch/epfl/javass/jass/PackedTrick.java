@@ -41,9 +41,8 @@ public final class PackedTrick {
                     return false; 
             }
             // INVALID CARD CASE
-            else{ 
+            else
                 aCardIsInvalid = false; 
-            }
         }
         int index = Bits32.extract(pkTrick, 24, 4);
 
@@ -70,13 +69,14 @@ public final class PackedTrick {
      * @return The next trick, with no cards
      */
     public static int nextEmpty(int pkTrick) {
-        assert (isValid(pkTrick));
+        assert(isValid(pkTrick)); 
+
         if (isLast(pkTrick))
             return INVALID;
         return Bits32.pack(PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID,
                 CARD_SIZE, PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID,
                 CARD_SIZE, Bits32.extract(pkTrick, 24, 4) + 1, 4,
-                Bits32.extract(pkTrick, 28, 2), 2,
+                winningPlayer(pkTrick).ordinal(), 2,
                 Bits32.extract(pkTrick, 30, 2), 2);
     }
 
@@ -112,12 +112,7 @@ public final class PackedTrick {
      */
     public static boolean isFull(int pkTrick) {
         assert (isValid(pkTrick));
-        for (int i = 0; i < 4; i++) {
-            if (Bits32.extract(pkTrick, CARD_SIZE * i,
-                    CARD_SIZE) == PackedCard.INVALID)
-                return false;
-        }
-        return true;
+        return size(pkTrick) == 4;
     }
 
     /**
@@ -153,7 +148,6 @@ public final class PackedTrick {
      */
     public static PlayerId player(int pkTrick, int index) {
         assert (isValid(pkTrick));
-        // a checker si c'est bien ça
         return PlayerId.values()[(Bits32.extract(pkTrick, 28, 2) + index)%4];
     }
 
@@ -214,6 +208,7 @@ public final class PackedTrick {
      */
     public static long playableCards(int pkTrick, long pkHand) {
         assert (isValid(pkTrick) && PackedCardSet.isValid(pkHand));
+
         long playableCardSet = PackedCardSet.EMPTY;
         long trickColorInHand = PackedCardSet.subsetOfColor(pkHand,
                 baseColor(pkTrick));
@@ -272,6 +267,7 @@ public final class PackedTrick {
      * @return The points of the trick
      */
     public static int points(int pkTrick) {
+        assert(isValid(pkTrick)); 
         int total = 0;
         Color trump = trump(pkTrick);
         for (int i = 0; i <size(pkTrick) ; i++) {
@@ -290,16 +286,26 @@ public final class PackedTrick {
      * @return The winning player of the trick
      */
     public static PlayerId winningPlayer(int pkTrick) {
-        int winningCard = card(pkTrick, 0);
-        int winningPosition = 0;
-        for (int i = 0; i < size(pkTrick); i++) {
-            int pkCard = card(pkTrick, i);
-            if (PackedCard.isBetter(trump(pkTrick), pkCard, winningCard)) {
-                winningCard = pkCard;
-                winningPosition++;
+
+//        int winningCard = Bits32.extract(pkTrick, 0, CARD_SIZE);
+//        int winningPosition = 0;
+//        for (int i = 0; i < size(pkTrick); i++) {
+//            int pkCard = card(pkTrick, i);
+//            if (PackedCard.isBetter(trump(pkTrick), pkCard, winningCard)) {
+//                winningCard = pkCard;
+//                winningPosition++;
+//            }
+//        }
+       // return player(pkTrick, winningPosition);
+        
+        int winningCard = winningCard(pkTrick); 
+        int index =0; 
+        for(int i=0; i<size(pkTrick); i++) {
+            if(Bits32.extract(pkTrick, i,CARD_SIZE*i)==winningCard) {
+                index = i; 
             }
         }
-        return player(pkTrick, winningPosition);
+        return player(pkTrick, index);
     }
 
     /**
