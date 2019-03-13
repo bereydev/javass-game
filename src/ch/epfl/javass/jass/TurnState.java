@@ -1,6 +1,3 @@
-/**
- * 
- */
 package ch.epfl.javass.jass;
 
 import ch.epfl.javass.Preconditions;
@@ -27,6 +24,12 @@ public final class TurnState {
     private int currentTrick = PackedTrick.INVALID;
     private static final int CARD_SIZE = 6;
 
+    /**
+     * @param trump
+     * @param score
+     * @param firstPlayer
+     * @return
+     */
     public static TurnState initial(Color trump, Score score, PlayerId firstPlayer) {
         int pkTrick = Bits32.pack(PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID, CARD_SIZE, 0, 4, firstPlayer.ordinal(), 2, trump.ordinal(), 2);
         return new TurnState(score.packed(), PackedCardSet.ALL_CARDS, pkTrick);
@@ -116,6 +119,7 @@ public final class TurnState {
     public TurnState withTrickCollected() {
         Preconditions.checkArgument(!trick().isFull());
         //TODO pas compris le but ...
+        return null;
     }
     
     /**
