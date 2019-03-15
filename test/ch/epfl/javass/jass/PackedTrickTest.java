@@ -1465,6 +1465,7 @@ public class PackedTrickTest {
                         PackedTrick.playableCards(p.pkTrick, p.pkHand)));
             }
             assertEquals(expected, actual);
+            
         }
         // */
     }
