@@ -217,8 +217,7 @@ public final class PackedTrick {
         long playableCardSet = pkHand;
         long baseSet = PackedCardSet.subsetOfColor(pkHand, baseColor);
         long trumpSet = PackedCardSet.subsetOfColor(pkHand, trumpColor);
-        long trumpAboveSet = PackedCardSet.trumpAbove(winningCard(pkTrick));
-        
+        long trumpAboveSet = PackedCardSet.intersection(pkHand, PackedCardSet.trumpAbove(winningCard(pkTrick)));
         if (baseSet != 0L) {
             playableCardSet = PackedCardSet.union(baseSet, trumpSet);
             if (trumpTrick && PackedCardSet.size(baseSet)  == 1 && PackedCardSet.contains(baseSet, PackedCard.pack(trumpColor, Rank.JACK))) {
