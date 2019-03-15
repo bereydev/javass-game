@@ -177,7 +177,8 @@ public final class Trick {
     }
     
     public String toString() {
-        return PackedTrick.toString(pkTrick); 
-
+        String trick = "Frist player:" + player(0).toString() + "Trump Color :" + trump().toString();
+        //TODO a finir
+        return trick;
     }
 }
