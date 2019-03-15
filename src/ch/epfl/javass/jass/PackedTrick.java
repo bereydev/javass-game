@@ -210,45 +210,81 @@ public final class PackedTrick {
      */
     public static long playableCards(int pkTrick, long pkHand) {
         assert (isValid(pkTrick) && PackedCardSet.isValid(pkHand));
-
-        long playableCardSet = PackedCardSet.EMPTY;
-        long trickColorInHand = PackedCardSet.subsetOfColor(pkHand,
-                baseColor(pkTrick));
-        if (baseColor(pkTrick) == trump(pkTrick)) {
-            if (PackedCardSet.size(trickColorInHand) == 0 || (PackedCardSet
-                    .size(trickColorInHand) == 1
-                    && PackedCardSet.contains(trickColorInHand,
-                            PackedCard.pack(trump(pkTrick), Rank.JACK)))) {
+        Color baseColor = baseColor(pkTrick);
+        Color trumpColor = trump(pkTrick);
+        boolean trumpTrick = (baseColor == trumpColor);
+        boolean isCut = (PackedCard.color(winningCard(pkTrick))== trumpColor);
+        long playableCardSet = pkHand;
+        long baseSet = PackedCardSet.subsetOfColor(pkHand, baseColor);
+        long trumpSet = PackedCardSet.subsetOfColor(pkHand, trumpColor);
+        long trumpAboveSet = PackedCardSet.trumpAbove(winningCard(pkTrick));
+        if (baseSet != 0L) {
+            playableCardSet = PackedCardSet.union(baseSet, trumpSet);
+            if (trumpTrick && PackedCardSet.size(baseSet)  == 1 && PackedCardSet.contains(baseSet, PackedCard.pack(trumpColor, Rank.JACK))) {
                 playableCardSet = pkHand;
-            } else {
-                playableCardSet = trickColorInHand;
+            }
+            if (isCut) {
+               playableCardSet = PackedCardSet.union(baseSet, trumpAboveSet);
             }
         } else {
-            if (PackedCardSet.size(trickColorInHand) == 0) {
-                if (PackedCardSet.size(pkHand)== 1) {
-                    playableCardSet = pkHand;
-                }
-                else if (PackedCard.color(winningCard(pkTrick)) == trump(pkTrick)) {
-                    playableCardSet = PackedCardSet.union(
-                            PackedCardSet.difference(pkHand,
-                                    PackedCardSet.subsetOfColor(pkHand,
-                                            trump(pkTrick))),
-                            PackedCardSet.trumpAbove(winningCard(pkTrick)));
-                } else {
+            if (! (trumpSet == 0L)) {
+                if (isCut) {
+                    playableCardSet = PackedCardSet.union(trumpAboveSet, PackedCardSet.difference(pkHand, trumpSet));
+                    if (pkHand == trumpSet && trumpAboveSet == 0L) {
+                        playableCardSet = pkHand;
+                    }
+                }else {
                     playableCardSet = pkHand;
                 }
             } else {
-                if (PackedCard.color(winningCard(pkTrick)) == trump(pkTrick)) {
-                    playableCardSet = PackedCardSet.union(trickColorInHand,
-                            PackedCardSet.trumpAbove(winningCard(pkTrick)));
-                } else {
-                    playableCardSet = PackedCardSet.union(trickColorInHand,
-                            PackedCardSet.subsetOfColor(pkHand,
-                                    trump(pkTrick)));
-                }
+                playableCardSet = pkHand;
             }
+            
         }
         return playableCardSet;
+//        Color baseColor = baseColor(pkTrick);
+//        Color trumpColor = trump(pkTrick);
+//        int winningCard = winningCard(pkTrick);
+//        long playableCardSet = PackedCardSet.EMPTY;
+//        long trickColorInHand = PackedCardSet.subsetOfColor(pkHand, baseColor);
+//        if (baseColor == trumpColor) {
+//            if (PackedCardSet.size(trickColorInHand) == 0
+//                    || (PackedCardSet.size(trickColorInHand) == 1
+//                            && PackedCardSet.contains(trickColorInHand,
+//                                    PackedCard.pack(trumpColor, Rank.JACK)))) {
+//                playableCardSet = pkHand;
+//            } else if (PackedCardSet.size(trickColorInHand) != 0){
+//                playableCardSet = trickColorInHand;
+//            }
+//        } else {
+//            if (PackedCardSet.size(trickColorInHand) == 0) {
+//                if (PackedCard.color(winningCard) == trumpColor) {
+//                    if (PackedCardSet.difference(pkHand,
+//                            PackedCardSet.subsetOfColor(pkHand,
+//                                    trumpColor)) != 0
+//                            || PackedCardSet.trumpAbove(winningCard) != 0) {
+//                        playableCardSet = PackedCardSet.union(
+//                                PackedCardSet.difference(pkHand,
+//                                        PackedCardSet.subsetOfColor(pkHand,
+//                                                trumpColor)),
+//                                PackedCardSet.trumpAbove(winningCard));
+//                    } else {
+//                        playableCardSet = pkHand;
+//                    }
+//                } else {
+//                    playableCardSet = pkHand;
+//                }
+//            } else {
+//                if (PackedCard.color(winningCard) == trumpColor) {
+//                    playableCardSet = PackedCardSet.union(trickColorInHand,
+//                            PackedCardSet.trumpAbove(winningCard));
+//                } else {
+//                    playableCardSet = PackedCardSet.union(trickColorInHand,
+//                            PackedCardSet.subsetOfColor(pkHand, trumpColor));
+//                }
+//            }
+//        }
+//        return playableCardSet;
     }
 
     /**
