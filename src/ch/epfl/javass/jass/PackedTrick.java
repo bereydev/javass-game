@@ -210,19 +210,6 @@ public final class PackedTrick {
      */
     public static long playableCards(int pkTrick, long pkHand) {
         assert (isValid(pkTrick) && PackedCardSet.isValid(pkHand));
-
-        if(isEmpty(pkTrick))
-            return pkHand; 
-       
-        Color baseColor = baseColor(pkTrick);
-        Color trumpColor = trump(pkTrick);
-        boolean trumpTrick = (baseColor == trumpColor);
-        boolean isCut = (PackedCard.isValid(winningCard(pkTrick)) && PackedCard.color(winningCard(pkTrick))== trumpColor);
-        long playableCardSet = pkHand;
-        long baseSet = PackedCardSet.subsetOfColor(pkHand, baseColor);
-        long trumpSet = PackedCardSet.subsetOfColor(pkHand, trumpColor);
-        
-        long trumpAboveSet = PackedCardSet.intersection(pkHand, PackedCardSet.trumpAbove(winningCard(pkTrick))); 
         if (isEmpty(pkTrick))
             return pkHand;
 
@@ -237,6 +224,7 @@ public final class PackedTrick {
 
         long trumpAboveSet = PackedCardSet.intersection(pkHand,
                 PackedCardSet.trumpAbove(winningCard(pkTrick)));
+
         if (baseSet != 0L) {
             playableCardSet = PackedCardSet.union(baseSet, trumpSet);
             if (trumpTrick && PackedCardSet.size(baseSet) == 1
@@ -251,11 +239,6 @@ public final class PackedTrick {
             if (!(trumpSet == 0L)) {
                 playableCardSet = PackedCardSet.EMPTY;
                 if (isCut) {
-                        for(Card.Color c : Card.Color.ALL) {
-                            if(c != trumpColor)
-                                playableCardSet+= PackedCardSet.subsetOfColor(pkHand, c); 
-                        }
-                        playableCardSet+= trumpAboveSet; 
                     for (int i = 0; i < 4; i++) {
                         if (Card.Color.values()[i] != trumpColor) {
                             playableCardSet = PackedCardSet.union(
@@ -266,6 +249,7 @@ public final class PackedTrick {
                     }
                     playableCardSet = PackedCardSet.union(playableCardSet,
                             trumpAboveSet);
+
                     if (pkHand == trumpSet && trumpAboveSet == 0L) {
                         playableCardSet = pkHand;
                     }
