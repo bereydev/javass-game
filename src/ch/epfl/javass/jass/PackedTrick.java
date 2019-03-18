@@ -88,7 +88,7 @@ public final class PackedTrick {
      */
     public static boolean isLast(int pkTrick) {
         assert (isValid(pkTrick));
-        return Bits32.extract(pkTrick, 24, 4) == TRICKS_BY_TURN;
+        return index(pkTrick) == TRICKS_BY_TURN;
     }
 
     /**
@@ -99,8 +99,7 @@ public final class PackedTrick {
     public static boolean isEmpty(int pkTrick) {
         assert (isValid(pkTrick));
         for (int i = 0; i < 4; i++) {
-            if (Bits32.extract(pkTrick, CARD_SIZE * i,
-                    CARD_SIZE) != PackedCard.INVALID)
+            if (card(pkTrick, i) != PackedCard.INVALID)
                 return false;
         }
         return true;
@@ -125,8 +124,7 @@ public final class PackedTrick {
         assert (isValid(pkTrick));
         int nbrOfCards = 0;
         for (int i = 0; i < 4; i++) {
-            if (Bits32.extract(pkTrick, CARD_SIZE * i,
-                    CARD_SIZE) != PackedCard.INVALID)
+            if (card(pkTrick, i) != PackedCard.INVALID)
                 nbrOfCards += 1;
         }
         return nbrOfCards;
