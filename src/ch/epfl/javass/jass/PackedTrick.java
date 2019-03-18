@@ -247,7 +247,6 @@ public final class PackedTrick {
                     }
                     playableCardSet = PackedCardSet.union(playableCardSet,
                             trumpAboveSet);
-
                     if (pkHand == trumpSet && trumpAboveSet == 0L) {
                         playableCardSet = pkHand;
                     }
