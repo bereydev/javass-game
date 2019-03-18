@@ -21,39 +21,48 @@ public final class PrintingPlayer implements Player {
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        // TODO Auto-generated method stub
-        
+        System.out.print("Les joueurs sont : ");
+        underlyingPlayer.setPlayers(ownId, playerNames);
+        //TODO comment ittérer sur une map ?
     }
 
     @Override
     public void updateHand(CardSet newHand) {
-        // TODO Auto-generated method stub
-        
+        System.out.print("Ma nouvelle main : ");
+        underlyingPlayer.updateHand(newHand);
+        System.out.println(newHand);
     }
 
     @Override
     public void setTrump(Color trump) {
-        // TODO Auto-generated method stub
-        
+        System.out.print("Atout : ");
+        underlyingPlayer.setTrump(trump);
+        System.out.println(trump);
     }
 
     @Override
     public void updateTrick(Trick newTrick) {
-        // TODO Auto-generated method stub
+        System.out.print("Pli " + newTrick.index() + ", commencé par " + newTrick.player(0) + " :");
+        underlyingPlayer.updateTrick(newTrick);
+        System.out.println(newTrick);
         
     }
 
     @Override
     public void updateScore(Score score) {
-        // TODO Auto-generated method stub
+        System.out.print("Scores : ");
+        underlyingPlayer.updateScore(score);
+        System.out.println(score);
         
     }
 
     @Override
     public void setWinningTeam(TeamId winningTeam) {
-        // TODO Auto-generated method stub
+        System.out.print("Et le vainqueur est ... l'équipe : ");
+        underlyingPlayer.setWinningTeam(winningTeam);
+        System.out.println(winningTeam.name());
+        System.out.println("Bravo !");
         
     }
 
-    // … autres méthodes de Player (à écrire)
 }

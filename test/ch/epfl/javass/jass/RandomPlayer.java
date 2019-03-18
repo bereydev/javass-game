@@ -7,6 +7,13 @@ import ch.epfl.javass.jass.Card.Color;
 
 public final class RandomPlayer implements Player {
     private final Random rng;
+    private CardSet hand;
+    private Score score;
+    private Color trump;
+    private Trick trick;
+    private TeamId winningTeam;
+    //surement quelque chose de plus intelligent à faire mais la je vois pas ...
+    
 
     public RandomPlayer(long rngSeed) {
       this.rng = new Random(rngSeed);
@@ -20,37 +27,37 @@ public final class RandomPlayer implements Player {
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        // TODO Auto-generated method stub
+        // TODO ...
         
     }
 
     @Override
     public void updateHand(CardSet newHand) {
-        // TODO Auto-generated method stub
+        this.hand = newHand;
         
     }
 
     @Override
     public void setTrump(Color trump) {
-        // TODO Auto-generated method stub
+        this.trump = trump;
         
     }
 
     @Override
     public void updateTrick(Trick newTrick) {
-        // TODO Auto-generated method stub
+        this.trick = newTrick;
         
     }
 
     @Override
     public void updateScore(Score score) {
-        // TODO Auto-generated method stub
+        this.score = score;
         
     }
 
     @Override
     public void setWinningTeam(TeamId winningTeam) {
-        // TODO Auto-generated method stub
+        this.winningTeam = winningTeam;
         
     }
 }
