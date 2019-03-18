@@ -470,7 +470,6 @@ public class PackedTrickTest {
     }
 
     @Test
-
     void winningPlayerWorksInTrickyCase1() {
         // If the 3rd player under-cut, the 2nd one is the winner
         int pkTrick = trick(0, SPADE, PLAYER_1, c(HEART, TEN),  c(SPADE, NINE), c(SPADE, EIGHT));
