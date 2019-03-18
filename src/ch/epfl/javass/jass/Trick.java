@@ -176,7 +176,6 @@ public final class Trick {
         return pkTrick; 
     }
     
-    @Override
     public String toString() {
         return PackedTrick.toString(pkTrick);
     }
