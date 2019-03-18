@@ -210,14 +210,22 @@ public final class PackedTrick {
      */
     public static long playableCards(int pkTrick, long pkHand) {
         assert (isValid(pkTrick) && PackedCardSet.isValid(pkHand));
+        if (isEmpty(pkTrick)) {
+            return pkHand;
+        }
         Color baseColor = baseColor(pkTrick);
         Color trumpColor = trump(pkTrick);
         boolean trumpTrick = (baseColor == trumpColor);
-        boolean isCut = (PackedCard.color(winningCard(pkTrick))== trumpColor);
+        boolean isCut = (PackedCard.isValid(winningCard(pkTrick)) && PackedCard.color(winningCard(pkTrick))== trumpColor);
         long playableCardSet = pkHand;
         long baseSet = PackedCardSet.subsetOfColor(pkHand, baseColor);
         long trumpSet = PackedCardSet.subsetOfColor(pkHand, trumpColor);
-        long trumpAboveSet = PackedCardSet.intersection(pkHand, PackedCardSet.trumpAbove(winningCard(pkTrick)));
+        long trumpSetTotal = PackedCardSet.subsetOfColor(PackedCardSet.ALL_CARDS, trumpColor);
+        long trumpAboveSet = trumpSet;
+        if(isCut) {
+            trumpAboveSet = PackedCardSet.intersection(pkHand, PackedCardSet.trumpAbove(winningCard(pkTrick)));
+        }
+        
         if (baseSet != 0L) {
             playableCardSet = PackedCardSet.union(baseSet, trumpSet);
             if (trumpTrick && PackedCardSet.size(baseSet)  == 1 && PackedCardSet.contains(baseSet, PackedCard.pack(trumpColor, Rank.JACK))) {
@@ -229,7 +237,7 @@ public final class PackedTrick {
         } else {
             if (! (trumpSet == 0L)) {
                 if (isCut) {
-                    playableCardSet = PackedCardSet.union(trumpAboveSet, PackedCardSet.difference(pkHand, trumpSet));
+                    playableCardSet = PackedCardSet.union(trumpAboveSet, PackedCardSet.intersection(pkHand, PackedCardSet.complement(trumpSetTotal)));
                     if (pkHand == trumpSet && trumpAboveSet == 0L) {
                         playableCardSet = pkHand;
                     }

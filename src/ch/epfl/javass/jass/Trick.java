@@ -178,8 +178,6 @@ public final class Trick {
     
     @Override
     public String toString() {
-        String trick = "Frist player:" + player(0).toString() + "Trump Color :" + trump().toString();
-        //TODO a finir
-        return trick;
+        return PackedTrick.toString(pkTrick);
     }
 }
