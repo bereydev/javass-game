@@ -470,10 +470,49 @@ public class PackedTrickTest {
     }
 
     @Test
+<<<<<<< HEAD
     void winningPlayerWorksInTrickyCase1() {
         // If the 3rd player under-cut, the 2nd one is the winner
         int pkTrick = trick(0, SPADE, PLAYER_1, c(HEART, TEN),  c(SPADE, NINE), c(SPADE, EIGHT));
         assertEquals(PlayerId.PLAYER_2, PackedTrick.winningPlayer(pkTrick));
+=======
+    void playableCards() {
+        /*
+         * SplittableRandom rng = newRandom(); for (int i = 0; i <
+         * RANDOM_ITERATIONS; ++i) { try { long pkTrick; long pkHand; do pkTrick
+         * = rng.nextInt() & 0b11111111_11111111_11111111_11111111L; while
+         * (!PackedTrick.isValid((int)pkTrick) || (i%3 + 1) <=
+         * PackedTrick.size((int)pkTrick)); do pkHand = rng.nextLong() &
+         * PackedCardSet.ALL_CARDS; while (!PackedCardSet.isValid(pkHand) || 8 <
+         * PackedCardSet.size(pkHand) || PackedCardSet.isEmpty(pkHand));
+         * System.out.println("put(new P(0b" + s(pkTrick, 32) + ", 0b" +
+         * s(pkHand, 64) + "L), 0b" + s(PackedTrick.playableCards((int)pkTrick,
+         * pkHand), 64) + "L);"); } catch (Error e) {
+         * 
+         * } assertTrue(true); } /
+         */
+        for (P p : playableCardsList.keySet()) {
+            long expected = playableCardsList.get(p);
+            long actual = PackedTrick.playableCards(p.pkTrick, p.pkHand);
+            if (expected != actual) {
+                System.out
+                        .println("pkTrick:" + PackedTrick.toString(p.pkTrick));
+                System.out
+                        .println("pkHand:" + PackedCardSet.toString(p.pkHand));
+                System.out.println();
+                System.out.println("Trump is "+ PackedTrick.trump(p.pkTrick));
+                System.out.println("Base Color is "+ PackedTrick.baseColor(p.pkTrick));
+                System.out.println("expected:"
+                        + PackedCardSet.toString(playableCardsList.get(p)));
+                System.out.println("actual:  " + PackedCardSet.toString(
+                        PackedTrick.playableCards(p.pkTrick, p.pkHand)));
+                System.out.println(p);
+            }
+            assertEquals(expected, actual);
+            
+        }
+        // */
+>>>>>>> alex
     }
 
     @Test
