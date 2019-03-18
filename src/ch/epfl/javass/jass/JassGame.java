@@ -67,8 +67,7 @@ public final class JassGame {
      * Advances to the end of the next trick, doing everything.
      */
     void advanceToEndOfNextTrick() {
-        if (isGameOver()) {
-            /* does nothing */ }
+        if (isGameOver()) {/* does nothing */ }
 
         else {
             // The trick has not started.
