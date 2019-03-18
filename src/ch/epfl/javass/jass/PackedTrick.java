@@ -73,7 +73,7 @@ public final class PackedTrick {
         assert (isValid(pkTrick));
         if (isLast(pkTrick))
             return INVALID;
-        
+
         return Bits32.pack(PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID,
                 CARD_SIZE, PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID,
                 CARD_SIZE, Bits32.extract(pkTrick, 24, 4) + 1, 4,
@@ -210,90 +210,58 @@ public final class PackedTrick {
      */
     public static long playableCards(int pkTrick, long pkHand) {
         assert (isValid(pkTrick) && PackedCardSet.isValid(pkHand));
-        if(isEmpty(pkTrick))
-            return pkHand; 
-        
+        if (isEmpty(pkTrick))
+            return pkHand;
+
         Color baseColor = baseColor(pkTrick);
         Color trumpColor = trump(pkTrick);
         boolean trumpTrick = (baseColor == trumpColor);
-        boolean isCut = (PackedCard.color(winningCard(pkTrick))== trumpColor);
+        boolean isCut = (PackedCard.color(winningCard(pkTrick)) == trumpColor
+                && !trumpTrick);
         long playableCardSet = pkHand;
         long baseSet = PackedCardSet.subsetOfColor(pkHand, baseColor);
         long trumpSet = PackedCardSet.subsetOfColor(pkHand, trumpColor);
-        
-        long trumpAboveSet = PackedCardSet.intersection(pkHand, PackedCardSet.trumpAbove(winningCard(pkTrick))); 
-        
+
+        long trumpAboveSet = PackedCardSet.intersection(pkHand,
+                PackedCardSet.trumpAbove(winningCard(pkTrick)));
+
         if (baseSet != 0L) {
             playableCardSet = PackedCardSet.union(baseSet, trumpSet);
-            if (trumpTrick && PackedCardSet.size(baseSet)  == 1 && PackedCardSet.contains(baseSet, PackedCard.pack(trumpColor, Rank.JACK))) {
+            if (trumpTrick && PackedCardSet.size(baseSet) == 1
+                    && PackedCardSet.contains(baseSet,
+                            PackedCard.pack(trumpColor, Rank.JACK))) {
                 playableCardSet = pkHand;
             }
             if (isCut) {
-               playableCardSet = PackedCardSet.union(baseSet, trumpAboveSet);
+                playableCardSet = PackedCardSet.union(baseSet, trumpAboveSet);
             }
         } else {
-            if (! (trumpSet == 0L)) {
+            if (!(trumpSet == 0L)) {
+                playableCardSet = PackedCardSet.EMPTY;
                 if (isCut) {
-                        for(Card.Color c : Card.Color.ALL) {
-                            if(c != trumpColor)
-                                playableCardSet+= PackedCardSet.subsetOfColor(pkHand, c); 
+                    for (int i = 0; i < 4; i++) {
+                        if (Card.Color.values()[i] != trumpColor) {
+                            playableCardSet = PackedCardSet.union(
+                                    playableCardSet,
+                                    PackedCardSet.subsetOfColor(pkHand,
+                                            Card.Color.values()[i]));
                         }
-                        playableCardSet+= trumpAboveSet; 
+                    }
+                    playableCardSet = PackedCardSet.union(playableCardSet,
+                            trumpAboveSet);
+
                     if (pkHand == trumpSet && trumpAboveSet == 0L) {
                         playableCardSet = pkHand;
                     }
-                }else {
+                } else {
                     playableCardSet = pkHand;
                 }
             } else {
                 playableCardSet = pkHand;
             }
-            
+
         }
-        return playableCardSet;
-//        Color baseColor = baseColor(pkTrick);
-//        Color trumpColor = trump(pkTrick);
-//        int winningCard = winningCard(pkTrick);
-//        long playableCardSet = PackedCardSet.EMPTY;
-//        long trickColorInHand = PackedCardSet.subsetOfColor(pkHand, baseColor);
-//        if (baseColor == trumpColor) {
-//            if (PackedCardSet.size(trickColorInHand) == 0
-//                    || (PackedCardSet.size(trickColorInHand) == 1
-//                            && PackedCardSet.contains(trickColorInHand,
-//                                    PackedCard.pack(trumpColor, Rank.JACK)))) {
-//                playableCardSet = pkHand;
-//            } else if (PackedCardSet.size(trickColorInHand) != 0){
-//                playableCardSet = trickColorInHand;
-//            }
-//        } else {
-//            if (PackedCardSet.size(trickColorInHand) == 0) {
-//                if (PackedCard.color(winningCard) == trumpColor) {
-//                    if (PackedCardSet.difference(pkHand,
-//                            PackedCardSet.subsetOfColor(pkHand,
-//                                    trumpColor)) != 0
-//                            || PackedCardSet.trumpAbove(winningCard) != 0) {
-//                        playableCardSet = PackedCardSet.union(
-//                                PackedCardSet.difference(pkHand,
-//                                        PackedCardSet.subsetOfColor(pkHand,
-//                                                trumpColor)),
-//                                PackedCardSet.trumpAbove(winningCard));
-//                    } else {
-//                        playableCardSet = pkHand;
-//                    }
-//                } else {
-//                    playableCardSet = pkHand;
-//                }
-//            } else {
-//                if (PackedCard.color(winningCard) == trumpColor) {
-//                    playableCardSet = PackedCardSet.union(trickColorInHand,
-//                            PackedCardSet.trumpAbove(winningCard));
-//                } else {
-//                    playableCardSet = PackedCardSet.union(trickColorInHand,
-//                            PackedCardSet.subsetOfColor(pkHand, trumpColor));
-//                }
-//            }
-//        }
-//        return playableCardSet;
+        return playableCardSet; 
     }
 
     /**
@@ -309,9 +277,9 @@ public final class PackedTrick {
                 winningCard = pkCard;
             }
         }
-        if(PackedCard.isValid(winningCard))
+        if (PackedCard.isValid(winningCard))
             return winningCard;
-        return 0; 
+        return 0;
     }
 
     /**

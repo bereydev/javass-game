@@ -1459,10 +1459,13 @@ public class PackedTrickTest {
                 System.out
                         .println("pkHand:" + PackedCardSet.toString(p.pkHand));
                 System.out.println();
+                System.out.println("Trump is "+ PackedTrick.trump(p.pkTrick));
+                System.out.println("Base Color is "+ PackedTrick.baseColor(p.pkTrick));
                 System.out.println("expected:"
                         + PackedCardSet.toString(playableCardsList.get(p)));
                 System.out.println("actual:  " + PackedCardSet.toString(
                         PackedTrick.playableCards(p.pkTrick, p.pkHand)));
+                System.out.println(p);
             }
             assertEquals(expected, actual);
             

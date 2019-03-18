@@ -240,7 +240,7 @@ public final class PackedCardSet {
     public static String toString(long pkCardSet) {
         StringJoiner cardList = new StringJoiner(",", "{", "}");
         for (int i = 0; i < size(pkCardSet); i++) {
-            int pkCard = get(pkCardSet, 0);
+            int pkCard = get(pkCardSet, i);
             cardList.add(PackedCard.toString(pkCard));
             remove(pkCardSet, pkCard);
         }
