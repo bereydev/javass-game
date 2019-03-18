@@ -57,7 +57,7 @@ public final class JassGame {
     /**
      * @return True if the game is over (a team has 1000points)
      */
-    boolean isGameOver() {
+    public boolean isGameOver() {
         return PackedScore.totalPoints(turnState.packedScore(),
                 TeamId.TEAM_1) == 1000
                 || PackedScore.totalPoints(turnState.packedScore(),
@@ -67,7 +67,7 @@ public final class JassGame {
     /**
      * Advances to the end of the next trick, doing everything.
      */
-    void advanceToEndOfNextTrick() {
+    public void advanceToEndOfNextTrick() {
 
     }
 
