@@ -17,7 +17,7 @@ public final class PacedPlayer implements Player {
     private Player underlyingPlayer; 
     private double minTime; 
     
-    PacedPlayer(Player underlyingPlayer, double minTime){
+    public PacedPlayer(Player underlyingPlayer, double minTime){
         this.underlyingPlayer = underlyingPlayer; 
         this.minTime = minTime; 
     }

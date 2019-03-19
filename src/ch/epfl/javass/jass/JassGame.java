@@ -9,13 +9,10 @@
 package ch.epfl.javass.jass;
 
 import java.util.Map;
-
-import java.util.Map.Entry;
 import java.util.Random;
 
 import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.Card.Rank;
-import ch.epfl.javass.jass.Trick;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -27,7 +24,7 @@ public final class JassGame {
     private long rngSeed;
     private Map<PlayerId, Player> players;
     private Map<PlayerId, String> playerNames;
-    private List<Card> cards = new LinkedList();
+    private List<Card> cards = new LinkedList<Card>();
     private Map<PlayerId, CardSet> hands;
     private Random shuffleRng;
     private Random trumpRng;
@@ -59,17 +56,19 @@ public final class JassGame {
     /**
      * @return True if the game is over (a team has 1000points)
      */
-    boolean isGameOver() {
-        //TODO : Check if game or total points 
-        return turnState.score().gamePoints(TeamId.TEAM_1) == 1000
-                || turnState.score().gamePoints(TeamId.TEAM_1) == 1000;
+
+    public boolean isGameOver() {
+        return PackedScore.totalPoints(turnState.packedScore(),
+                TeamId.TEAM_1) == 1000
+                || PackedScore.totalPoints(turnState.packedScore(),
+                        TeamId.TEAM_2) == 1000;
     }
 
     /**
      * Advances to the end of the next trick, doing everything.
      */
-    void advanceToEndOfNextTrick() {
-        if (isGameOver() || turnState.isTerminal()) {/* does nothing */ }
+    public void advanceToEndOfNextTrick() {
+        if (isGameOver()) {/* does nothing */ }
 
         else {
             // The trick has not started.
