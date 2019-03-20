@@ -48,11 +48,15 @@ public final class JassGame {
                 cards.add(Card.ofPacked(j + (i << 4)));
             }
         }
+        turnState = TurnState.initial(
+                Color.values()[trumpRng.nextInt(4)], Score.INITIAL,
+                PlayerId.PLAYER_1);
     }
 
     /**
      * @return True if the game is over (a team has 1000points)
      */
+
     public boolean isGameOver() {
         return turnState.score().totalPoints(TeamId.TEAM_2) == 1000
                 || turnState.score().totalPoints(TeamId.TEAM_2) == 1000;
@@ -72,15 +76,18 @@ public final class JassGame {
                         Color.values()[trumpRng.nextInt(4)], Score.INITIAL,
                         firstPlayer());
             }
-            do {
-                play();
-                turnState.withTrickCollected();
-                
-            } while (!turnState.trick().isLast());
+            for (PlayerId p : players.keySet()) {
+                //TODO : Find a way to make them play in order 
+                Card cardToPlay = players.get(p).cardToPlay(turnState,
+                        hands.get(p));
 
-            turnState.score().withAdditionalTrick(
-                    turnState.trick().winningPlayer().team(),
-                    turnState.trick().points());
+                turnState = turnState.withNewCardPlayedAndTrickCollected(cardToPlay);
+                players.get(p)
+                        .updateTrick(turnState.trick().withAddedCard(cardToPlay));
+                players.get(p).updateHand(hands.get(p).remove(cardToPlay));
+                players.get(p).updateScore(turnState.score());
+               
+            }
         }
 
     }
@@ -109,21 +116,6 @@ public final class JassGame {
         // This shouldn't happen
         return PlayerId.PLAYER_1;
     }
-
-    private void play() {
-        for (PlayerId p : players.keySet()) {
-            Card cardToPlay = players.get(p).cardToPlay(turnState,
-                    hands.get(p));
-
-            players.get(p)
-                    .updateTrick(turnState.trick().withAddedCard(cardToPlay));
-            players.get(p).updateHand(hands.get(p).remove(cardToPlay));
-            players.get(p).updateScore(turnState.score());
-            turnState.withNewCardPlayed(cardToPlay);
-        }
-
-    }
-
     public static void main(String[] args) {
         // JassGame test = new JassGame(2019,,);
     }
