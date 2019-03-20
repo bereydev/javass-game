@@ -27,6 +27,7 @@ public final class JassGame {
     private Map<PlayerId, String> playerNames;
     private List<Card> cards = new LinkedList<Card>();
     private Map<PlayerId, CardSet> hands = new HashMap<PlayerId,CardSet>(); 
+    private List<PlayerId> playersInOrder = new LinkedList<PlayerId>(); 
     private Random shuffleRng;
     private Random trumpRng;
 
@@ -77,19 +78,32 @@ public final class JassGame {
                 turnState = TurnState.initial(
                         Color.values()[trumpRng.nextInt(4)], Score.INITIAL,
                         firstPlayer());
+                organizePlayers(firstPlayer()); 
+                players.get(PlayerId.PLAYER_1).setPlayers(PlayerId.PLAYER_1, playerNames); 
+                players.get(PlayerId.PLAYER_1).setTrump(turnState.trick().trump());
+                players.get(PlayerId.PLAYER_1).updateHand(hands.get(PlayerId.PLAYER_1));
             }
-            for (PlayerId p : players.keySet()) {
-                //TODO : Find a way to make them play in order 
+            else 
+                organizePlayers(turnState.nextPlayer());
+            
+            players.get(PlayerId.PLAYER_1).updateScore(turnState.score());
+            for (PlayerId p : playersInOrder) {
+                
+                players.get(PlayerId.PLAYER_1).updateTrick(turnState.trick());
                 Card cardToPlay = players.get(p).cardToPlay(turnState,
-                        hands.get(p));
-
-                turnState = turnState.withNewCardPlayedAndTrickCollected(cardToPlay);
-                players.get(p)
-                        .updateTrick(turnState.trick().withAddedCard(cardToPlay));
-                players.get(p).updateHand(hands.get(p).remove(cardToPlay));
-                players.get(p).updateScore(turnState.score());
+                        hands.get(p)); 
                
+                players.get(p).updateHand(hands.get(p).remove(cardToPlay));
+                
+                turnState = turnState.withNewCardPlayed(cardToPlay);
+                
+                
+                
+                //UPDATE THE HAND 
+                hands.replace(p, hands.get(p).remove(cardToPlay)); 
             }
+            players.get(PlayerId.PLAYER_1).updateTrick(turnState.trick());
+            turnState = turnState.withTrickCollected(); 
         }
 
     }
@@ -100,11 +114,9 @@ public final class JassGame {
             CardSet hand = CardSet.EMPTY;
             for (int i = CARDS_PER_HAND * p.ordinal(); i < CARDS_PER_HAND
                     * (p.ordinal() + 1); i++) {
-                hand.add(cards.get(i));
-                System.out.println(p + " has the card "+ cards.get(i));
+                hand = hand.add(cards.get(i));
             }
             hands.put(p, hand);
-            System.out.println("added!");
         }
 
     }
@@ -112,11 +124,21 @@ public final class JassGame {
     private PlayerId firstPlayer() {
 
         for (PlayerId p : hands.keySet()) {
-            if (hands.get(p).contains(Card.of(Color.DIAMOND, Rank.SEVEN)))
+            if (hands.get(p).contains(Card.of(Color.DIAMOND, Rank.SEVEN))) {
                 return p;
+            }
+               
         }
         // This shouldn't happen
         return PlayerId.PLAYER_1;
+    }
+    private void organizePlayers(PlayerId firstPlayer) {
+        playersInOrder.clear();
+        for(int i = firstPlayer.ordinal(); i<firstPlayer.ordinal()+4; i++) {
+            playersInOrder.add(PlayerId.values()[i%4]); 
+        }
+//        for(PlayerId p: playersInOrder)
+//            System.out.println(p);
     }
     public static void main(String[] args) {
         // JassGame test = new JassGame(2019,,);

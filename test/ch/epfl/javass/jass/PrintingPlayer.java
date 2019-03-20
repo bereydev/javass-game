@@ -21,10 +21,17 @@ public final class PrintingPlayer implements Player {
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        System.out.print("Les joueurs sont : ");
+        System.out.println("Les joueurs sont : ");
         //TODO comment ittérer sur une map ?
-        for(String name : playerNames.values()) 
-            System.out.println(name);
+        for(PlayerId p : playerNames.keySet()) {
+            System.out.print(p);
+            if(p.ordinal() == ownId.ordinal())
+                System.out.println("(that's me)");
+            else 
+                System.out.println("");
+        }
+            
+            
     }
 
     @Override

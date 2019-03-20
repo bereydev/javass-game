@@ -14,4 +14,12 @@ public final class RandomPlayer implements Player {
         CardSet playable = state.trick().playableCards(hand);
         return playable.get(rng.nextInt(playable.size()));
     }
+    
+//    //TEST
+//    @Override
+//    public void updateTrick(Trick newTrick) {
+//        System.out.print("Pli " + newTrick.index() + ", commencé par " + newTrick.player(0) + " :");
+//        System.out.println(newTrick);
+//        
+//    }
 }
