@@ -16,6 +16,7 @@ import ch.epfl.javass.jass.Card.Rank;
 
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public final class JassGame {
     private Map<PlayerId, Player> players;
     private Map<PlayerId, String> playerNames;
     private List<Card> cards = new LinkedList<Card>();
-    private Map<PlayerId, CardSet> hands;
+    private Map<PlayerId, CardSet> hands = new HashMap<PlayerId,CardSet>(); 
     private Random shuffleRng;
     private Random trumpRng;
 
@@ -48,6 +49,7 @@ public final class JassGame {
                 cards.add(Card.ofPacked(j + (i << 4)));
             }
         }
+        //Initialization of turnState (to be modified later)
         turnState = TurnState.initial(
                 Color.values()[trumpRng.nextInt(4)], Score.INITIAL,
                 PlayerId.PLAYER_1);
@@ -94,15 +96,15 @@ public final class JassGame {
 
     private void deal() {
         Collections.shuffle(cards, shuffleRng);
-        for (PlayerId p : hands.keySet()) {
+        for (PlayerId p : PlayerId.ALL) {
             CardSet hand = CardSet.EMPTY;
             for (int i = CARDS_PER_HAND * p.ordinal(); i < CARDS_PER_HAND
                     * (p.ordinal() + 1); i++) {
                 hand.add(cards.get(i));
-                // System.out.println("added card "+
-                // PackedCard.toString(cards.get(i)));
+                System.out.println(p + " has the card "+ cards.get(i));
             }
             hands.put(p, hand);
+            System.out.println("added!");
         }
 
     }

@@ -23,6 +23,8 @@ public final class PrintingPlayer implements Player {
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         System.out.print("Les joueurs sont : ");
         //TODO comment ittérer sur une map ?
+        for(String name : playerNames.values()) 
+            System.out.println(name);
     }
 
     @Override
