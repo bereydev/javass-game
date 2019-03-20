@@ -58,10 +58,8 @@ public final class JassGame {
      */
 
     public boolean isGameOver() {
-        return PackedScore.totalPoints(turnState.packedScore(),
-                TeamId.TEAM_1) == 1000
-                || PackedScore.totalPoints(turnState.packedScore(),
-                        TeamId.TEAM_2) == 1000;
+        return turnState.score().totalPoints(TeamId.TEAM_2) == 1000
+                || turnState.score().totalPoints(TeamId.TEAM_2) == 1000;
     }
 
     /**
