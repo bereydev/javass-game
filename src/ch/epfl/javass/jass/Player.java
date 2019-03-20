@@ -12,12 +12,22 @@ public interface Player {
      *         turn is the one described by state and that the player has the
      *         cards hand in the hand
      */
-    public abstract Card cardToPlay(TurnState state, CardSet hand);
-    //TODO à mettre en abstact ou non ?
-    public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames);
-    public void updateHand(CardSet newHand);
-    public void setTrump(Color trump);
-    public void updateTrick(Trick newTrick);
-    public void updateScore(Score score);
-    public void setWinningTeam(TeamId winningTeam);
+    abstract Card cardToPlay(TurnState state, CardSet hand);
+    default public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
+    }
+    default void updateHand(CardSet newHand) {
+        
+    }
+    default void setTrump(Color trump) {
+        
+    }
+    default void updateTrick(Trick newTrick) {
+        
+    }
+    default void updateScore(Score score) {
+        
+    }
+    default void setWinningTeam(TeamId winningTeam) {
+        
+    }
 }
