@@ -135,6 +135,9 @@ public final class TurnState {
         }
         Score nextScore = score().withAdditionalTrick(
                 trick().winningPlayer().team(), trick().points());
+        if (isTerminal()) {
+            nextScore = nextScore.nextTurn();
+        }
         Trick nextTrick = trick().nextEmpty();
         return new TurnState(nextScore.packed(), unplayedCards,
                 nextTrick.packed());

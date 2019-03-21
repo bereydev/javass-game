@@ -22,12 +22,10 @@ import java.util.List;
 
 public final class JassGame {
 
-    private long rngSeed;
     private Map<PlayerId, Player> players;
     private Map<PlayerId, String> playerNames;
-    private List<Card> cards = new LinkedList<Card>();
-    private Map<PlayerId, CardSet> hands = new HashMap<PlayerId,CardSet>(); 
-    private List<PlayerId> playersInOrder = new LinkedList<PlayerId>(); 
+    private Map<PlayerId, CardSet> hands = new HashMap<PlayerId, CardSet>();
+    private List<PlayerId> playersInOrder = new LinkedList<PlayerId>();
     private Random shuffleRng;
     private Random trumpRng;
 
@@ -44,16 +42,9 @@ public final class JassGame {
         this.players = Collections.unmodifiableMap(new EnumMap<>(players));
         this.playerNames = Collections
                 .unmodifiableMap(new EnumMap<>(playerNames));
-        // Initialization of the list of cards.
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 9; j++) {
-                cards.add(Card.ofPacked(j + (i << 4)));
-            }
-        }
-        //Initialization of turnState (to be modified later)
-        turnState = TurnState.initial(
-                Color.values()[trumpRng.nextInt(4)], Score.INITIAL,
-                PlayerId.PLAYER_1);
+        // Initialization of turnState (to be modified later)
+        turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
+                Score.INITIAL, PlayerId.PLAYER_1);
     }
 
     /**
@@ -61,54 +52,77 @@ public final class JassGame {
      */
 
     public boolean isGameOver() {
-        return turnState.score().totalPoints(TeamId.TEAM_2) == 1000
-                || turnState.score().totalPoints(TeamId.TEAM_2) == 1000;
+        return turnState.score().totalPoints(TeamId.TEAM_1) >= 1000
+                || turnState.score().totalPoints(TeamId.TEAM_2) >= 1000;
     }
 
     /**
      * Advances to the end of the next trick, doing everything.
      */
-    public void advanceToEndOfNextTrick() {
-        if (isGameOver()) {/* does nothing */ }
 
-        else {
-            // The trick has not started.
-            if (turnState.trick().index() == 0) {
-                deal();
-                turnState = TurnState.initial(
-                        Color.values()[trumpRng.nextInt(4)], Score.INITIAL,
-                        firstPlayer());
-                organizePlayers(firstPlayer()); 
-                players.get(PlayerId.PLAYER_1).setPlayers(PlayerId.PLAYER_1, playerNames); 
-                players.get(PlayerId.PLAYER_1).setTrump(turnState.trick().trump());
-                players.get(PlayerId.PLAYER_1).updateHand(hands.get(PlayerId.PLAYER_1));
-            }
-            else 
-                organizePlayers(turnState.nextPlayer());
-            
-            players.get(PlayerId.PLAYER_1).updateScore(turnState.score());
+    public void advanceToEndOfNextTrick() {
+        // The trick has not started.
+        if (isGameOver()) {
             for (PlayerId p : playersInOrder) {
+                players.get(p).updateScore(turnState.score());
+            }
+        } else {
+            if (!turnState.isTerminal() && turnState.trick().isFull()) {
+                turnState = turnState.withTrickCollected();
+            }
+            if (turnState.isTerminal() || turnState.trick().index() == 0 ) {
+                deal();
+                if (turnState.isTerminal()) {
+                    turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
+                            turnState.score().nextTurn(), firstPlayer());
+                }else {
+                    turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
+                            Score.INITIAL, firstPlayer());
+                }
                 
-                players.get(PlayerId.PLAYER_1).updateTrick(turnState.trick());
+                organizePlayers(firstPlayer());
+                for (PlayerId p : playersInOrder) {
+                    players.get(p).setPlayers(PlayerId.PLAYER_1, playerNames);
+                    players.get(p).updateHand(hands.get(PlayerId.PLAYER_1));
+                    players.get(p).setTrump(turnState.trick().trump());
+                }
+            } else
+                organizePlayers(turnState.nextPlayer());
+            for (PlayerId p : playersInOrder) {
+                players.get(p).updateScore(turnState.score());
+            }
+            
+            for (PlayerId p : playersInOrder) {
+
+                for (PlayerId q : playersInOrder) {
+                    players.get(q).updateTrick(turnState.trick());
+                }
+
                 Card cardToPlay = players.get(p).cardToPlay(turnState,
-                        hands.get(p)); 
-               
+                        hands.get(p));
+
                 players.get(p).updateHand(hands.get(p).remove(cardToPlay));
-                
+
                 turnState = turnState.withNewCardPlayed(cardToPlay);
-                
-                
-                
-                //UPDATE THE HAND 
-                hands.replace(p, hands.get(p).remove(cardToPlay)); 
+
+                // UPDATE THE HAND
+                hands.replace(p, hands.get(p).remove(cardToPlay));
             }
             players.get(PlayerId.PLAYER_1).updateTrick(turnState.trick());
-            turnState = turnState.withTrickCollected(); 
-        }
 
+        }
+        
     }
 
     private void deal() {
+
+        List<Card> cards = new LinkedList<Card>();
+        // Initialization of the list of cards.
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 9; j++) {
+                cards.add(Card.ofPacked(j + (i << 4)));
+            }
+        }
         Collections.shuffle(cards, shuffleRng);
         for (PlayerId p : PlayerId.ALL) {
             CardSet hand = CardSet.EMPTY;
@@ -127,19 +141,22 @@ public final class JassGame {
             if (hands.get(p).contains(Card.of(Color.DIAMOND, Rank.SEVEN))) {
                 return p;
             }
-               
+
         }
         // This shouldn't happen
         return PlayerId.PLAYER_1;
     }
+
     private void organizePlayers(PlayerId firstPlayer) {
         playersInOrder.clear();
-        for(int i = firstPlayer.ordinal(); i<firstPlayer.ordinal()+4; i++) {
-            playersInOrder.add(PlayerId.values()[i%4]); 
+        for (int i = firstPlayer.ordinal(); i < firstPlayer.ordinal()
+                + 4; i++) {
+            playersInOrder.add(PlayerId.values()[i % 4]);
         }
-//        for(PlayerId p: playersInOrder)
-//            System.out.println(p);
+        // for(PlayerId p: playersInOrder)
+        // System.out.println(p);
     }
+
     public static void main(String[] args) {
         // JassGame test = new JassGame(2019,,);
     }
