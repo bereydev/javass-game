@@ -26,6 +26,7 @@ public final class JassGame {
     private Map<PlayerId, String> playerNames;
     private Map<PlayerId, CardSet> hands = new HashMap<PlayerId, CardSet>();
     private List<PlayerId> playersInOrder = new LinkedList<PlayerId>();
+    private PlayerId turnStarter;
     private Random shuffleRng;
     private Random trumpRng;
 
@@ -52,8 +53,8 @@ public final class JassGame {
      */
 
     public boolean isGameOver() {
-        return turnState.score().totalPoints(TeamId.TEAM_1) >= 1000
-                || turnState.score().totalPoints(TeamId.TEAM_2) >= 1000;
+        return turnState.score().totalPoints(TeamId.TEAM_1) >= 1200
+                || turnState.score().totalPoints(TeamId.TEAM_2) >= 1200;
     }
 
     /**
@@ -70,22 +71,26 @@ public final class JassGame {
             if (!turnState.isTerminal() && turnState.trick().isFull()) {
                 turnState = turnState.withTrickCollected();
             }
+            
             if (turnState.isTerminal() || turnState.trick().index() == 0 ) {
                 deal();
+                PlayerId playa = playerTurn();
                 if (turnState.isTerminal()) {
                     turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
-                            turnState.score().nextTurn(), firstPlayer());
+                            turnState.score().nextTurn(), playa);
                 }else {
                     turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
-                            Score.INITIAL, firstPlayer());
+                            Score.INITIAL, playa);
                 }
                 
-                organizePlayers(firstPlayer());
+                organizePlayers(playa);
                 for (PlayerId p : playersInOrder) {
                     players.get(p).setPlayers(PlayerId.PLAYER_1, playerNames);
                     players.get(p).updateHand(hands.get(PlayerId.PLAYER_1));
                     players.get(p).setTrump(turnState.trick().trump());
                 }
+             
+                
             } else
                 organizePlayers(turnState.nextPlayer());
             for (PlayerId p : playersInOrder) {
@@ -106,7 +111,7 @@ public final class JassGame {
                 turnState = turnState.withNewCardPlayed(cardToPlay);
 
                 // UPDATE THE HAND
-               // hands.replace(p, hands.get(p).remove(cardToPlay));
+               hands.replace(p, hands.get(p).remove(cardToPlay));
             }
             players.get(PlayerId.PLAYER_1).updateTrick(turnState.trick());
 
@@ -117,13 +122,14 @@ public final class JassGame {
     private void deal() {
 
         List<Card> cards = new LinkedList<Card>();
-        // Initialization of the list of cards.
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 9; j++) {
-                cards.add(Card.ofPacked(j + (i << 4)));
-            }
-        }
+        
+        for(Card.Color c : Card.Color.ALL)
+            for(Card.Rank r : Card.Rank.ALL) 
+                cards.add(Card.of(c, r)); 
+
+        hands.clear();
         Collections.shuffle(cards, shuffleRng);
+        
         for (PlayerId p : PlayerId.ALL) {
             CardSet hand = CardSet.EMPTY;
             for (int i = CARDS_PER_HAND * p.ordinal(); i < CARDS_PER_HAND
@@ -156,8 +162,17 @@ public final class JassGame {
         // for(PlayerId p: playersInOrder)
         // System.out.println(p);
     }
-
-    public static void main(String[] args) {
-        // JassGame test = new JassGame(2019,,);
+    
+    private PlayerId playerTurn() {
+        if(turnState.score().totalPoints(TeamId.TEAM_1) == 0 &&
+                turnState.score().totalPoints(TeamId.TEAM_2) == 0) {
+            this.turnStarter = firstPlayer();
+            System.out.println("NOW PLAYING : "+ turnStarter+" //////////////////#1" );
+        }
+        else {
+            this.turnStarter = PlayerId.values()[(turnStarter.ordinal()+1)%4]; 
+            System.out.println("NOW PLAYING : "+ turnStarter+" //////////////////" );
+        }
+        return turnStarter; 
     }
 }
