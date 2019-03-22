@@ -106,10 +106,10 @@ public final class TurnState {
      * @return
      */
     public PlayerId nextPlayer() {
-        if (trick().isFull()) {
+        if (PackedTrick.isFull(currentTrick)) {
             throw new IllegalStateException();
         }
-        return trick().player(trick().size());
+        return PackedTrick.player(currentTrick, PackedTrick.size(currentTrick));
     }
 
     /**
@@ -117,7 +117,7 @@ public final class TurnState {
      * @return
      */
     public TurnState withNewCardPlayed(Card card) {
-        if (trick().isFull()) {
+        if (PackedTrick.isFull(currentTrick)) {
             throw new IllegalStateException();
         }
         Trick trick = trick().withAddedCard(card);
@@ -130,14 +130,11 @@ public final class TurnState {
      * @return
      */
     public TurnState withTrickCollected() {
-        if (!trick().isFull()) {
+        if (!PackedTrick.isFull(currentTrick)) {
             throw new IllegalStateException();
         }
         Score nextScore = score().withAdditionalTrick(
                 trick().winningPlayer().team(), trick().points());
-        if (isTerminal()) {
-            nextScore = nextScore.nextTurn();
-        }
         Trick nextTrick = trick().nextEmpty();
         return new TurnState(nextScore.packed(), unplayedCards,
                 nextTrick.packed());
