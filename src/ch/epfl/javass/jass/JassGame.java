@@ -106,7 +106,7 @@ public final class JassGame {
                 turnState = turnState.withNewCardPlayed(cardToPlay);
 
                 // UPDATE THE HAND
-                hands.replace(p, hands.get(p).remove(cardToPlay));
+               // hands.replace(p, hands.get(p).remove(cardToPlay));
             }
             players.get(PlayerId.PLAYER_1).updateTrick(turnState.trick());
 
