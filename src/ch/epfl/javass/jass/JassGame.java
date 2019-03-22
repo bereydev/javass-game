@@ -26,7 +26,8 @@ public final class JassGame {
     private Map<PlayerId, String> playerNames;
     private Map<PlayerId, CardSet> hands = new HashMap<PlayerId, CardSet>();
     private List<PlayerId> playersInOrder = new LinkedList<PlayerId>();
-    private PlayerId turnStarter;
+    private List<PlayerId> playersTurn = new LinkedList<PlayerId>();
+    private PlayerId turnStarter; 
     private Random shuffleRng;
     private Random trumpRng;
 
@@ -71,19 +72,19 @@ public final class JassGame {
             if (!turnState.isTerminal() && turnState.trick().isFull()) {
                 turnState = turnState.withTrickCollected();
             }
-            
             if (turnState.isTerminal() || turnState.trick().index() == 0 ) {
                 deal();
-                PlayerId playa = playerTurn();
+                PlayerId starter = turnStarter(); 
                 if (turnState.isTerminal()) {
                     turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
-                            turnState.score().nextTurn(), playa);
+                            turnState.score().nextTurn(), starter);
+                    organizePlayers(starter);
                 }else {
                     turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
-                            Score.INITIAL, playa);
+                            Score.INITIAL, starter);
                 }
                 
-                organizePlayers(playa);
+                organizePlayers(starter);
                 for (PlayerId p : playersInOrder) {
                     players.get(p).setPlayers(PlayerId.PLAYER_1, playerNames);
                     players.get(p).updateHand(hands.get(PlayerId.PLAYER_1));
@@ -162,17 +163,14 @@ public final class JassGame {
         // for(PlayerId p: playersInOrder)
         // System.out.println(p);
     }
-    
-    private PlayerId playerTurn() {
-        if(turnState.score().totalPoints(TeamId.TEAM_1) == 0 &&
-                turnState.score().totalPoints(TeamId.TEAM_2) == 0) {
-            this.turnStarter = firstPlayer();
-            System.out.println("NOW PLAYING : "+ turnStarter+" //////////////////#1" );
+    private PlayerId turnStarter() {
+        if(turnState.score().totalPoints(TeamId.TEAM_1)==0 &&turnState.score().totalPoints(TeamId.TEAM_1)==0) {
+            turnStarter = firstPlayer(); 
         }
         else {
-            this.turnStarter = PlayerId.values()[(turnStarter.ordinal()+1)%4]; 
-            System.out.println("NOW PLAYING : "+ turnStarter+" //////////////////" );
+            turnStarter = PlayerId.values()[(turnStarter.ordinal()+1)%4]; 
         }
         return turnStarter; 
     }
+    
 }
