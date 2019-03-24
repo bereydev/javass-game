@@ -78,7 +78,6 @@ public final class JassGame {
                 if (turnState.isTerminal()) {
                     turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
                             turnState.score().nextTurn(), starter);
-                    organizePlayers(starter);
                 }else {
                     turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
                             Score.INITIAL, starter);
@@ -92,8 +91,8 @@ public final class JassGame {
                 }
              
                 
-            } else
-                organizePlayers(turnState.nextPlayer());
+            }
+            
             for (PlayerId p : playersInOrder) {
                 players.get(p).updateScore(turnState.score());
             }
@@ -115,7 +114,8 @@ public final class JassGame {
                hands.replace(p, hands.get(p).remove(cardToPlay));
             }
             players.get(PlayerId.PLAYER_1).updateTrick(turnState.trick());
-
+            
+            organizePlayers(turnState.trick().winningPlayer());
         }
         
     }
@@ -172,5 +172,4 @@ public final class JassGame {
         }
         return turnStarter; 
     }
-    
 }
