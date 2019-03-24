@@ -11,6 +11,8 @@ package ch.epfl.javass.jass;
 import java.util.Map;
 import java.util.Random;
 
+import org.hamcrest.core.IsNot;
+
 import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.Card.Rank;
 
@@ -27,8 +29,9 @@ public final class JassGame {
     private Map<PlayerId, CardSet> hands = new HashMap<PlayerId, CardSet>();
     private List<PlayerId> playersInOrder = new LinkedList<PlayerId>();
     private List<PlayerId> playersTurn = new LinkedList<PlayerId>();
-    private PlayerId turnStarter; 
     private Random shuffleRng;
+    private boolean isNewGame = true;
+    private PlayerId turnStarter;
     private Random trumpRng;
 
     private TurnState turnState;
@@ -49,13 +52,19 @@ public final class JassGame {
                 Score.INITIAL, PlayerId.PLAYER_1);
     }
 
+    private void initializeGame() {
+
+    }
+
     /**
      * @return True if the game is over (a team has 1000points)
      */
 
     public boolean isGameOver() {
-        return turnState.score().totalPoints(TeamId.TEAM_1) >= 1200
-                || turnState.score().totalPoints(TeamId.TEAM_2) >= 1200;
+        return turnState.score()
+                .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
+                || turnState.score()
+                        .totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS;
     }
 
     /**
@@ -63,61 +72,55 @@ public final class JassGame {
      */
 
     public void advanceToEndOfNextTrick() {
-        // The trick has not started.
-        if (isGameOver()) {
-            for (PlayerId p : playersInOrder) {
-                players.get(p).updateScore(turnState.score());
-            }
+
+        if (isGameOver())
+            return;
+        if (isNewGame) {
+            isNewGame = false;
+            deal();
+            organizePlayers(firstPlayer());
+            turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
+                    turnState.score().nextTurn(), firstPlayer());
         } else {
-            if (!turnState.isTerminal() && turnState.trick().isFull()) {
-                turnState = turnState.withTrickCollected();
-            }
-            if (turnState.isTerminal() || turnState.trick().index() == 0 ) {
+            if (turnState.isTerminal()) {
+                isNewGame = false;
                 deal();
-                PlayerId starter = turnStarter(); 
-                if (turnState.isTerminal()) {
-                    turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
-                            turnState.score().nextTurn(), starter);
-                }else {
-                    turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
-                            Score.INITIAL, starter);
-                }
-                
-                organizePlayers(starter);
-                for (PlayerId p : playersInOrder) {
-                    players.get(p).setPlayers(PlayerId.PLAYER_1, playerNames);
-                    players.get(p).updateHand(hands.get(PlayerId.PLAYER_1));
-                    players.get(p).setTrump(turnState.trick().trump());
-                }
-             
-                
+                organizePlayers(turnState.nextPlayer());
+                turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
+                        turnState.score().nextTurn(), turnState.nextPlayer());
             }
-            
-            for (PlayerId p : playersInOrder) {
-                players.get(p).updateScore(turnState.score());
-            }
-            
-            for (PlayerId p : playersInOrder) {
-
-                for (PlayerId q : playersInOrder) {
-                    players.get(q).updateTrick(turnState.trick());
-                }
-
-                Card cardToPlay = players.get(p).cardToPlay(turnState,
-                        hands.get(p));
-
-                players.get(p).updateHand(hands.get(p).remove(cardToPlay));
-
-                turnState = turnState.withNewCardPlayed(cardToPlay);
-
-                // UPDATE THE HAND
-               hands.replace(p, hands.get(p).remove(cardToPlay));
-            }
-            players.get(PlayerId.PLAYER_1).updateTrick(turnState.trick());
-            
-            organizePlayers(turnState.trick().winningPlayer());
+            deal();
+            organizePlayers(turnStarter());
+            turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
+                    turnState.score().nextTurn(), turnStarter());
         }
-        
+        for (PlayerId p : playersInOrder) {
+             players.get(p).setPlayers(PlayerId.PLAYER_1, playerNames);
+             players.get(p).updateHand(hands.get(PlayerId.PLAYER_1));
+             players.get(p).setTrump(turnState.trick().trump());
+             }
+
+             for (PlayerId p : playersInOrder) {
+             players.get(p).updateScore(turnState.score());
+             }
+            
+             for (PlayerId p : playersInOrder) {
+            
+             for (PlayerId q : playersInOrder) {
+             players.get(q).updateTrick(turnState.trick());
+             }
+            
+             Card cardToPlay = players.get(p).cardToPlay(turnState,
+             hands.get(p));
+            
+             players.get(p).updateHand(hands.get(p).remove(cardToPlay));
+            
+             turnState = turnState.withNewCardPlayed(cardToPlay);
+            
+             // UPDATE THE HAND
+             hands.replace(p, hands.get(p).remove(cardToPlay));
+             }
+             players.get(PlayerId.PLAYER_1).updateTrick(turnState.trick());
     }
 
     private void deal() {
