@@ -202,8 +202,8 @@ public final class PackedCardSet {
      */
     public static long intersection(long pkCardSet1, long pkCardSet2) {
         assert (isValid(pkCardSet1) && isValid(pkCardSet2));
-
-        return pkCardSet1 & pkCardSet2;
+        long result = pkCardSet1 & pkCardSet2;
+        return result; 
     }
 
     /**

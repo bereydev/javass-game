@@ -55,7 +55,6 @@ public class JassGameTest {
 
                 CardSet cards = CardSet.ALL_CARDS;
                 for (TestPlayer p: ps.values()) {
-                   // System.out.println(cards.intersection(p.updateHandInitialHand));
                     assertEquals(9, cards.intersection(p.updateHandInitialHand).size());
                     cards = cards.difference(p.updateHandInitialHand);
                 }
@@ -91,7 +90,6 @@ public class JassGameTest {
                 g.advanceToEndOfNextTrick();
                 assertEquals(PlayerId.COUNT, playingOrderLog.size());
                 TestPlayer firstPlayer = ps.get(playingOrderLog.get(0));
-                System.out.println(firstPlayer.updateHandInitialHand);
                 assertTrue(firstPlayer.updateHandInitialHand.contains(Card.of(Color.DIAMOND, Rank.SEVEN)));
             }
         });
@@ -182,7 +180,6 @@ public class JassGameTest {
                     int expectedCallsToUpdateTrick = 5 * t;
                     Trick player1Trick = ps.get(PlayerId.PLAYER_1).updateTrickNewTrick;
                     for (TestPlayer p: ps.values()) {
-                        System.out.println(p.updateTrickCallCount + " nb of calls to updatetrick");
                         assertTrue(p.updateTrickCallCount >= expectedCallsToUpdateTrick);
                         assertEquals(player1Trick, p.updateTrickNewTrick);
                     }
