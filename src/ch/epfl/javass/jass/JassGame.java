@@ -1,6 +1,7 @@
 /*
  *  Author : Alexandre Santangelo 
  *  Date   : Mar 13, 2019   
+<<<<<<< HEAD
  */
 
 /**
