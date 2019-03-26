@@ -8,6 +8,7 @@
  */
 package ch.epfl.javass.jass;
 
+
 public final class MctsPlayer implements Player {
     
     
@@ -27,7 +28,7 @@ public final class MctsPlayer implements Player {
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        // TODO jeje this is not easy 
+        Node first = new Node(state, hand, state.score().totalPoints(ownId.team()),1); 
         return null;
     }
     
@@ -35,9 +36,17 @@ public final class MctsPlayer implements Player {
         private static final int MAX_NB_OF_NODES =9; 
         private TurnState currentState; 
         private Node[] children = new Node[MAX_NB_OF_NODES]; 
-        private CardSet cardset; 
+        private CardSet cardsetForNextNodes; 
         private int totalPoints; 
         private int nbOfTurns; 
+        private TeamId ownerTeam; 
+        
+        Node(TurnState currentState,CardSet cardset, int totalPoints, int nbOfTurns) {
+            cardsetForNextNodes = cardset; 
+            this.currentState = new TurnState(currentState); 
+            this.totalPoints = totalPoints; 
+            this.nbOfTurns = nbOfTurns; 
+        }
     }
     
 

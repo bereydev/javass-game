@@ -18,6 +18,11 @@ public final class TurnState {
         unplayedCards = pkCardSet;
         currentTrick = pkTrick;
     }
+    public TurnState(TurnState toCopy) {
+        currentScore = toCopy.currentScore; 
+        unplayedCards = toCopy.unplayedCards; 
+        currentTrick = toCopy.currentTrick; 
+    }
 
     private long currentScore = PackedScore.INITIAL;
     private long unplayedCards = PackedCardSet.ALL_CARDS;
