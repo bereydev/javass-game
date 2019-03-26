@@ -57,17 +57,8 @@ public final class JassGame {
      */
 
     public boolean isGameOver() {
-        boolean isGameOver = turnState.score().totalPoints(TeamId.TEAM_1) >= 1000
-                || turnState.score().totalPoints(TeamId.TEAM_2) >= 1000; 
-        if(isGameOver) {
-            TeamId winningTeam = turnState.score().totalPoints(TeamId.TEAM_1) >= 1000 ? TeamId.TEAM_1 : TeamId.TEAM_2;
-            turnState.withTrickCollected(); 
-            for (PlayerId p : playersInOrder) {
-                players.get(p).setWinningTeam(winningTeam);
-                players.get(p).updateScore(turnState.score());
-            }
-        }
-        return isGameOver;
+        return turnState.score().totalPoints(TeamId.TEAM_1) >= 1000
+                || turnState.score().totalPoints(TeamId.TEAM_2) >= 1000;
     }
 
     /**
@@ -76,6 +67,11 @@ public final class JassGame {
 
     public void advanceToEndOfNextTrick() {
         if (isGameOver()) {
+            TeamId winningTeam = turnState.score().totalPoints(TeamId.TEAM_1) >= 1000 ? TeamId.TEAM_1 : TeamId.TEAM_2;
+            for (PlayerId p : playersInOrder) {
+                players.get(p).setWinningTeam(winningTeam);
+                players.get(p).updateScore(turnState.score());
+            }
             return; 
         } 
         
@@ -127,7 +123,6 @@ public final class JassGame {
         for (PlayerId q : playersInOrder) {
             players.get(q).updateTrick(turnState.trick());
         }
-        players.get(PlayerId.PLAYER_1).updateTrick(turnState.trick());
         player1 = turnState.trick().winningPlayer(); 
 
         if(newGame)
