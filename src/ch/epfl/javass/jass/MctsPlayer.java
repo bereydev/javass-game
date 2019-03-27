@@ -8,6 +8,10 @@
  */
 package ch.epfl.javass.jass;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SplittableRandom;
 
 public final class MctsPlayer implements Player {
     
@@ -28,25 +32,56 @@ public final class MctsPlayer implements Player {
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        Node first = new Node(state, hand, state.score().totalPoints(ownId.team()),1); 
+        Node first = new Node(state, state.trick().playableCards(hand)); 
+        return null;
+    }
+    
+    private List<Node> addNode(){
         return null;
     }
     
     private static class Node{
-        private static final int MAX_NB_OF_NODES =9; 
         private TurnState currentState; 
-        private Node[] children = new Node[MAX_NB_OF_NODES]; 
+        private Node[] children; 
         private CardSet cardsetForNextNodes; 
         private int totalPoints; 
-        private int nbOfTurns; 
-        private TeamId ownerTeam; 
+        private int nbOfTurns = 0; 
+        private Node parent = null;
         
-        Node(TurnState currentState,CardSet cardset, int totalPoints, int nbOfTurns) {
+        Node(TurnState currentState,CardSet cardset) {
             cardsetForNextNodes = cardset; 
             this.currentState = new TurnState(currentState); 
             this.totalPoints = totalPoints; 
             this.nbOfTurns = nbOfTurns; 
+            children = new Node[cardset.size()];
+            
         }
+       
+        Node(TurnState currentState,CardSet cardset, Node parent) {
+            this(currentState, cardset);
+            this.parent = parent;
+        }
+        int finalScore() {
+            return totalPoints;
+        }
+        
+        CardSet currentPlayableCards() {
+            return null;
+        }
+        
+        void runRandomGame() {
+//            SplittableRandom rng = new SplittableRandom(); 
+//            while (! currentState.isTerminal()) {
+//                currentState.withNewCardPlayed(card)
+//              }
+//            totalPoints = 
+        }
+        
+        int selectChild() {
+            return 0;
+        }
+        
+        
     }
     
 
