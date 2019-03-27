@@ -49,7 +49,7 @@ public final class JassGame {
         // Initialization of turnState (to be modified later)
         turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
                 Score.INITIAL, PlayerId.PLAYER_1);
-        newGame = true; 
+        newGame = turnState.score().equals(Score.INITIAL); 
     }
 
     /**

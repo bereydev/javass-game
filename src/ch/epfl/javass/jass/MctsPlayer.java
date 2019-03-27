@@ -28,25 +28,29 @@ public final class MctsPlayer implements Player {
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        Node first = new Node(state, hand, state.score().totalPoints(ownId.team()),1); 
+        Node first = new Node(state, state.trick().playableCards(hand)); 
         return null;
     }
     
     private static class Node{
-        private static final int MAX_NB_OF_NODES =9; 
+      
         private TurnState currentState; 
-        private Node[] children = new Node[MAX_NB_OF_NODES]; 
+        private Node[] children; 
         private CardSet cardsetForNextNodes; 
         private int totalPoints; 
-        private int nbOfTurns; 
-        private TeamId ownerTeam; 
+        private int nbOfTurns=0; 
+        private Node parent=null; 
         
-        Node(TurnState currentState,CardSet cardset, int totalPoints, int nbOfTurns) {
-            cardsetForNextNodes = cardset; 
-            this.currentState = new TurnState(currentState); 
-            this.totalPoints = totalPoints; 
-            this.nbOfTurns = nbOfTurns; 
+        
+        
+        int finalScore() {
+            return 0; 
         }
+        CardSet currentPlayableCards() {
+            return CardSet.EMPTY; 
+        }
+        
+        
     }
     
 
