@@ -34,14 +34,7 @@ public final class MctsPlayer implements Player {
     public Card cardToPlay(TurnState state, CardSet hand) {
         Node first = new Node(state, state.trick().playableCards(hand), ownId, hand); 
         return null;
-    }
-    
-    private List<Node> addNode(){
-        return null;
-    }
-    
-
-    
+    } 
     private static class Node{
         private TurnState currentState; 
         private Node[] children; 
