@@ -42,6 +42,7 @@ public final class MctsPlayer implements Player {
             List<Node> nodeList = root.addNode();
             Score finalScore = nodeList.get(nodeList.size() - 1).finalScore();
             // propagate the finalScore depending on the team
+
         }
         return hand.get(root.selectChild(0));
     }
