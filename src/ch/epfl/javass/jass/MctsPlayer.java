@@ -1,18 +1,13 @@
 /*
- *	Author : Alexandre Santangelo 
+ *	Author : Alexandre Santangelo & Jonathan Bereyziat
+ *
  *	Date   : Mar 24, 2019	
 */
 
-/**
- * 
- */
 package ch.epfl.javass.jass;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import java.util.SplittableRandom;
 import java.lang.Math;
 
@@ -22,6 +17,15 @@ public final class MctsPlayer implements Player {
     private long rngSeed;
     private int iterations;
 
+    /**
+     * @param ownId
+     *            the Id of the player that will be a MctsPlayer
+     * @param rngSeed
+     *            the seed used for the random number Generation
+     * @param iterations
+     *            the number of iterations must be greater than 9 and less than
+     *            the maximal number of nodes
+     */
     public MctsPlayer(PlayerId ownId, long rngSeed, int iterations) {
         if (iterations < 9)
             throw new IllegalArgumentException();
@@ -32,62 +36,96 @@ public final class MctsPlayer implements Player {
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        Node first = new Node(state, state.trick().playableCards(hand), ownId, hand); 
-        return null;
-    } 
-    private static class Node{
-        private TurnState currentState; 
-        private Node[] children; 
-        private CardSet unplayedCards; 
-        private CardSet hand; 
-        private int totalPoints; 
-        private int nbOfTurns=0; 
-        private final PlayerId ownId; 
-   
-        
-        Node(TurnState currentState, CardSet cardset, PlayerId ownId, CardSet hand) {
+        Node root = new Node(state, state.trick().playableCards(hand), ownId,
+                hand);
+        for (int i = 0; i < iterations; i++) {
+            List<Node> nodeList = root.addNode();
+            Score finalScore = nodeList.get(nodeList.size() - 1).finalScore();
+            // propagate the finalScore depending on the team
+        }
+        return hand.get(root.selectChild(0));
+    }
+
+    /**
+     * Node object represent a Node of the Monte Carlo Tree
+     *
+     */
+    private static class Node {
+        private TurnState currentState;
+        private Node[] children;
+        private CardSet unplayedCards;
+        private CardSet hand;
+        private int totalPoints;
+        private int nbOfTurns = 0;
+        private final PlayerId ownId;
+
+        /**
+         * @param currentState
+         *            the State of the game where the node is created
+         * @param cardset
+         *            the Set of card that remains to play
+         * @param ownId
+         *            the id of the proprietary MctsPlayer
+         * @param hand
+         *            the hand of the MctsPlayer
+         */
+        private Node(TurnState currentState, CardSet cardset, PlayerId ownId,
+                CardSet hand) {
             unplayedCards = cardset;
             this.currentState = new TurnState(currentState);
-            this.ownId = ownId; 
+            this.ownId = ownId;
             children = new Node[cardset.size()];
-            this.hand = hand; 
+            this.hand = hand;
+            runRandomGame();
 
         }
-        void runRandomGame() {
-            TurnState stateCopy = new TurnState(currentState); 
-            CardSet cards = CardSet.ALL_CARDS.intersection(unplayedCards); 
-            SplittableRandom rng = new SplittableRandom(); 
-            PlayerId player; 
-            while(!stateCopy.isTerminal()) {
-                while(stateCopy.trick().size() <4) {
-                    player = stateCopy.nextPlayer(); 
-                    cards  = currentPlayableCards(cards,stateCopy, player); 
+        /**
+         * @return the score of the randomly simulated Jass game 
+         */
+        private Score runRandomGame() {
+            TurnState stateCopy = new TurnState(currentState);
+            CardSet cards = CardSet.ALL_CARDS.intersection(unplayedCards);
+            SplittableRandom rng = new SplittableRandom();
+            PlayerId player;
+            while (!stateCopy.isTerminal()) {
+                while (stateCopy.trick().size() < 4) {
+                    player = stateCopy.nextPlayer();
+                    cards = currentPlayableCards(cards, stateCopy, player);
                     Card cardToPlay = cards.get(rng.nextInt(cards.size()));
-                    
-                    cards.remove(cardToPlay); 
-                    hand.remove(cardToPlay); 
-                    stateCopy.trick().withAddedCard(cardToPlay); 
-                }
-                stateCopy = stateCopy.withTrickCollected(); 
-            }
-         }
-        
-        int selectChild() {
-            return 0;
-        }
-        
-        Score finalScore() {
-            return null; 
-        }
-        CardSet currentPlayableCards(CardSet cards,TurnState currentState, PlayerId player) {
-            if(player.equals(ownId)) 
-                return  currentState.trick().playableCards(hand); 
-            
-            return currentState.trick().playableCards(cards).intersection(hand.complement()); 
-        }
-       
 
-        int selectChild(int c) {
+                    cards.remove(cardToPlay);
+                    hand.remove(cardToPlay);
+                    stateCopy.trick().withAddedCard(cardToPlay);
+                }
+                stateCopy = stateCopy.withTrickCollected();
+            }
+            return null;
+        }
+
+        /**
+         * @return the final Score of the randomly generated game of Jass in the
+         *         node
+         */
+        private Score finalScore() {
+            return null;
+        }
+
+        private CardSet currentPlayableCards(CardSet cards,
+                TurnState currentState, PlayerId player) {
+            if (player.equals(ownId))
+                return currentState.trick().playableCards(hand);
+
+            return currentState.trick().playableCards(cards)
+                    .intersection(hand.complement());
+        }
+
+        /**
+         * @param c
+         *            the constant (40) of exploration or the MCTS if c = 0 we
+         *            obtain the next card to play for the MctsPlayer
+         * @return the Best child of a node regarding the formulae of the MCTS
+         */
+        private int selectChild(int c) {
             boolean noChild = true; // the array of children is empty
             int nbrChild = 0;
             for (Object ob : children) {
@@ -114,13 +152,17 @@ public final class MctsPlayer implements Player {
             return indexOfTheBestChild;
         }
 
-        List<Node> addNode() {
+        /**
+         * @return A list of nodes from the one added by the function to the
+         *         root (the one to which the function is applied)
+         */
+        private List<Node> addNode() {
             List<Node> nodes = new ArrayList<MctsPlayer.Node>();
             nodes.add(this);
 
-             if (currentState.isTerminal()) {
-                 return nodes ;
-             }
+            if (currentState.isTerminal()) {
+                return nodes;
+            }
             boolean isFull = true; // the array of children is full
             int indexToAdd = 0;
             for (int i = 0; i < children.length; i++) {
