@@ -92,6 +92,9 @@ public final class MctsPlayer implements Player {
             return indexOfTheBestChild;
         }
 
+        /**
+         * @return A list of nodes from the one added by the function to the root (the one to which the function is applied)
+         */
         List<Node> addNode() {
             List<Node> nodes = new ArrayList<MctsPlayer.Node>();
             nodes.add(this);
