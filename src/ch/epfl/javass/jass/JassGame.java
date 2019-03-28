@@ -62,6 +62,7 @@ public final class JassGame {
                 || turnState.score().totalPoints(TeamId.TEAM_2) >= 1000; 
 
         if(GameOver)
+            System.out.println(winningTeam);
             for (PlayerId p : playersInOrder) {
                 players.get(p).setWinningTeam(winningTeam);
                 players.get(p).updateScore(turnState.score().nextTurn());

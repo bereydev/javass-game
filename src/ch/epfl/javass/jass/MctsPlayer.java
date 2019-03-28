@@ -7,6 +7,7 @@
 package ch.epfl.javass.jass;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.SplittableRandom;
 import java.lang.Math;
@@ -32,16 +33,23 @@ public final class MctsPlayer implements Player {
         this.iterations = iterations;
         this.rngSeed = rngSeed;
         this.ownId = ownId;
+        System.out.println("I'm in team: " + ownId.team());
     }
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
         Node root = new Node(state, state.trick().playableCards(hand), ownId,
                 hand);
+        List<Node> nodeList;  
         for (int i = 0; i < iterations; i++) {
-            List<Node> nodeList = root.addNode();
-            Score finalScore = nodeList.get(nodeList.size() - 1).finalScore();
-            // propagate the finalScore depending on the team
+            nodeList = root.addNode();
+            Collections.reverse(nodeList); 
+            double totalPoints=0; 
+            for(Node n : nodeList) {
+                totalPoints += n.totalPoints; 
+                n.totalPoints = totalPoints/n.nbOfTurns; 
+            }
+            Collections.reverse(nodeList);
         }
         return hand.get(root.selectChild(0));
     }
@@ -53,9 +61,9 @@ public final class MctsPlayer implements Player {
     private static class Node {
         private TurnState currentState;
         private Node[] children;
-        private CardSet unplayedCards;
+        private CardSet cardSetForNextNodes;
         private CardSet hand;
-        private int totalPoints;
+        private double totalPoints;
         private int nbOfTurns = 0;
         private final PlayerId ownId;
 
@@ -71,35 +79,32 @@ public final class MctsPlayer implements Player {
          */
         private Node(TurnState currentState, CardSet cardset, PlayerId ownId,
                 CardSet hand) {
-            unplayedCards = cardset;
+            cardSetForNextNodes = cardset;
             this.currentState = new TurnState(currentState);
             this.ownId = ownId;
             children = new Node[cardset.size()];
             this.hand = hand;
-            runRandomGame();
-
+            this.totalPoints = runRandomGame().gamePoints(ownId.team()); 
         }
         /**
          * @return the score of the randomly simulated Jass game 
          */
         private Score runRandomGame() {
             TurnState stateCopy = new TurnState(currentState);
-            CardSet cards = CardSet.ALL_CARDS.intersection(unplayedCards);
-            SplittableRandom rng = new SplittableRandom();
+            CardSet cards = CardSet.ALL_CARDS.intersection(cardSetForNextNodes);
             PlayerId player;
-            while (!stateCopy.isTerminal()) {
+            while (!stateCopy.isTerminal() ) {
                 while (stateCopy.trick().size() < 4) {
                     player = stateCopy.nextPlayer();
                     cards = currentPlayableCards(cards, stateCopy, player);
-                    Card cardToPlay = cards.get(rng.nextInt(cards.size()));
-
+                    Card cardToPlay = cards.get(0);
                     cards.remove(cardToPlay);
                     hand.remove(cardToPlay);
-                    stateCopy.trick().withAddedCard(cardToPlay);
+                    stateCopy = stateCopy.withNewCardPlayed(cardToPlay);
                 }
                 stateCopy = stateCopy.withTrickCollected();
             }
-            return null;
+            return stateCopy.score();
         }
 
         /**
@@ -112,11 +117,11 @@ public final class MctsPlayer implements Player {
 
         private CardSet currentPlayableCards(CardSet cards,
                 TurnState currentState, PlayerId player) {
-            if (player.equals(ownId))
+            if (player.equals(ownId)) {
                 return currentState.trick().playableCards(hand);
-
-            return currentState.trick().playableCards(cards)
-                    .intersection(hand.complement());
+            }
+            return currentState.trick().playableCards(cardSetForNextNodes.
+                    intersection(hand.complement())); 
         }
 
         /**
@@ -140,7 +145,7 @@ public final class MctsPlayer implements Player {
             int indexOfTheBestChild = 0;
             double bestNodeValue = 0;
             for (int i = 0; i < nbrChild; i++) {
-                int S = children[i].totalPoints;
+                double S = children[i].totalPoints;
                 int N = children[i].nbOfTurns;
                 int Np = nbOfTurns;
                 double nodeValue = S / N + c * Math.sqrt(2 * Math.log(N) / Np);
@@ -178,12 +183,12 @@ public final class MctsPlayer implements Player {
             } else {
                 TurnState nextCurrentState = currentState
                         .withNewCardPlayedAndTrickCollected(
-                                unplayedCards.get(0));
+                                cardSetForNextNodes.get(0));
                 // WARNING if the currentState arrived with a full trick an
                 // IllecgalStateException is thrown but in theory it shouldn't
                 // happen
                 children[indexToAdd] = new Node(nextCurrentState,
-                        nextCurrentState.unplayedCards(), ownId, hand.remove(unplayedCards.get(0)));
+                        nextCurrentState.unplayedCards(), ownId, hand.remove(cardSetForNextNodes.get(0)));
             }
             return nodes;
 

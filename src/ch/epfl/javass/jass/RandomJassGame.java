@@ -9,17 +9,16 @@ public final class RandomJassGame {
         Map<PlayerId, String> playerNames = new HashMap<>();
 
         for (PlayerId pId: PlayerId.ALL) {
-          Player player = new RandomPlayer(2019);
+          Player player = new RandomPlayer(0);
           if (pId == PlayerId.PLAYER_2)
-              player = new PrintingPlayer(player);
+              player = new PrintingPlayer(new MctsPlayer(PlayerId.PLAYER_2,0,100000));
           players.put(pId, player);
           playerNames.put(pId, pId.name());
         }
 
-        JassGame g = new JassGame(2019, players, playerNames);
+        JassGame g = new JassGame(0, players, playerNames);
         while (! g.isGameOver()) {
           g.advanceToEndOfNextTrick();
-          System.out.println("----");
         }
       }
 }

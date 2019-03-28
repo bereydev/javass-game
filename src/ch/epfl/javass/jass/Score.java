@@ -45,7 +45,7 @@ public final class Score {
      * @return The unpacked version of the score
      */
     public static Score ofPacked(long pkScore) {
-        Preconditions.checkArgument(PackedScore.isValid(pkScore));
+      //  Preconditions.checkArgument(PackedScore.isValid(pkScore));
 
         int nbP1 = (int) Bits64.extract(pkScore, 0, 4);
         int tP1 = (int) Bits64.extract(pkScore, 4, 9);
