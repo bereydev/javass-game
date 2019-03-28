@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.SplittableRandom;
 import java.lang.Math;
 
@@ -31,39 +32,77 @@ public final class MctsPlayer implements Player {
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        Node first = new Node(state, state.trick().playableCards(hand));
+        Node first = new Node(state, state.trick().playableCards(hand), ownId, hand); 
         return null;
     }
+    
+    private List<Node> addNode(){
+        return null;
+    }
+    
 
-    private static class Node {
-        private TurnState currentState;
-        private Node[] children;
-        private CardSet cardsetForNextNodes;
-        private int totalPoints;
-        private int nbOfTurns = 0;
-        private Node parent = null;
-
-        Node(TurnState currentState, CardSet cardset) {
-            cardsetForNextNodes = cardset;
+    
+    private static class Node{
+        private TurnState currentState; 
+        private Node[] children; 
+        private CardSet unplayedCards; 
+        private CardSet hand; 
+        private int totalPoints; 
+        private int nbOfTurns=0; 
+        private Node parent=null;
+        private final PlayerId ownId; 
+   
+        
+        Node(TurnState currentState, CardSet cardset, PlayerId ownId, CardSet hand) {
+            unplayedCards = cardset;
             this.currentState = new TurnState(currentState);
-            this.totalPoints = totalPoints;
-            this.nbOfTurns = nbOfTurns;
+            this.ownId = ownId; 
             children = new Node[cardset.size()];
+            this.hand = hand; 
 
         }
 
-        Node(TurnState currentState, CardSet cardset, Node parent) {
-            this(currentState, cardset);
+        Node(TurnState currentState, CardSet cardset,PlayerId ownId, Node parent,CardSet hand) {
+            unplayedCards = cardset;
+            this.currentState = new TurnState(currentState);
+            this.ownId = ownId; 
+            children = new Node[cardset.size()];
             this.parent = parent;
+            this.hand = hand; 
         }
-
-        int finalScore() {
-            return totalPoints;
+        void runRandomGame() {
+            TurnState stateCopy = new TurnState(currentState); 
+            CardSet cards = CardSet.ALL_CARDS.intersection(unplayedCards); 
+            SplittableRandom rng = new SplittableRandom(); 
+            PlayerId player; 
+            while(!stateCopy.isTerminal()) {
+                while(stateCopy.trick().size() <4) {
+                    player = stateCopy.nextPlayer(); 
+                    cards  = currentPlayableCards(cards,stateCopy, player); 
+                    Card cardToPlay = cards.get(rng.nextInt(cards.size()));
+                    
+                    cards.remove(cardToPlay); 
+                    hand.remove(cardToPlay); 
+                    stateCopy.trick().withAddedCard(cardToPlay); 
+                }
+                stateCopy = stateCopy.withTrickCollected(); 
+            }
+         }
+        
+        int selectChild() {
+            return 0;
         }
-
-        CardSet currentPlayableCards() {
-            return cardsetForNextNodes;
+        
+        Score finalScore() {
+            return null; 
         }
+        CardSet currentPlayableCards(CardSet cards,TurnState currentState, PlayerId player) {
+            if(player.equals(ownId)) 
+                return  currentState.trick().playableCards(hand); 
+            
+            return currentState.trick().playableCards(cards).intersection(hand.complement()); 
+        }
+       
 
         int selectChild(int c) {
             boolean noChild = true; // the array of children is empty
@@ -117,12 +156,12 @@ public final class MctsPlayer implements Player {
             } else {
                 TurnState nextCurrentState = currentState
                         .withNewCardPlayedAndTrickCollected(
-                                cardsetForNextNodes.get(0));
+                                unplayedCards.get(0));
                 // WARNING if the currentState arrived with a full trick an
                 // IllecgalStateException is thrown but in theory it shouldn't
                 // happen
                 children[indexToAdd] = new Node(nextCurrentState,
-                        nextCurrentState.unplayedCards());
+                        nextCurrentState.unplayedCards(), ownId, this, hand.remove(unplayedCards.get(0)));
             }
             return nodes;
 

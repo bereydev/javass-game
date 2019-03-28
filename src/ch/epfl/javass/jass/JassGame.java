@@ -49,7 +49,7 @@ public final class JassGame {
         // Initialization of turnState (to be modified later)
         turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
                 Score.INITIAL, PlayerId.PLAYER_1);
-        newGame = true; 
+        newGame = turnState.score().equals(Score.INITIAL); 
     }
 
     /**
@@ -58,12 +58,15 @@ public final class JassGame {
 
     public boolean isGameOver() {
         TeamId winningTeam = turnState.score().totalPoints(TeamId.TEAM_1) >= 1000 ? TeamId.TEAM_1 : TeamId.TEAM_2;
-        for (PlayerId p : playersInOrder) {
-            players.get(p).setWinningTeam(winningTeam);
-            players.get(p).updateScore(turnState.score().nextTurn());
-        }
-        return turnState.score().totalPoints(TeamId.TEAM_1) >= 1000
-                || turnState.score().totalPoints(TeamId.TEAM_2) >= 1000;
+        boolean GameOver = turnState.score().totalPoints(TeamId.TEAM_1) >= 1000
+                || turnState.score().totalPoints(TeamId.TEAM_2) >= 1000; 
+
+        if(GameOver)
+            for (PlayerId p : playersInOrder) {
+                players.get(p).setWinningTeam(winningTeam);
+                players.get(p).updateScore(turnState.score().nextTurn());
+            }
+        return GameOver;
     }
 
     /**
@@ -135,9 +138,9 @@ public final class JassGame {
     private void deal() {
         List<Card> cards = new LinkedList<Card>();
         
-        for(Card.Color c : Card.Color.ALL)
-            for(Card.Rank r : Card.Rank.ALL) 
-                cards.add(Card.of(c, r)); 
+        for (int i = 0; i < CardSet.ALL_CARDS.size(); ++i) {
+            cards.add(CardSet.ALL_CARDS.get(i));
+        }
         Collections.shuffle(cards, shuffleRng);
         
         hands.clear();

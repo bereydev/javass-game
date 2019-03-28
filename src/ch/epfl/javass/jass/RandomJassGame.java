@@ -10,7 +10,7 @@ public final class RandomJassGame {
 
         for (PlayerId pId: PlayerId.ALL) {
           Player player = new RandomPlayer(2019);
-          if (pId == PlayerId.PLAYER_1)
+          if (pId == PlayerId.PLAYER_2)
               player = new PrintingPlayer(player);
           players.put(pId, player);
           playerNames.put(pId, pId.name());
