@@ -49,7 +49,6 @@ public final class MctsPlayer implements Player {
         private CardSet hand; 
         private int totalPoints; 
         private int nbOfTurns=0; 
-        private Node parent=null;
         private final PlayerId ownId; 
    
         
@@ -60,15 +59,6 @@ public final class MctsPlayer implements Player {
             children = new Node[cardset.size()];
             this.hand = hand; 
 
-        }
-
-        Node(TurnState currentState, CardSet cardset,PlayerId ownId, Node parent,CardSet hand) {
-            unplayedCards = cardset;
-            this.currentState = new TurnState(currentState);
-            this.ownId = ownId; 
-            children = new Node[cardset.size()];
-            this.parent = parent;
-            this.hand = hand; 
         }
         void runRandomGame() {
             TurnState stateCopy = new TurnState(currentState); 
@@ -158,7 +148,7 @@ public final class MctsPlayer implements Player {
                 // IllecgalStateException is thrown but in theory it shouldn't
                 // happen
                 children[indexToAdd] = new Node(nextCurrentState,
-                        nextCurrentState.unplayedCards(), ownId, this, hand.remove(unplayedCards.get(0)));
+                        nextCurrentState.unplayedCards(), ownId, hand.remove(unplayedCards.get(0)));
             }
             return nodes;
 
