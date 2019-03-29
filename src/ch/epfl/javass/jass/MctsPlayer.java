@@ -1,199 +1,245 @@
-/*
- *	Author : Alexandre Santangelo & Jonathan Bereyziat
- *
- *	Date   : Mar 24, 2019	
-*/
-
 package ch.epfl.javass.jass;
-
-import java.util.ArrayList;
-import java.util.Collections;
+ 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.SplittableRandom;
-import java.lang.Math;
-
+ 
+import ch.epfl.javass.Preconditions;
+import ch.epfl.javass.jass.Card.Color;
+import ch.epfl.javass.jass.Card.Rank;
+ 
+/**
+ * Class representing a simulated player using the MCTS algorithm
+ *
+ * @author Jonathan Bereyziat
+ * @author Alexandre Santangelo
+ */
 public final class MctsPlayer implements Player {
-
-    private PlayerId ownId;
-    private long rngSeed;
-    private int iterations;
-
-    /**
-     * @param ownId
-     *            the Id of the player that will be a MctsPlayer
-     * @param rngSeed
-     *            the seed used for the random number Generation
-     * @param iterations
-     *            the number of iterations must be greater than 9 and less than
-     *            the maximal number of nodes
-     */
-    public MctsPlayer(PlayerId ownId, long rngSeed, int iterations) {
-        if (iterations < 9)
-            throw new IllegalArgumentException();
-        this.iterations = iterations;
-        this.rngSeed = rngSeed;
-        this.ownId = ownId;
-        System.out.println("I'm in team: " + ownId.team());
+    //méthodes de test
+    public static void main(String[] args) { //TODO Enlever pour le rendu
+        
+        MctsPlayer player = new MctsPlayer(PlayerId.PLAYER_2, 0, 9);
+       
+        CardSet hand = CardSet.EMPTY
+                .add(Card.of(Color.SPADE, Rank.EIGHT))
+                .add(Card.of(Color.SPADE, Rank.NINE))
+                .add(Card.of(Color.SPADE, Rank.TEN))
+                .add(Card.of(Color.HEART, Rank.SIX))
+                .add(Card.of(Color.HEART, Rank.SEVEN))
+                .add(Card.of(Color.HEART, Rank.EIGHT))
+                .add(Card.of(Color.HEART, Rank.NINE))
+                .add(Card.of(Color.HEART, Rank.TEN))
+                .add(Card.of(Color.HEART, Rank.JACK));
+       
+        CardSet unsedCards = CardSet.ALL_CARDS.difference(hand).remove(Card.of(Color.SPADE, Rank.JACK));
+       
+        TurnState state = TurnState.ofPackedComponents(
+                PackedScore.INITIAL,
+                unsedCards.packed(),
+                Trick.firstEmpty(Color.SPADE, PlayerId.PLAYER_1).withAddedCard(Card.of(Color.SPADE, Rank.JACK)).packed());
+       
+        Node root = new Node(state, hand.packed(), state.trick().playableCards(hand).size());
+       
+        long time = System.currentTimeMillis();
+        for (int i = 0; i < 100_000; ++i) {
+            player.updateNodes(root.addNode(player.ownId, 40));
+        }
+        System.out.println(System.currentTimeMillis() - time);
+        System.out.println(nodeTreeString(root, 1));
     }
-
+    
+    private static String nodeTreeString(Node root, int maxDeep) {
+        StringBuilder sb = new StringBuilder();
+        addNodeRecursif(sb, root, 0, maxDeep);
+ 
+        return sb.toString();
+    }
+   
+    private static void addNodeRecursif(StringBuilder sb, Node root, int deep, int maxDeep) {
+        addNodeTree(sb, root, deep);
+        if (root == null || deep == maxDeep)
+            return;
+       
+        for (Node child : root.children)
+            addNodeRecursif(sb, child, deep + 1, maxDeep);
+    }
+   
+    private static void addNodeTree(StringBuilder sb, Node node, int deep) {
+        if (node == null)
+            return;
+       
+        for (int i = 0; i < deep; ++i)
+            sb.append('\t');
+        sb.append(node).append('\n');
+    }
+    //fin des méthodes de test
+   
+   
+    private final PlayerId ownId;
+    private final SplittableRandom rng;
+    private final int iterations;
+    private static final int C = 40;
+   
+    public MctsPlayer(PlayerId ownId, long rngSeed, int iterations) {
+       
+        Preconditions.checkArgument(iterations >= Jass.HAND_SIZE);
+        Preconditions.checkArgument(iterations < (Integer.MAX_VALUE / 257));
+       
+        this.ownId = ownId;
+        this.rng = new SplittableRandom(rngSeed);
+        this.iterations = iterations;
+    }
+   
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        Node root = new Node(state, state.trick().playableCards(hand), ownId,
-                hand);
-        List<Node> nodeList;  
-        for (int i = 0; i < iterations; i++) {
-            nodeList = root.addNode();
-            Collections.reverse(nodeList); 
-            double totalPoints=0; 
-            for(Node n : nodeList) {
-                totalPoints += n.totalPoints; 
-                n.totalPoints = totalPoints/n.nbOfTurns; 
-            }
-            Collections.reverse(nodeList);
-        }
+        Node root = new Node(state, hand.packed(), state.trick().playableCards(hand).size());
+       
+        for (int i = 0; i < iterations; ++i)
+            this.updateNodes(root.addNode(this.ownId, C));
+       
         return hand.get(root.selectChild(0));
     }
-
-    /**
-     * Node object represent a Node of the Monte Carlo Tree
-     *
-     */
+   
+   
+    private static long playable(PlayerId ownId, TurnState state, long hand) {
+        long cards = ownId.equals(state.nextPlayer()) ? hand : PackedCardSet.difference(state.packedUnplayedCards(), hand);
+        return PackedTrick.playableCards(state.packedTrick(), cards);
+    }
+   
+    private int randomCard(TurnState state, long hand) {
+        long cards = playable(ownId, state, hand);
+        return PackedCardSet.get(cards, rng.nextInt(PackedCardSet.size(cards)));
+    }
+ 
+    private long randomPlay(Node node) {
+        TurnState stateForPlay = node.currentState;
+        long hand = node.hand;
+       
+        while (!stateForPlay.isTerminal()) {
+           
+            while(!PackedTrick.isFull(stateForPlay.packedTrick())) {
+                int card = randomCard(stateForPlay, hand);
+                hand = PackedCardSet.remove(hand, card);
+                stateForPlay = stateForPlay.withNewCardPlayed(Card.ofPacked(card));
+            }
+            stateForPlay = stateForPlay.withTrickCollected();
+        }
+        return stateForPlay.packedScore();
+    }
+   
+   
+    private void updateNodes(List<Node> nodes) {
+        long score = randomPlay(nodes.get(0));
+        for (Node node2 : nodes) {
+            TeamId team = node2.team();
+            if (team != null)
+                node2.totalPoints += PackedScore.totalPoints(score, node2.team());
+            node2.turnsCompleted++;
+        }
+    }
+   
+   
     private static class Node {
-        private TurnState currentState;
-        private Node[] children;
-        private CardSet cardSetForNextNodes;
-        private CardSet hand;
-        private double totalPoints;
-        private int nbOfTurns = 0;
-        private final PlayerId ownId;
-
-        /**
-         * @param currentState
-         *            the State of the game where the node is created
-         * @param cardset
-         *            the Set of card that remains to play
-         * @param ownId
-         *            the id of the proprietary MctsPlayer
-         * @param hand
-         *            the hand of the MctsPlayer
-         */
-        private Node(TurnState currentState, CardSet cardset, PlayerId ownId,
-                CardSet hand) {
-            cardSetForNextNodes = cardset;
-            this.currentState = new TurnState(currentState);
-            this.ownId = ownId;
-            children = new Node[cardset.size()];
+       
+        private final TurnState currentState;
+        private final Node[] children;
+        private final long hand;
+        private int totalPoints;
+        private int turnsCompleted;
+       
+        private Node(TurnState currentState, long hand, int childSize) {
+            this.currentState = currentState;
             this.hand = hand;
-            this.totalPoints = runRandomGame().gamePoints(ownId.team()); 
+            this.children = new Node[childSize];
+            this.totalPoints = 0;
+            this.turnsCompleted = 0;
         }
-        /**
-         * @return the score of the randomly simulated Jass game 
-         */
-        private Score runRandomGame() {
-            TurnState stateCopy = new TurnState(currentState);
-            CardSet cards = CardSet.ALL_CARDS.intersection(cardSetForNextNodes);
-            PlayerId player;
-            while (!stateCopy.isTerminal() ) {
-                while (stateCopy.trick().size() < 4) {
-                    player = stateCopy.nextPlayer();
-                    cards = currentPlayableCards(cards, stateCopy, player);
-                    Card cardToPlay = cards.get(0);
-                    cards.remove(cardToPlay);
-                    hand.remove(cardToPlay);
-                    stateCopy = stateCopy.withNewCardPlayed(cardToPlay);
-                }
-                stateCopy = stateCopy.withTrickCollected();
+        
+        private LinkedList<Node> addNode(PlayerId ownId, int c) {
+            LinkedList<Node> pathNodes = new LinkedList<>();
+            Node parent = null;
+            Node node = this;
+            int index = -1;
+           
+            while (node != null) {
+                pathNodes.addFirst(node);
+                parent = node;
+                index = node.selectChild(c);
+                if (index == -1)
+                    return pathNodes;
+                node = node.children[index];
             }
-            return stateCopy.score();
-        }
+           
 
-        /**
-         * @return the final Score of the randomly generated game of Jass in the
-         *         node
-         */
-        private Score finalScore() {
-            return null;
+            long cards = playable(ownId, parent.currentState, parent.hand);
+            int card = PackedCardSet.get(cards, index);
+            long newHand = PackedCardSet.remove(parent.hand, card);
+           
+            TurnState nextTurnState = parent.currentState.withNewCardPlayed(Card.ofPacked(card));
+           
+            int childSize;
+            if (nextTurnState.isTerminal() || nextTurnState.trick().isFull())
+                childSize = 0;
+            else
+                childSize = PackedCardSet.size(playable(ownId, nextTurnState, newHand));
+           
+            node = new Node(nextTurnState, newHand, childSize);
+            parent.children[index] = node;
+            pathNodes.addFirst(node);
+           
+            return pathNodes;
         }
-
-        private CardSet currentPlayableCards(CardSet cards,
-                TurnState currentState, PlayerId player) {
-            if (player.equals(ownId)) {
-                return currentState.trick().playableCards(hand);
+       
+        private TeamId team() {
+            int p = currentState.trick().size() - 1;
+            return p >= 0 ? currentState.trick().player(p).team() : null;
+        }
+       
+        private int nbrOfChild() {
+            int i = 0;
+            for (Node child : children) {
+                if (child != null)
+                    ++i;
             }
-            return currentState.trick().playableCards(cardSetForNextNodes.
-                    intersection(hand.complement())); 
+            return i;
         }
-
-        /**
-         * @param c
-         *            the constant (40) of exploration or the MCTS if c = 0 we
-         *            obtain the next card to play for the MctsPlayer
-         * @return the Best child of a node regarding the formulae of the MCTS
-         */
+       
+        private double computeV(Node parent, int c) {
+            double S= totalPoints;
+            double N = turnsCompleted;
+           
+            if (turnsCompleted > 0)
+                return S / N + c * Math.sqrt(2 *Math.log(parent.turnsCompleted) / N);
+            else
+                return Double.POSITIVE_INFINITY;
+        }
+       
         private int selectChild(int c) {
-            boolean noChild = true; // the array of children is empty
-            int nbrChild = 0;
-            for (Object ob : children) {
-                if (ob != null) {
-                    noChild = false;
-                    nbrChild++;
-                }
-            }
-            assert (!noChild); // you can't choose the best child if there is
-                               // non childNode in the Array
-
-            int indexOfTheBestChild = 0;
-            double bestNodeValue = 0;
-            for (int i = 0; i < nbrChild; i++) {
-                double S = children[i].totalPoints;
-                int N = children[i].nbOfTurns;
-                int Np = nbOfTurns;
-                double nodeValue = S / N + c * Math.sqrt(2 * Math.log(N) / Np);
-                if (nodeValue >= bestNodeValue) {
-                    bestNodeValue = nodeValue;
+            int indexOfTheBestChild = -1;
+            double bestV = Double.NEGATIVE_INFINITY;
+            for (int i = 0; i < children.length; i++) {
+                Node node = children[i];
+                if (node == null)
+                    return i;
+                double nodeValue = node.computeV(this, c);
+                if (nodeValue > bestV) {
                     indexOfTheBestChild = i;
+                    bestV = nodeValue;
                 }
             }
             return indexOfTheBestChild;
         }
-
-        /**
-         * @return A list of nodes from the one added by the function to the
-         *         root (the one to which the function is applied)
-         */
-        private List<Node> addNode() {
-            List<Node> nodes = new ArrayList<MctsPlayer.Node>();
-            nodes.add(this);
-
-            if (currentState.isTerminal()) {
-                return nodes;
-            }
-            boolean isFull = true; // the array of children is full
-            int indexToAdd = 0;
-            for (int i = 0; i < children.length; i++) {
-                if (children[i] == null) {
-                    isFull = false;
-                    indexToAdd = i;
-                    break;
-                }
-            }
-            if (isFull) {
-                Node selectedChild = children[selectChild(40)];
-                nodes.addAll(selectedChild.addNode());
-            } else {
-                TurnState nextCurrentState = currentState
-                        .withNewCardPlayedAndTrickCollected(
-                                cardSetForNextNodes.get(0));
-                // WARNING if the currentState arrived with a full trick an
-                // IllecgalStateException is thrown but in theory it shouldn't
-                // happen
-                children[indexToAdd] = new Node(nextCurrentState,
-                        nextCurrentState.unplayedCards(), ownId, hand.remove(cardSetForNextNodes.get(0)));
-            }
-            return nodes;
-
+ 
+        @Override
+        public String toString() {
+            return new StringBuilder()
+            .append("Node : [")
+            .append(currentState.trick())
+            .append('\t').append(PackedCardSet.toString(hand))
+            .append('\t').append("child : ").append(nbrOfChild()).append('/').append(children.length)
+            .append('\t').append("totalPoints : ").append((float)totalPoints / (float)turnsCompleted)
+            .append('\t').append("turnsCompleted : ").append(turnsCompleted)
+            .append("]").toString();
         }
-
     }
-
 }
