@@ -1,12 +1,8 @@
 /*
  *  Author : Alexandre Santangelo 
  *  Date   : Mar 13, 2019   
-<<<<<<< HEAD
  */
 
-/**
- * 
- */
 package ch.epfl.javass.jass;
 
 import java.util.Map;
