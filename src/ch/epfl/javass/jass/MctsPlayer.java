@@ -9,6 +9,7 @@ package ch.epfl.javass.jass;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.SplittableRandom;
 import java.lang.Math;
 
@@ -38,8 +39,8 @@ public final class MctsPlayer implements Player {
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        Node root = new Node(state, state.trick().playableCards(hand), ownId,
-                hand);
+        Node root = new Node(state, state.unplayedCards(), ownId,
+                hand,rngSeed);
         List<Node> nodeList;  
         for (int i = 0; i < iterations; i++) {
             nodeList = root.addNode();
@@ -66,6 +67,8 @@ public final class MctsPlayer implements Player {
         private double totalPoints;
         private int nbOfTurns = 0;
         private final PlayerId ownId;
+        private final SplittableRandom rng; 
+        private final long seed; 
 
         /**
          * @param currentState
@@ -78,12 +81,14 @@ public final class MctsPlayer implements Player {
          *            the hand of the MctsPlayer
          */
         private Node(TurnState currentState, CardSet cardset, PlayerId ownId,
-                CardSet hand) {
+                CardSet hand, long seed) {
             cardSetForNextNodes = cardset;
             this.currentState = new TurnState(currentState);
             this.ownId = ownId;
             children = new Node[cardset.size()];
             this.hand = hand;
+            this.seed = seed; 
+            this.rng = new SplittableRandom(seed); 
             this.totalPoints = runRandomGame().gamePoints(ownId.team()); 
         }
         /**
@@ -97,7 +102,7 @@ public final class MctsPlayer implements Player {
                 while (stateCopy.trick().size() < 4) {
                     player = stateCopy.nextPlayer();
                     cards = currentPlayableCards(cards, stateCopy, player);
-                    Card cardToPlay = cards.get(0);
+                    Card cardToPlay = cards.get(rng.nextInt(0, cards.size()));
                     cards.remove(cardToPlay);
                     hand.remove(cardToPlay);
                     stateCopy = stateCopy.withNewCardPlayed(cardToPlay);
@@ -188,7 +193,8 @@ public final class MctsPlayer implements Player {
                 // IllecgalStateException is thrown but in theory it shouldn't
                 // happen
                 children[indexToAdd] = new Node(nextCurrentState,
-                        nextCurrentState.unplayedCards(), ownId, hand.remove(cardSetForNextNodes.get(0)));
+                        cardSetForNextNodes.remove(cardSetForNextNodes.get(0)), ownId,
+                        hand.remove(cardSetForNextNodes.get(0)),this.seed);
             }
             return nodes;
 
