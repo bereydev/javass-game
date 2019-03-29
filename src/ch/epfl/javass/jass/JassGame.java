@@ -1,12 +1,8 @@
 /*
  *  Author : Alexandre Santangelo 
  *  Date   : Mar 13, 2019   
-<<<<<<< HEAD
  */
 
-/**
- * 
- */
 package ch.epfl.javass.jass;
 
 import java.util.Map;
@@ -27,12 +23,11 @@ public final class JassGame {
     private Map<PlayerId, String> playerNames;
     private Map<PlayerId, CardSet> hands = new HashMap<PlayerId, CardSet>();
     private List<PlayerId> playersInOrder = new LinkedList<PlayerId>();
-    private List<PlayerId> playersTurn = new LinkedList<PlayerId>();
-    private PlayerId turnStarter; 
-    private Random shuffleRng;
-    private PlayerId player1 = PlayerId.PLAYER_1; 
-    private Random trumpRng;
-    private Boolean newGame; 
+    private PlayerId turnStarter;
+    private final Random shuffleRng;
+    private PlayerId player1 = PlayerId.PLAYER_1;
+    private final Random trumpRng;
+    private Boolean newGame = true;
     private TurnState turnState;
     private static final int CARDS_PER_HAND = 9;
 
@@ -49,7 +44,6 @@ public final class JassGame {
         // Initialization of turnState (to be modified later)
         turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
                 Score.INITIAL, PlayerId.PLAYER_1);
-        newGame = turnState.score().equals(Score.INITIAL); 
     }
 
     /**
@@ -57,15 +51,19 @@ public final class JassGame {
      */
 
     public boolean isGameOver() {
-        TeamId winningTeam = turnState.score().totalPoints(TeamId.TEAM_1) >= 1000 ? TeamId.TEAM_1 : TeamId.TEAM_2;
         boolean GameOver = turnState.score().totalPoints(TeamId.TEAM_1) >= 1000
-                || turnState.score().totalPoints(TeamId.TEAM_2) >= 1000; 
+                || turnState.score().totalPoints(TeamId.TEAM_2) >= 1000;
 
-        if(GameOver)
+        if (GameOver) {
+            TeamId winningTeam = turnState.score()
+                    .totalPoints(TeamId.TEAM_1) >= 1000 ? TeamId.TEAM_1
+                            : TeamId.TEAM_2;
+            System.out.println(winningTeam);
             for (PlayerId p : playersInOrder) {
                 players.get(p).setWinningTeam(winningTeam);
                 players.get(p).updateScore(turnState.score().nextTurn());
             }
+        }
         return GameOver;
     }
 
@@ -75,32 +73,31 @@ public final class JassGame {
 
     public void advanceToEndOfNextTrick() {
         if (isGameOver()) {
-            
-            return; 
-        } 
-        
-        if(newGame) {
-            deal(); 
-            player1 = turnStarter(); 
-            organizePlayers(player1);  
+            return;
+        }
+
+        if (newGame) {
+            deal();
+            player1 = turnStarter();
+            organizePlayers(player1);
             turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
                     Score.INITIAL, player1);
-        }
-        else {
+        } else {
             turnState = turnState.withTrickCollected();
-            if(turnState.isTerminal()) {
-                deal(); 
-                player1 = turnStarter(); 
-                organizePlayers(player1); 
-                turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
+            if (turnState.isTerminal()) {
+                deal();
+                player1 = turnStarter();
+                organizePlayers(player1);
+                turnState = TurnState.initial(
+                        Color.values()[trumpRng.nextInt(4)],
                         turnState.score().nextTurn(), player1);
-            }
-            else {
+            } else {
                 organizePlayers(player1);
             }
         }
 
-        if(newGame) {
+        if (newGame) {
+            newGame = false;
             for (PlayerId p : playersInOrder) {
                 players.get(p).setPlayers(p, playerNames);
                 players.get(p).updateHand(hands.get(p));
@@ -110,7 +107,7 @@ public final class JassGame {
         for (PlayerId p : playersInOrder) {
             players.get(p).updateScore(turnState.score());
         }
-        
+
         for (PlayerId p : playersInOrder) {
 
             for (PlayerId q : playersInOrder) {
@@ -127,22 +124,18 @@ public final class JassGame {
         for (PlayerId q : playersInOrder) {
             players.get(q).updateTrick(turnState.trick());
         }
-        player1 = turnState.trick().winningPlayer(); 
-
-        if(newGame)
-            newGame=false; 
+        player1 = turnState.trick().winningPlayer();
 
     }
 
-
     private void deal() {
         List<Card> cards = new LinkedList<Card>();
-        
+
         for (int i = 0; i < CardSet.ALL_CARDS.size(); ++i) {
             cards.add(CardSet.ALL_CARDS.get(i));
         }
         Collections.shuffle(cards, shuffleRng);
-        
+
         hands.clear();
         for (PlayerId p : players.keySet()) {
             CardSet hand = CardSet.EMPTY;
@@ -172,15 +165,16 @@ public final class JassGame {
                 + 4; i++) {
             playersInOrder.add(PlayerId.values()[i % 4]);
         }
-//        for(PlayerId p: playersInOrder)
-//            System.out.println(p);
+        // for(PlayerId p: playersInOrder)
+        // System.out.println(p);
     }
+
     private PlayerId turnStarter() {
-        if(newGame) 
-            turnStarter = firstPlayer(); 
-        else 
-            turnStarter = PlayerId.values()[(turnStarter.ordinal()+1)%4]; 
-        return turnStarter; 
+        if (newGame)
+            turnStarter = firstPlayer();
+        else
+            turnStarter = PlayerId.values()[(turnStarter.ordinal() + 1) % 4];
+        return turnStarter;
     }
 
 }
