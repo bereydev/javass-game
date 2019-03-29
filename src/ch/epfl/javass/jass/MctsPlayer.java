@@ -50,7 +50,6 @@ public final class MctsPlayer implements Player {
                 totalPoints += n.totalPoints; 
                 n.totalPoints = totalPoints/n.nbOfTurns; 
             }
-            nodeList.clear();
         }
         return hand.get(root.selectChild(0));
     }
@@ -80,13 +79,17 @@ public final class MctsPlayer implements Player {
          * @param hand
          *            the hand of the MctsPlayer
          */
-        private Node(TurnState currentState, CardSet cardset, PlayerId ownId,
+        private Node(TurnState currentState, CardSet cardSet, PlayerId ownId,
                 CardSet hand, long seed) {
-            cardSetForNextNodes = cardset;
+            this.hand = CardSet.ALL_CARDS.intersection(hand);
+            cardSetForNextNodes = CardSet.ALL_CARDS.intersection(cardSet); 
+            for(int i=0; i<this.hand.size(); i++) {
+               cardSetForNextNodes = cardSetForNextNodes.remove(this.hand.get(i)); 
+            }
             this.currentState = new TurnState(currentState);
             this.ownId = ownId;
-            children = new Node[cardset.size()];
-            this.hand = hand;
+            children = new Node[cardSetForNextNodes.size()];
+            
             this.seed = seed; 
             this.rng = new SplittableRandom(seed); 
             this.totalPoints = runRandomGame().gamePoints(ownId.team()); 
@@ -96,16 +99,40 @@ public final class MctsPlayer implements Player {
          */
         private Score runRandomGame() {
             TurnState stateCopy = new TurnState(currentState);
-            CardSet cards = CardSet.ALL_CARDS.intersection(cardSetForNextNodes);
+            CardSet cardsNotHand = CardSet.ALL_CARDS.intersection(cardSetForNextNodes); 
+            CardSet handCopy = CardSet.ALL_CARDS.intersection(hand); 
+            CardSet cards; 
             PlayerId player;
+            Card cardToPlay; 
+            System.out.println("My hand is "+handCopy + " I'm "+ ownId);
+            System.out.println("The cards are "+cardsNotHand);
             while (!stateCopy.isTerminal() ) {
                 while (stateCopy.trick().size() < 4) {
                     player = stateCopy.nextPlayer();
-                    cards = currentPlayableCards(cards, stateCopy, player);
-                    Card cardToPlay = cards.get(rng.nextInt(0, cards.size()));
-                    cards.remove(cardToPlay);
-                    hand.remove(cardToPlay);
+                    
+                    if(player.equals(ownId)) {
+                        cards = stateCopy.trick().playableCards(handCopy);
+                    }  
+                    else {
+                        cards = stateCopy.trick().playableCards(cardsNotHand);
+                    }
+                    
+                    if(cards.size()==0)
+                        cards = handCopy.union(cardsNotHand);
+                   
+                    cardToPlay = cards.get(rng.nextInt(cards.size()));
+//                    System.out.println(player + " plays "+ cardToPlay + " pli nb " + 
+//                    stateCopy.trick().index() + ". cards remaining " +
+//                            (cardsNotHand.size()+handCopy.size()));
+                    
+                    
                     stateCopy = stateCopy.withNewCardPlayed(cardToPlay);
+                    
+                    if(player.equals(ownId))
+                        handCopy = handCopy.remove(cardToPlay); 
+                    else 
+                        cardsNotHand = cardsNotHand.remove(cardToPlay); 
+                        
                 }
                 stateCopy = stateCopy.withTrickCollected();
             }
@@ -118,15 +145,6 @@ public final class MctsPlayer implements Player {
          */
         private Score finalScore() {
             return null;
-        }
-
-        private CardSet currentPlayableCards(CardSet cards,
-                TurnState currentState, PlayerId player) {
-            if (player.equals(ownId)) {
-                return currentState.trick().playableCards(hand);
-            }
-            return currentState.trick().playableCards(cardSetForNextNodes.
-                    intersection(hand.complement())); 
         }
 
         /**
