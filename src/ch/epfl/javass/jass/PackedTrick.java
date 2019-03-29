@@ -256,7 +256,6 @@ public final class PackedTrick {
             } else {
                 playableCardSet = pkHand;
             }
-
         }
         return playableCardSet; 
     }
