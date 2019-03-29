@@ -50,7 +50,7 @@ public final class MctsPlayer implements Player {
                 totalPoints += n.totalPoints; 
                 n.totalPoints = totalPoints/n.nbOfTurns; 
             }
-            Collections.reverse(nodeList);
+            nodeList.clear();
         }
         return hand.get(root.selectChild(0));
     }
