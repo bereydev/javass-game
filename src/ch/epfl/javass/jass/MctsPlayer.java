@@ -37,8 +37,7 @@ public final class MctsPlayer implements Player {
        
         for (int i = 0; i < iterations; ++i)
             this.updateNodes(root.addNode(this.ownId, C));
-       
-        return hand.get(root.selectChild(0));
+        return state.trick().playableCards(hand).get(root.selectChild(0));
     }
    
    
