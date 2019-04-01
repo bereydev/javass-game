@@ -12,7 +12,7 @@ import ch.epfl.javass.Preconditions;
  * @author Alexandre Santangelo
  */
 public final class MctsPlayer implements Player {
-   
+    
     private final PlayerId ownId;
     private final SplittableRandom rng;
     private final int iterations;
@@ -34,7 +34,6 @@ public final class MctsPlayer implements Player {
        
         for (int i = 0; i < iterations; ++i)
             this.updateNodes(root.addNode(this.ownId, C));
-       
         return state.trick().playableCards(hand).get(root.selectChild(0));
     }
    

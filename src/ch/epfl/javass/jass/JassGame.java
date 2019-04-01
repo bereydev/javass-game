@@ -176,5 +176,10 @@ public final class JassGame {
             turnStarter = PlayerId.values()[(turnStarter.ordinal() + 1) % 4];
         return turnStarter;
     }
-
+    
+    public TeamId winner() {
+        return  isGameOver() ?  turnState.score()
+                .totalPoints(TeamId.TEAM_1) >= 1000 ? TeamId.TEAM_1
+                        : TeamId.TEAM_2 : null ; 
+    }
 }
