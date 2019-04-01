@@ -15,66 +15,7 @@ import ch.epfl.javass.jass.Card.Rank;
  * @author Alexandre Santangelo
  */
 public final class MctsPlayer implements Player {
-    //méthodes de test
-    public static void main(String[] args) { //TODO Enlever pour le rendu
-        
-        MctsPlayer player = new MctsPlayer(PlayerId.PLAYER_2, 0, 9);
-       
-        CardSet hand = CardSet.EMPTY
-                .add(Card.of(Color.SPADE, Rank.EIGHT))
-                .add(Card.of(Color.SPADE, Rank.NINE))
-                .add(Card.of(Color.SPADE, Rank.TEN))
-                .add(Card.of(Color.HEART, Rank.SIX))
-                .add(Card.of(Color.HEART, Rank.SEVEN))
-                .add(Card.of(Color.HEART, Rank.EIGHT))
-                .add(Card.of(Color.HEART, Rank.NINE))
-                .add(Card.of(Color.HEART, Rank.TEN))
-                .add(Card.of(Color.HEART, Rank.JACK));
-       
-        CardSet unsedCards = CardSet.ALL_CARDS.difference(hand).remove(Card.of(Color.SPADE, Rank.JACK));
-       
-        TurnState state = TurnState.ofPackedComponents(
-                PackedScore.INITIAL,
-                unsedCards.packed(),
-                Trick.firstEmpty(Color.SPADE, PlayerId.PLAYER_1).withAddedCard(Card.of(Color.SPADE, Rank.JACK)).packed());
-       
-        Node root = new Node(state, hand.packed(), state.trick().playableCards(hand).size());
-       
-        long time = System.currentTimeMillis();
-        for (int i = 0; i < 100_000; ++i) {
-            player.updateNodes(root.addNode(player.ownId, 40));
-        }
-        System.out.println(System.currentTimeMillis() - time);
-        System.out.println(nodeTreeString(root, 1));
-    }
     
-    private static String nodeTreeString(Node root, int maxDeep) {
-        StringBuilder sb = new StringBuilder();
-        addNodeRecursif(sb, root, 0, maxDeep);
- 
-        return sb.toString();
-    }
-   
-    private static void addNodeRecursif(StringBuilder sb, Node root, int deep, int maxDeep) {
-        addNodeTree(sb, root, deep);
-        if (root == null || deep == maxDeep)
-            return;
-       
-        for (Node child : root.children)
-            addNodeRecursif(sb, child, deep + 1, maxDeep);
-    }
-   
-    private static void addNodeTree(StringBuilder sb, Node node, int deep) {
-        if (node == null)
-            return;
-       
-        for (int i = 0; i < deep; ++i)
-            sb.append('\t');
-        sb.append(node).append('\n');
-    }
-    //fin des méthodes de test
-   
-   
     private final PlayerId ownId;
     private final SplittableRandom rng;
     private final int iterations;
