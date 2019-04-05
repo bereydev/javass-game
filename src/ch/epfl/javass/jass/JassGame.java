@@ -58,7 +58,6 @@ public final class JassGame {
             TeamId winningTeam = turnState.score()
                     .totalPoints(TeamId.TEAM_1) >= 1000 ? TeamId.TEAM_1
                             : TeamId.TEAM_2;
-            System.out.println(winningTeam);
             for (PlayerId p : playersInOrder) {
                 players.get(p).setWinningTeam(winningTeam);
                 players.get(p).updateScore(turnState.score().nextTurn());
@@ -165,8 +164,6 @@ public final class JassGame {
                 + 4; i++) {
             playersInOrder.add(PlayerId.values()[i % 4]);
         }
-        // for(PlayerId p: playersInOrder)
-        // System.out.println(p);
     }
 
     private PlayerId turnStarter() {
