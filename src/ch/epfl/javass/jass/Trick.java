@@ -47,7 +47,7 @@ public final class Trick {
     }
 
     /**
-     * @return Same behavior as PackedTrick's functions
+     * @return The same trick but without any card. 
      */
     public Trick nextEmpty() {
         if (!isFull()) {
@@ -57,42 +57,42 @@ public final class Trick {
     }
 
     /**
-     * @return Same behavior as PackedTrick's functions
+     * @return True if there is no card in the trick, false if there are 
      */
     public boolean isEmpty() {
         return PackedTrick.isEmpty(pkTrick);
     }
 
     /**
-     * @return Same behavior as PackedTrick's functions
+     * @return True if the trick has 4 cards, false if not. 
      */
     public boolean isFull() {
         return PackedTrick.isFull(pkTrick);
     }
 
     /**
-     * @return Same behavior as PackedTrick's functions
+     * @return true if it is the last trick of the game, false if not 
      */
     public boolean isLast() {
         return PackedTrick.isLast(pkTrick);
     }
 
     /**
-     * @return Same behavior as PackedTrick's functions
+     * @return the number of cards in the trick 
      */
     public int size() {
         return PackedTrick.size(pkTrick);
     }
 
     /**
-     * @return Same behavior as PackedTrick's functions
+     * @return The trump of the trick 
      */
     public Color trump() {
         return PackedTrick.trump(pkTrick);
     }
 
     /**
-     * @return Same behavior as PackedTrick's functions
+     * @return The index of the trick 
      */
     public int index() {
         return PackedTrick.index(pkTrick);
@@ -100,7 +100,7 @@ public final class Trick {
 
     /**
      * @param index
-     * @return Same behavior as PackedTrick's functions
+     * @return The player at index, index in the trick 
      */
     public PlayerId player(int index) {
         if (!(index >=0 && index < 4)) {
@@ -110,8 +110,8 @@ public final class Trick {
     }
 
     /**
-     * @param index
-     * @return Same behavior as PackedTrick's functions
+     * @param index An index between 0 and 3. 
+     * @return The card at index index in the trick 
      */
     public Card card(int index) {
         if (!(index >=0 && index < 4)) {
@@ -121,23 +121,23 @@ public final class Trick {
     }
 
     /**
-     * @param c
-     * @return Same behavior as PackedTrick's functions
+     * @param c The card to add
+     * @return The trick with an added card. 
      */
     public Trick withAddedCard(Card c) {
         return new Trick(PackedTrick.withAddedCard(pkTrick, c.packed()));
     }
 
     /**
-     * @return Same behavior as PackedTrick's functions
+     * @return The base color of the trick 
      */
     public Color baseColor() {
         return PackedTrick.baseColor(pkTrick);
     }
 
     /**
-     * @param hand
-     * @return Same behavior as PackedTrick's functions
+     * @param hand  Your hand of cards 
+     * @return The set of playable cards given your hand and Jass rules 
      */
     public CardSet playableCards(CardSet hand) {
 
@@ -146,14 +146,14 @@ public final class Trick {
     }
 
     /**
-     * @return Same behavior as PackedTrick's functions
+     * @return The points of the trick 
      */
     public int points() {
         return PackedTrick.points(pkTrick);
     }
 
     /**
-     * @return Same behavior as PackedTrick's functions
+     * @return The currently winning player. 
      */
     public PlayerId winningPlayer() {
         if (isEmpty()) {
@@ -176,6 +176,7 @@ public final class Trick {
         return pkTrick; 
     }
     
+    @Override 
     public String toString() {
         return PackedTrick.toString(pkTrick);
     }

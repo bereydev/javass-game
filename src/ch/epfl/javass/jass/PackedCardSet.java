@@ -42,7 +42,7 @@ public final class PackedCardSet {
     /**
      * @param pkCard
      *            An integer coding for a card
-     * @return The set of cards that are better than pkCard
+     * @return The set of trump cards that are better than pkCard
      */
     public static long trumpAbove(int pkCard) {
         assert (PackedCard.isValid(pkCard));
@@ -202,8 +202,7 @@ public final class PackedCardSet {
      */
     public static long intersection(long pkCardSet1, long pkCardSet2) {
         assert (isValid(pkCardSet1) && isValid(pkCardSet2));
-        long result = pkCardSet1 & pkCardSet2;
-        return result; 
+        return pkCardSet1 & pkCardSet2;
     }
 
     /**

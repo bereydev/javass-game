@@ -86,11 +86,7 @@ public final class Card {
         return PackedCard.points(trump, this.packed());
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
+    @Override 
     public boolean equals(Object thatO) {
         
         if (thatO instanceof Card) {
@@ -100,20 +96,12 @@ public final class Card {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
+    @Override 
     public int hashCode() {
         return this.packed();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
+    @Override
     public String toString() {
         return PackedCard.toString(this.packed());
     }
@@ -126,10 +114,14 @@ public final class Card {
         public static final int COUNT = 4;
         private String symbol;
 
+        /**
+         * @param symbol    The symbol to print. 
+         */
         private Color(String symbol) {
             this.symbol = symbol;
         }
-
+        
+        @Override 
         public String toString() {
             return symbol;
         }
@@ -178,10 +170,14 @@ public final class Card {
             return trumpOrdinal;
         }
 
+        /**
+         * @param symbol    The symbol to print. 
+         */
         private Rank(String symbol) {
             this.symbol = symbol;
         }
-
+        
+        @Override
         public String toString() {
             return symbol;
         }

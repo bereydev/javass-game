@@ -7,6 +7,9 @@ import ch.epfl.javass.jass.Card.Color;
 public final class PrintingPlayer implements Player {
     private final Player underlyingPlayer;
 
+    /**
+     * @param underlyingPlayer  The player to print 
+     */
     public PrintingPlayer(Player underlyingPlayer) {
       this.underlyingPlayer = underlyingPlayer;
     }

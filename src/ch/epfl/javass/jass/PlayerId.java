@@ -24,6 +24,7 @@ public enum PlayerId {
     public TeamId team() {
         if (this.ordinal() % 2 == 0)
             return TeamId.TEAM_1;
+        
         return TeamId.TEAM_2;
     }
     
