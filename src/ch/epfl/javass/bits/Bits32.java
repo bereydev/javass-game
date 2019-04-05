@@ -45,12 +45,7 @@ public final class Bits32 {
     public static int mask(int start, int size) {
         Preconditions.checkArgument(start >= 0 && start <= Integer.SIZE);
         Preconditions.checkArgument(size >= 0 && size <= Integer.SIZE - start);
-        if (size == Integer.SIZE)
-            return ~0;
-        int result = 1 << size;
-        result -= 1;
-        result = result << start;
-        return result;
+        return size == Integer.SIZE ? ~0 : (1 << size) - 1 << start;
     }
 
     /**
@@ -67,11 +62,7 @@ public final class Bits32 {
     public static int extract(int bits, int start, int size) {
         Preconditions.checkArgument(start >= 0 && start <= Integer.SIZE);
         Preconditions.checkArgument(size >= 0 && size <= Integer.SIZE - start);
-        if (size == 0)
-            return 0;
-        bits = bits & mask(start, size);
-        bits = bits >>> start;
-        return bits;
+        return size == 0 ? 0 : (bits & mask(start, size)) >>> start;
     }
 
     /**
@@ -93,8 +84,7 @@ public final class Bits32 {
         Preconditions.checkArgument(
                 s2 > 0 && s2 < Integer.SIZE && bitsSize(v2) <= s2);
         Preconditions.checkArgument(s1 + s2 <= Integer.SIZE);
-        int bits = v2 << s1;
-        return v1 | bits;
+        return v1 | v2 << s1;
     }
 
     /**
@@ -115,9 +105,7 @@ public final class Bits32 {
      * @return the concatenated integer 'v1 + v2 + v3'
      */
     public static int pack(int v1, int s1, int v2, int s2, int v3, int s3) {
-        int bits = pack(v1, s1, v2, s2);
-        
-        return pack(bits, s1+s2, v3, s3);
+        return pack(pack(v1, s1, v2, s2), s1 + s2, v3, s3);
     }
 
     /**
@@ -157,9 +145,9 @@ public final class Bits32 {
             int v4, int s4, int v5, int s5, int v6, int s6, int v7, int s7) {
         int bits1 = pack(v1, s1, v2, s2, v3, s3);
         int bits2 = pack(v4, s4, v5, s5, v6, s6);
-        int bits3 = pack(bits1, s1+s2+s3, bits2, s4+s5+s6);
+        int bits3 = pack(bits1, s1 + s2 + s3, bits2, s4 + s5 + s6);
 
-        return pack(bits3, s1+s2+s3+s4+s5+s6, v7, s7);
+        return pack(bits3, s1 + s2 + s3 + s4 + s5 + s6, v7, s7);
     }
 
 }

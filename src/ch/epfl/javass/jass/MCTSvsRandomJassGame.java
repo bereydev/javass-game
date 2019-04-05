@@ -1,6 +1,5 @@
 package ch.epfl.javass.jass;
 
-import java.awt.Toolkit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +11,7 @@ public final class MCTSvsRandomJassGame {
         for (PlayerId pId : PlayerId.ALL) {
             Player player = new RandomPlayer(0);
             if (pId == PlayerId.PLAYER_2 || pId == PlayerId.PLAYER_4)
-                player = new PrintingPlayer(new MctsPlayer(pId, 0, 1000));
+                player = new MctsPlayer(pId, 0, 1000);
             players.put(pId, player);
             playerNames.put(pId, pId.name());
         }

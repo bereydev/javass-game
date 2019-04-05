@@ -4,7 +4,7 @@ package ch.epfl.javass.bits;
 import ch.epfl.javass.Preconditions;
 
 public class Bits64 {
-    
+
     /**
      * Private constructor you can't instantiate
      */
@@ -40,13 +40,7 @@ public class Bits64 {
     public static long mask(int start, int size) {
         Preconditions.checkArgument(start >= 0 && start <= Long.SIZE);
         Preconditions.checkArgument(size >= 0 && size <= Long.SIZE - start);
-        if (size == Long.SIZE)
-            return ~0L;
-
-        long num = 1L << size;
-        num -= 1L;
-        num = num << start;
-        return num;
+        return size == Long.SIZE ? ~0L : (1L << size) - 1L << start;
     }
 
     /**
@@ -61,11 +55,7 @@ public class Bits64 {
     public static long extract(long bits, int start, int size) {
         Preconditions.checkArgument(start >= 0 && start <= Long.SIZE);
         Preconditions.checkArgument(size >= 0 && size <= Long.SIZE - start);
-
-        bits = bits & mask(start, size);
-        bits = bits >>> start;
-
-        return bits;
+        return (bits & mask(start, size)) >>> start;
     }
 
     /**
@@ -85,10 +75,7 @@ public class Bits64 {
         Preconditions
                 .checkArgument(s2 > 0 && s2 < Long.SIZE && bitsSize(v2) <= s2);
         Preconditions.checkArgument(s1 + s2 <= Long.SIZE);
-
-        long bits = v2 << s1;
-
-        return v1 | bits;
+        return v1 | v2 << s1;
     }
 
 }

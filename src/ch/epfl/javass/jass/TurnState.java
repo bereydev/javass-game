@@ -18,10 +18,11 @@ public final class TurnState {
         unplayedCards = pkCardSet;
         currentTrick = pkTrick;
     }
+
     public TurnState(TurnState toCopy) {
-        currentScore = toCopy.currentScore; 
-        unplayedCards = toCopy.unplayedCards; 
-        currentTrick = toCopy.currentTrick; 
+        currentScore = toCopy.currentScore;
+        unplayedCards = toCopy.unplayedCards;
+        currentTrick = toCopy.currentTrick;
     }
 
     private long currentScore = PackedScore.INITIAL;
@@ -104,16 +105,15 @@ public final class TurnState {
      * @return
      */
     public boolean isTerminal() {
-        return packedTrick() == PackedTrick.INVALID;
+        return currentTrick == PackedTrick.INVALID;
     }
 
     /**
      * @return
      */
     public PlayerId nextPlayer() {
-        if (PackedTrick.isFull(currentTrick)) {
+        if (PackedTrick.isFull(currentTrick))
             throw new IllegalStateException();
-        }
         return PackedTrick.player(currentTrick, PackedTrick.size(currentTrick));
     }
 
@@ -122,27 +122,27 @@ public final class TurnState {
      * @return
      */
     public TurnState withNewCardPlayed(Card card) {
-        if (PackedTrick.isFull(currentTrick)) {
+        if (PackedTrick.isFull(currentTrick))
             throw new IllegalStateException();
-        }
-        Trick trick = trick().withAddedCard(card);
-        CardSet unplayedCards = unplayedCards().remove(card);
-        return ofPackedComponents(currentScore, unplayedCards.packed(),
-                trick.packed());
+
+        int pkTrick = PackedTrick.withAddedCard(currentTrick, card.packed());
+        long pkUnplayedCards = PackedCardSet.remove(unplayedCards,
+                card.packed());
+        return ofPackedComponents(currentScore, pkUnplayedCards, pkTrick);
     }
 
     /**
      * @return
      */
     public TurnState withTrickCollected() {
-        if (!PackedTrick.isFull(currentTrick)) {
+        if (!PackedTrick.isFull(currentTrick))
             throw new IllegalStateException();
-        }
-        Score nextScore = score().withAdditionalTrick(
-                trick().winningPlayer().team(), trick().points());
-        Trick nextTrick = trick().nextEmpty();
-        return new TurnState(nextScore.packed(), unplayedCards,
-                nextTrick.packed());
+
+        long nextScore = PackedScore.withAdditionalTrick(currentScore,
+                PackedTrick.winningPlayer(currentTrick).team(),
+                PackedTrick.points(currentTrick));
+        int nextTrick = PackedTrick.nextEmpty(currentTrick);
+        return new TurnState(nextScore, unplayedCards, nextTrick);
     }
 
     /**
@@ -150,13 +150,12 @@ public final class TurnState {
      * @return
      */
     public TurnState withNewCardPlayedAndTrickCollected(Card card) {
-        if (trick().isFull()) {
+        if (PackedTrick.isFull(currentTrick))
             throw new IllegalStateException();
-        }
+
         TurnState turnState = withNewCardPlayed(card);
-        if (turnState.trick().isFull()) {
+        if (PackedTrick.isFull(turnState.currentTrick))
             turnState = turnState.withTrickCollected();
-        }
         return turnState;
 
     }

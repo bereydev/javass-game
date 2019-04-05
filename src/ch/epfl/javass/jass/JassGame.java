@@ -29,7 +29,6 @@ public final class JassGame {
     private final Random trumpRng;
     private Boolean newGame = true;
     private TurnState turnState;
-    private static final int CARDS_PER_HAND = 9;
 
     public JassGame(long rngSeed, Map<PlayerId, Player> players,
             Map<PlayerId, String> playerNames) {
@@ -42,7 +41,7 @@ public final class JassGame {
         this.playerNames = Collections
                 .unmodifiableMap(new EnumMap<>(playerNames));
         // Initialization of turnState (to be modified later)
-        turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
+        turnState = TurnState.initial(Color.values()[0],
                 Score.INITIAL, PlayerId.PLAYER_1);
     }
 
@@ -51,13 +50,14 @@ public final class JassGame {
      */
 
     public boolean isGameOver() {
-        boolean GameOver = turnState.score().totalPoints(TeamId.TEAM_1) >= 1000
-                || turnState.score().totalPoints(TeamId.TEAM_2) >= 1000;
+        boolean GameOver = turnState.score().totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
+                || turnState.score().totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS;
 
         if (GameOver) {
             TeamId winningTeam = turnState.score()
-                    .totalPoints(TeamId.TEAM_1) >= 1000 ? TeamId.TEAM_1
+                    .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS? TeamId.TEAM_1
                             : TeamId.TEAM_2;
+            System.out.println(winningTeam);
             for (PlayerId p : playersInOrder) {
                 players.get(p).setWinningTeam(winningTeam);
                 players.get(p).updateScore(turnState.score().nextTurn());
@@ -138,7 +138,7 @@ public final class JassGame {
         hands.clear();
         for (PlayerId p : players.keySet()) {
             CardSet hand = CardSet.EMPTY;
-            for (int i = CARDS_PER_HAND * p.ordinal(); i < CARDS_PER_HAND
+            for (int i = Jass.HAND_SIZE * p.ordinal(); i < Jass.HAND_SIZE
                     * (p.ordinal() + 1); i++) {
                 hand = hand.add(cards.get(i));
             }
