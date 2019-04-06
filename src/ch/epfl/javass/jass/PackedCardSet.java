@@ -17,8 +17,6 @@ public final class PackedCardSet {
      */
     private PackedCardSet() {
     }
-
-    private final static int NUM_OF_CARDS = 9;
     public final static long EMPTY = 0L;
     public final static long ALL_CARDS = Bits64.mask(0, 9) | Bits64.mask(16, 9)
             | Bits64.mask(32, 9) | Bits64.mask(48, 9);
@@ -61,17 +59,17 @@ public final class PackedCardSet {
         long NINE = 1L << 3;
         long tab[] = new long[9];
         int c = color.ordinal();
-        tab[Card.Rank.SIX.ordinal()] = Bits64.mask(1, NUM_OF_CARDS - 1) << c
+        tab[Card.Rank.SIX.ordinal()] = Bits64.mask(1, Jass.HAND_SIZE - 1) << c
                 * 16;
-        tab[Card.Rank.SEVEN.ordinal()] = Bits64.mask(2, NUM_OF_CARDS - 2) << c
+        tab[Card.Rank.SEVEN.ordinal()] = Bits64.mask(2, Jass.HAND_SIZE - 2) << c
                 * 16;
-        tab[Card.Rank.EIGHT.ordinal()] = Bits64.mask(3, NUM_OF_CARDS - 3) << c
+        tab[Card.Rank.EIGHT.ordinal()] = Bits64.mask(3, Jass.HAND_SIZE - 3) << c
                 * 16;
-        tab[Card.Rank.TEN.ordinal()] = Bits64.mask(5, NUM_OF_CARDS - 5)
+        tab[Card.Rank.TEN.ordinal()] = Bits64.mask(5, Jass.HAND_SIZE - 5)
                 + NINE << c * 16;
-        tab[Card.Rank.QUEEN.ordinal()] = Bits64.mask(7, NUM_OF_CARDS - 7) + NINE
+        tab[Card.Rank.QUEEN.ordinal()] = Bits64.mask(7, Jass.HAND_SIZE - 7) + NINE
                 + JACK << c * 16;
-        tab[Card.Rank.KING.ordinal()] = Bits64.mask(8, NUM_OF_CARDS - 8) + NINE
+        tab[Card.Rank.KING.ordinal()] = Bits64.mask(8, Jass.HAND_SIZE - 8) + NINE
                 + JACK << c * 16;
         tab[Card.Rank.ACE.ordinal()] = NINE + JACK << c * 16;
         tab[Card.Rank.NINE.ordinal()] = JACK << c * 16;

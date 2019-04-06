@@ -19,12 +19,6 @@ public final class TurnState {
         currentTrick = pkTrick;
     }
 
-    public TurnState(TurnState toCopy) {
-        currentScore = toCopy.currentScore;
-        unplayedCards = toCopy.unplayedCards;
-        currentTrick = toCopy.currentTrick;
-    }
-
     private long currentScore = PackedScore.INITIAL;
     private long unplayedCards = PackedCardSet.ALL_CARDS;
     private int currentTrick = PackedTrick.INVALID;
@@ -34,7 +28,8 @@ public final class TurnState {
      * @param trump
      * @param score
      * @param firstPlayer
-     * @return
+     * @return the initial state of a jassGame from the trump, score,
+     *         firstPlayer given and with an empty first trick
      */
     public static TurnState initial(Color trump, Score score,
             PlayerId firstPlayer) {
@@ -49,7 +44,7 @@ public final class TurnState {
      * @param pkScore
      * @param pkUnplayedCards
      * @param pkTrick
-     * @return
+     * @return act like a constructor
      */
     public static TurnState ofPackedComponents(long pkScore,
             long pkUnplayedCards, int pkTrick) {
@@ -60,56 +55,58 @@ public final class TurnState {
     }
 
     /**
-     * @return
+     * @return the pakedScore long value
      */
     public long packedScore() {
         return currentScore;
     }
 
     /**
-     * @return
+     * @return the packedCardset long value
      */
     public long packedUnplayedCards() {
         return unplayedCards;
     }
 
     /**
-     * @return
+     * @return the packedTrick int value
      */
     public int packedTrick() {
         return currentTrick;
     }
 
     /**
-     * @return
+     * @return a Score object
      */
     public Score score() {
         return Score.ofPacked(currentScore);
     }
 
     /**
-     * @return
+     * @return a CardSet object
      */
     public CardSet unplayedCards() {
         return CardSet.ofPacked(unplayedCards);
     }
 
     /**
-     * @return
+     * @return a Trick object
      */
     public Trick trick() {
         return Trick.ofPacked(currentTrick);
     }
 
     /**
-     * @return
+     * @return true if the State is the last of the game
      */
     public boolean isTerminal() {
         return currentTrick == PackedTrick.INVALID;
     }
 
     /**
-     * @return
+     * the currentTrick must be not full
+     * 
+     * @return the player that will play the next card in the trick
      */
     public PlayerId nextPlayer() {
         if (PackedTrick.isFull(currentTrick))
@@ -118,8 +115,11 @@ public final class TurnState {
     }
 
     /**
+     * the currentTrick must be not full
+     * 
      * @param card
-     * @return
+     *            the card to add to the trick
+     * @return the state with the new card played
      */
     public TurnState withNewCardPlayed(Card card) {
         if (PackedTrick.isFull(currentTrick))
@@ -132,7 +132,9 @@ public final class TurnState {
     }
 
     /**
-     * @return
+     * the currentTrick must be full
+     * 
+     * @return the new turn state with an empty trick
      */
     public TurnState withTrickCollected() {
         if (!PackedTrick.isFull(currentTrick))
@@ -146,8 +148,12 @@ public final class TurnState {
     }
 
     /**
+     * the currentTrick must be not full
+     * 
      * @param card
-     * @return
+     *            the card to add to the trick
+     * @return the new turn state eventually with an empty trick if the card
+     *         played fulfill the trick
      */
     public TurnState withNewCardPlayedAndTrickCollected(Card card) {
         if (PackedTrick.isFull(currentTrick))
