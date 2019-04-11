@@ -2,8 +2,6 @@ package ch.epfl.javass.jass;
 
 import java.util.List;
 
-import ch.epfl.javass.bits.Bits32;
-
 import java.util.Collections;
 import java.util.Arrays;
 
@@ -13,9 +11,6 @@ import java.util.Arrays;
 public final class Card {
 
     private int pkCard; 
-    
-    private static final int RANK_SIZE =4; 
-    private static final int COLOR_SIZE =2; 
 
     private Card(Color c, Rank r) {
         pkCard = PackedCard.pack(c, r);  
@@ -150,32 +145,23 @@ public final class Card {
          */
         public int trumpOrdinal() {
             int num = this.ordinal();
-            int trumpOrdinal;
             switch (num) {
             case 3:
-                trumpOrdinal = 7;
-                break;
+                return 7;
             case 4:
-                trumpOrdinal = 3;
-                break;
+                return 3;
             case 5:
-                trumpOrdinal = 8;
-                break;
+                return 8;
             case 6:
-                trumpOrdinal = 4;
-                break;
+                return 4;
             case 7:
-                trumpOrdinal = 5;
-                break;
+                return 5;
             case 8:
-                trumpOrdinal = 6;
-                break;
+                return 6;
             // the 3 first cards don't change of value when trump
             default:
-                trumpOrdinal = this.ordinal();
-                break;
+                return num;
             }
-            return trumpOrdinal;
         }
 
         private Rank(String symbol) {

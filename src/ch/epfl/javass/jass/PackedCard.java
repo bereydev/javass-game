@@ -8,7 +8,7 @@ import ch.epfl.javass.jass.Card.Rank;
  * @author : Alexandre Santangelo Date : Feb 19, 2019
  */
 public class PackedCard {
-    
+
     /**
      * Private constructor you can't instantiate
      */
@@ -16,6 +16,10 @@ public class PackedCard {
     }
 
     public static int INVALID = 63;
+    private static final int RANK_SIZE = 4;
+    private static final int RANK_START = 0;
+    private static final int COLOR_SIZE = 2;
+    private static final int COLOR_START = 4;
 
     /**
      * @param pkCard
@@ -23,10 +27,11 @@ public class PackedCard {
      * @return true if the packed card corresponds to a card
      */
     public static boolean isValid(int pkCard) {
-        int rank = Bits32.extract(pkCard, 0, 4);
-        int color = Bits32.extract(pkCard, 4, 2);
-        int rest = Bits32.extract(pkCard, 6, Integer.SIZE - 6); // Bits that
-                                                                // should be 0
+        int rank = Bits32.extract(pkCard, RANK_START, RANK_SIZE);
+        int color = Bits32.extract(pkCard, COLOR_START, COLOR_SIZE);
+        // bits that should be 0
+        int rest = Bits32.extract(pkCard, RANK_SIZE + COLOR_SIZE,
+                Integer.SIZE - (RANK_SIZE + COLOR_SIZE));
         return (rank <= 8 && rank >= 0) && (color >= 0 && color <= 3)
                 && (rest == 0);
     }
@@ -36,11 +41,10 @@ public class PackedCard {
      *            Color of the card
      * @param r
      *            Rank of the card
-     * @return An int that represents the card
+     * @return integer representing a packed card
      */
     public static int pack(Card.Color c, Card.Rank r) {
-
-        return Bits32.pack(r.ordinal(), 4, c.ordinal(), 2);
+        return Bits32.pack(r.ordinal(), RANK_SIZE, c.ordinal(), COLOR_SIZE);
     }
 
     /**
@@ -50,7 +54,7 @@ public class PackedCard {
      */
     public static Card.Color color(int pkCard) {
         assert (isValid(pkCard));
-        int color = Bits32.extract(pkCard, 4, 2);
+        int color = Bits32.extract(pkCard, COLOR_START, COLOR_SIZE);
         return Color.values()[color];
     }
 
@@ -61,7 +65,7 @@ public class PackedCard {
      */
     public static Card.Rank rank(int pkCard) {
         assert (isValid(pkCard));
-        int rank = Bits32.extract(pkCard, 0, 4);
+        int rank = Bits32.extract(pkCard, RANK_START, RANK_SIZE);
         return Rank.values()[rank];
     }
 
@@ -84,13 +88,13 @@ public class PackedCard {
                 return true;
             else
                 return false;
-        } else if (Bits32.extract(pkCardR, 4, 2) != Bits32.extract(pkCardL, 4,
-                2))
+        } else if (Bits32.extract(pkCardR, COLOR_START, COLOR_SIZE) != Bits32
+                .extract(pkCardL, COLOR_START, COLOR_SIZE))
             return false; // Not comparable as they are not of the same kind and
                           // not trump
         else
-            return Bits32.extract(pkCardL, 0, 4) > Bits32.extract(pkCardR, 0,
-                    4);
+            return Bits32.extract(pkCardL, RANK_START, RANK_SIZE) > Bits32
+                    .extract(pkCardR, RANK_START, RANK_SIZE);
     }
 
     /**
@@ -102,25 +106,26 @@ public class PackedCard {
      */
     public static int points(Card.Color trump, int pkCard) {
         assert (isValid(pkCard));
-        int rank = Bits32.extract(pkCard, 0, 4);
+        Rank rank = rank(pkCard);
 
-        if (trump.ordinal() == Bits32.extract(pkCard, 4, 2)) { // Card has trump
-                                                               // color
-            if (rank == 3)
+        if (trump.ordinal() == Bits32.extract(pkCard, COLOR_START,
+                COLOR_SIZE)) { // Card has trump
+            // color
+            if (rank.equals(Rank.NINE))
                 return 14;
-            else if (rank == 5)
+            else if (rank.equals(Rank.JACK))
                 return 20;
         }
         switch (rank) {
-        case 4:
+        case TEN:
             return 10;
-        case 5:
+        case JACK:
             return 2;
-        case 6:
+        case QUEEN:
             return 3;
-        case 7:
+        case KING:
             return 4;
-        case 8:
+        case ACE:
             return 11;
 
         default:
