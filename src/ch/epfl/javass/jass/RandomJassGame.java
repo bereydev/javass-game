@@ -3,6 +3,12 @@ package ch.epfl.javass.jass;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Alexandre Santangelo, Jonathan Bereyziat
+ * 
+ * Simulates a JassGame. 
+ *
+ */
 public final class RandomJassGame {
     public static void main(String[] args) {
         Map<PlayerId, Player> players = new HashMap<>();

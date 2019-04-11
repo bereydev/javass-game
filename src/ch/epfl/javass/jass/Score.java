@@ -123,34 +123,18 @@ public final class Score {
         return ofPacked(PackedScore.nextTurn(this.packed()));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return Long.hashCode(this.packed());
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         return PackedScore.toString(this.packed());
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object other) {
-
         if (other instanceof Score)
             return this.packed() == ((Score) other).packed();
         return false;

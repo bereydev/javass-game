@@ -143,7 +143,7 @@ public final class PackedTrick {
     /**
      * @param pkTrick
      *            A packed trick.
-     * @param index
+     * @param index Of the player you want 
      * @return
      */
     public static PlayerId player(int pkTrick, int index) {
@@ -269,9 +269,8 @@ public final class PackedTrick {
         int winningCard = card(pkTrick, 0);
         for (int i = 0; i < size(pkTrick); i++) {
             int pkCard = card(pkTrick, i);
-            if (PackedCard.isBetter(trump(pkTrick), pkCard, winningCard)) {
+            if (PackedCard.isBetter(trump(pkTrick), pkCard, winningCard)) 
                 winningCard = pkCard;
-            }
         }
         if (PackedCard.isValid(winningCard))
             return winningCard;
@@ -287,9 +286,9 @@ public final class PackedTrick {
         assert (isValid(pkTrick));
         int total = 0;
         Color trump = trump(pkTrick);
-        for (int i = 0; i < size(pkTrick); i++) {
+        for (int i = 0; i < size(pkTrick); i++) 
             total += PackedCard.points(trump, card(pkTrick, i));
-        }
+        
         if (isLast(pkTrick))
             total += 5;
 
@@ -307,9 +306,8 @@ public final class PackedTrick {
         int winningCard = winningCard(pkTrick);
         int index = 0;
         for (int i = 0; i < size(pkTrick); i++) {
-            if (card(pkTrick, i) == winningCard) {
+            if (card(pkTrick, i) == winningCard) 
                 index = i;
-            }
         }
         return player(pkTrick, index);
     }

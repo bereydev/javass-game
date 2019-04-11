@@ -16,7 +16,7 @@ public class CardSet {
     private long pkCardSet;
 
     /**
-     * private constructor you can't instantiate
+     * private constructor, can't instantiate
      */
     private CardSet(long pkCards) {
         pkCardSet = pkCards;
@@ -161,31 +161,16 @@ public class CardSet {
         return ofPacked(PackedCardSet.subsetOfColor(pkCardSet, color));
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return Long.hashCode(pkCardSet);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         return PackedCardSet.toString(pkCardSet);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object other) {
 
