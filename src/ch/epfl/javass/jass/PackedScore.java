@@ -16,12 +16,12 @@ public final class PackedScore {
     }
 
     public static final long INITIAL = 0L;
-    private static final int zero = 0;
-    private static final int turnTrickSize = 4;
-    private static final int turnPointsSize = 9;
-    private static final int scoreSize = 24;
-    private static final int gamePointsSize = 11;
-    private static final int gamePointsStart = 13;
+    private static final int ZERO = 0;
+    private static final int TURN_TRICK_SIZE = 4;
+    private static final int TURN_POINTS_SIZE = 9;
+    private static final int SCORE_SIZE = 24;
+    private static final int GAME_POINTS_SIZE = 11;
+    private static final int GAME_POINTS_START = 13;
     private static final int MAX_TRICKS = 9;
     private static final int MAX_GAME_POINTS = 2000;
     private static final int MAX_TURN_POINTS = 257;
@@ -33,30 +33,30 @@ public final class PackedScore {
      * @return true if the pkScore is valid and false otherwise
      */
     public static boolean isValid(long pkScore) {
-        long score1 = Bits64.extract(pkScore, zero, Integer.SIZE);
+        long score1 = Bits64.extract(pkScore, ZERO, Integer.SIZE);
         long score2 = Bits64.extract(pkScore, Integer.SIZE, Integer.SIZE);
-        long turnTricks1 = Bits64.extract(score1, zero, turnTrickSize);
-        long turnPoints1 = Bits64.extract(score1, turnTrickSize,
-                turnPointsSize);
-        long gamePoints1 = Bits64.extract(score1, gamePointsStart,
-                gamePointsSize);
-        long rest_1 = Bits64.extract(score1, scoreSize,
-                Integer.SIZE - scoreSize);
-        long turnTricks2 = Bits64.extract(score2, zero, turnTrickSize);
-        long turnPoints2 = Bits64.extract(score2, turnTrickSize,
-                turnPointsSize);
-        long gamePoints2 = Bits64.extract(score2, gamePointsStart,
-                gamePointsSize);
-        long rest_2 = Bits64.extract(score2, scoreSize,
-                Integer.SIZE - scoreSize);
-        return (turnTricks1 >= zero && turnTricks1 <= MAX_TRICKS)
-                && (turnPoints1 >= zero && turnPoints1 <= MAX_TURN_POINTS)
-                && (gamePoints1 >= zero && gamePoints1 <= MAX_GAME_POINTS)
-                && (rest_1 == zero)
-                && (turnTricks2 >= zero && turnTricks2 <= MAX_TRICKS)
-                && (turnPoints2 >= zero && turnPoints2 <= MAX_TURN_POINTS)
-                && (gamePoints2 >= zero && gamePoints2 <= MAX_GAME_POINTS)
-                && (rest_2 == zero);
+        long turnTricks1 = Bits64.extract(score1, ZERO, TURN_TRICK_SIZE);
+        long turnPoints1 = Bits64.extract(score1, TURN_TRICK_SIZE,
+                TURN_POINTS_SIZE);
+        long gamePoints1 = Bits64.extract(score1, GAME_POINTS_START,
+                GAME_POINTS_SIZE);
+        long rest_1 = Bits64.extract(score1, SCORE_SIZE,
+                Integer.SIZE - SCORE_SIZE);
+        long turnTricks2 = Bits64.extract(score2, ZERO, TURN_TRICK_SIZE);
+        long turnPoints2 = Bits64.extract(score2, TURN_TRICK_SIZE,
+                TURN_POINTS_SIZE);
+        long gamePoints2 = Bits64.extract(score2, GAME_POINTS_START,
+                GAME_POINTS_SIZE);
+        long rest_2 = Bits64.extract(score2, SCORE_SIZE,
+                Integer.SIZE - SCORE_SIZE);
+        return (turnTricks1 >= ZERO && turnTricks1 <= MAX_TRICKS)
+                && (turnPoints1 >= ZERO && turnPoints1 <= MAX_TURN_POINTS)
+                && (gamePoints1 >= ZERO && gamePoints1 <= MAX_GAME_POINTS)
+                && (rest_1 == ZERO)
+                && (turnTricks2 >= ZERO && turnTricks2 <= MAX_TRICKS)
+                && (turnPoints2 >= ZERO && turnPoints2 <= MAX_TURN_POINTS)
+                && (gamePoints2 >= ZERO && gamePoints2 <= MAX_GAME_POINTS)
+                && (rest_2 == ZERO);
     }
 
     /**
@@ -77,14 +77,14 @@ public final class PackedScore {
      */
     public static long pack(int turnTricks1, int turnPoints1, int gamePoints1,
             int turnTricks2, int turnPoints2, int gamePoints2) {
-        long b1 = Bits64.pack(turnTricks1, turnTrickSize, turnPoints1,
-                turnPointsSize);
-        long score1 = Bits64.pack(b1, gamePointsStart, gamePoints1,
-                gamePointsSize);
-        long b2 = Bits64.pack(turnTricks2, turnTrickSize, turnPoints2,
-                turnPointsSize);
-        long score2 = Bits64.pack(b2, gamePointsStart, gamePoints2,
-                gamePointsSize);
+        long b1 = Bits64.pack(turnTricks1, TURN_TRICK_SIZE, turnPoints1,
+                TURN_POINTS_SIZE);
+        long score1 = Bits64.pack(b1, GAME_POINTS_START, gamePoints1,
+                GAME_POINTS_SIZE);
+        long b2 = Bits64.pack(turnTricks2, TURN_TRICK_SIZE, turnPoints2,
+                TURN_POINTS_SIZE);
+        long score2 = Bits64.pack(b2, GAME_POINTS_START, gamePoints2,
+                GAME_POINTS_SIZE);
         long scoreFinal = Bits64.pack(score1, Integer.SIZE, score2,
                 Integer.SIZE);
 
@@ -102,9 +102,9 @@ public final class PackedScore {
     public static int turnTricks(long pkScore, TeamId t) {
         assert (isValid(pkScore));
         if (t == TeamId.TEAM_1) {
-            return (int) Bits64.extract(pkScore, zero, turnTrickSize);
+            return (int) Bits64.extract(pkScore, ZERO, TURN_TRICK_SIZE);
         } else {
-            return (int) Bits64.extract(pkScore, Integer.SIZE, turnTrickSize);
+            return (int) Bits64.extract(pkScore, Integer.SIZE, TURN_TRICK_SIZE);
         }
 
     }
@@ -120,10 +120,11 @@ public final class PackedScore {
     public static int turnPoints(long pkScore, TeamId t) {
         assert (isValid(pkScore));
         if (t == TeamId.TEAM_1) {
-            return (int) Bits64.extract(pkScore, turnTrickSize, turnPointsSize);
+            return (int) Bits64.extract(pkScore, TURN_TRICK_SIZE,
+                    TURN_POINTS_SIZE);
         } else {
-            return (int) Bits64.extract(pkScore, Integer.SIZE + turnTrickSize,
-                    turnPointsSize);
+            return (int) Bits64.extract(pkScore, Integer.SIZE + TURN_TRICK_SIZE,
+                    TURN_POINTS_SIZE);
         }
     }
 
@@ -138,11 +139,11 @@ public final class PackedScore {
     public static int gamePoints(long pkScore, TeamId t) {
         assert (isValid(pkScore));
         if (t == TeamId.TEAM_1) {
-            return (int) Bits64.extract(pkScore, gamePointsStart,
-                    gamePointsSize);
+            return (int) Bits64.extract(pkScore, GAME_POINTS_START,
+                    GAME_POINTS_SIZE);
         } else {
-            return (int) Bits64.extract(pkScore, Integer.SIZE + gamePointsStart,
-                    gamePointsSize);
+            return (int) Bits64.extract(pkScore,
+                    Integer.SIZE + GAME_POINTS_START, GAME_POINTS_SIZE);
         }
     }
 
@@ -211,7 +212,7 @@ public final class PackedScore {
         gamePoints1 += turnPoints1;
         gamePoints2 += turnPoints2;
 
-        return pack(zero, zero, gamePoints1, zero, zero, gamePoints2);
+        return pack(ZERO, ZERO, gamePoints1, ZERO, ZERO, gamePoints2);
     }
 
     /**

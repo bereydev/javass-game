@@ -4,8 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.SplittableRandom;
 import ch.epfl.javass.Preconditions;
-import ch.epfl.javass.jass.Card.Color;
-import ch.epfl.javass.jass.Card.Rank;
 
 /**
  * Class representing a simulated player using the MCTS algorithm

@@ -61,7 +61,6 @@ public final class JassGame {
                     .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
                             ? TeamId.TEAM_1
                             : TeamId.TEAM_2;
-            System.out.println(winningTeam);
             for (PlayerId p : playersInOrder) {
                 players.get(p).setWinningTeam(winningTeam);
                 players.get(p).updateScore(turnState.score().nextTurn());
