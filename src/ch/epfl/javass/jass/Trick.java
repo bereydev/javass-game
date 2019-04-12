@@ -12,7 +12,6 @@ public final class Trick {
 
     private Trick(int pkTrick) {
         this.pkTrick = pkTrick;
-
     }
 
     public final static Trick INVALID = new Trick(PackedTrick.INVALID);
@@ -49,9 +48,8 @@ public final class Trick {
      * @return The same trick but without any card.
      */
     public Trick nextEmpty() {
-        if (!isFull()) {
+        if (!isFull())
             throw new IllegalStateException();
-        }
         return new Trick(PackedTrick.nextEmpty(pkTrick));
     }
 
@@ -102,9 +100,8 @@ public final class Trick {
      * @return The player at index, index in the trick
      */
     public PlayerId player(int index) {
-        if (!(index >= 0 && index < 4)) {
+        if (!(index >= 0 && index < 4))
             throw new IndexOutOfBoundsException();
-        }
         return PackedTrick.player(pkTrick, index);
     }
 
@@ -114,9 +111,8 @@ public final class Trick {
      * @return The card at index index in the trick
      */
     public Card card(int index) {
-        if (!(index >= 0 && index < 4)) {
+        if (!(index >= 0 && index < 4))
             throw new IndexOutOfBoundsException();
-        }
         return Card.ofPacked(PackedTrick.card(pkTrick, index));
     }
 
@@ -158,18 +154,15 @@ public final class Trick {
      * @return The currently winning player.
      */
     public PlayerId winningPlayer() {
-        if (isEmpty()) {
+        if (isEmpty())
             throw new IllegalStateException();
-        }
         return PackedTrick.winningPlayer(pkTrick);
     }
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof Trick) {
-            if (((Trick) other).pkTrick == pkTrick)
-                return true;
-        }
+        if (other instanceof Trick)
+            return ((Trick) other).pkTrick == pkTrick;
         return false;
     }
 

@@ -61,6 +61,7 @@ public final class JassGame {
                     .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
                             ? TeamId.TEAM_1
                             : TeamId.TEAM_2;
+                    System.out.println(winningTeam);
             for (PlayerId p : playersInOrder) {
                 players.get(p).setWinningTeam(winningTeam);
                 players.get(p).updateScore(turnState.score().nextTurn());
@@ -153,13 +154,13 @@ public final class JassGame {
      * @return The player that has the seven of diamonds.
      */
     private PlayerId firstPlayer() {
-
+        PlayerId firstPlayer = PlayerId.PLAYER_1;
         for (PlayerId p : hands.keySet()) {
             if (hands.get(p).contains(Card.of(Color.DIAMOND, Rank.SEVEN)))
-                return p;
+                firstPlayer = p;
         }
         // This shouldn't happen
-        return PlayerId.PLAYER_1;
+        return firstPlayer;
     }
 
     /**
