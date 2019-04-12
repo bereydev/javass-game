@@ -11,6 +11,12 @@ import ch.epfl.javass.jass.PackedScore;
 
 public final class Score {
 
+    private final static int zero = 0;
+    private static final int turnTrickSize = 4;
+    private static final int turnPointsSize = 9;
+    private static final int gamePointsSize = 11;
+    private static final int gamePointsStart = 13;
+
     private int turnTricks1, turnPoints1, gamePoints1;
     private int turnTricks2, turnPoints2, gamePoints2;
 
@@ -37,7 +43,8 @@ public final class Score {
         gamePoints2 = gP2;
     }
 
-    public static final Score INITIAL = new Score(0, 0, 0, 0, 0, 0);
+    public static final Score INITIAL = new Score(zero, zero, zero, zero, zero,
+            zero);
 
     /**
      * @param pkScore
@@ -47,12 +54,15 @@ public final class Score {
     public static Score ofPacked(long pkScore) {
         // Preconditions.checkArgument(PackedScore.isValid(pkScore));
 
-        int nbP1 = (int) Bits64.extract(pkScore, 0, 4);
-        int tP1 = (int) Bits64.extract(pkScore, 4, 9);
-        int gP1 = (int) Bits64.extract(pkScore, 13, 11);
-        int nbP2 = (int) Bits64.extract(pkScore, 32, 4);
-        int tP2 = (int) Bits64.extract(pkScore, 36, 9);
-        int gP2 = (int) Bits64.extract(pkScore, 45, 11);
+        int nbP1 = (int) Bits64.extract(pkScore, zero, turnTrickSize);
+        int tP1 = (int) Bits64.extract(pkScore, turnTrickSize, turnPointsSize);
+        int gP1 = (int) Bits64.extract(pkScore, gamePointsStart,
+                gamePointsSize);
+        int nbP2 = (int) Bits64.extract(pkScore, Integer.SIZE, turnTrickSize);
+        int tP2 = (int) Bits64.extract(pkScore, Integer.SIZE + turnTrickSize,
+                turnPointsSize);
+        int gP2 = (int) Bits64.extract(pkScore, Integer.SIZE + gamePointsStart,
+                gamePointsSize);
 
         return new Score(nbP1, tP1, gP1, nbP2, tP2, gP2);
     }

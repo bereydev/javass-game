@@ -18,16 +18,26 @@ public final class PackedCardSet {
     private PackedCardSet() {
     }
 
+    private static final int SIZE = Long.SIZE / 4;
+    private static final int ColorSize = 2;
+    private static final int ColorStart = 4;
+    private static final int rankSize = 4;
+    private static final int rankStart = 0;
+
     public final static long EMPTY = 0L;
-    public final static long ALL_CARDS = Bits64.mask(0, 9) | Bits64.mask(16, 9)
-            | Bits64.mask(32, 9) | Bits64.mask(48, 9);
+    public final static long ALL_CARDS = Bits64.mask(0, Card.Rank.COUNT)
+            | Bits64.mask(SIZE, Card.Rank.COUNT)
+            | Bits64.mask(SIZE * 2, Card.Rank.COUNT)
+            | Bits64.mask(SIZE * 3, Card.Rank.COUNT);
     private final static long trumpAboveTab[][] = {
             supTrumpCardTab(Card.Color.SPADE),
             supTrumpCardTab(Card.Color.HEART),
             supTrumpCardTab(Card.Color.DIAMOND),
             supTrumpCardTab(Card.Color.CLUB) };
-    private final static long colorSetTab[] = { Bits64.mask(0, 9),
-            Bits64.mask(16, 9), Bits64.mask(32, 9), Bits64.mask(48, 9) };
+    private final static long colorSetTab[] = { Bits64.mask(0, Card.Rank.COUNT),
+            Bits64.mask(SIZE, Card.Rank.COUNT),
+            Bits64.mask(SIZE * 2, Card.Rank.COUNT),
+            Bits64.mask(3 * SIZE, Card.Rank.COUNT) };
 
     /**
      * @param pkCardSet
@@ -46,8 +56,8 @@ public final class PackedCardSet {
     public static long trumpAbove(int pkCard) {
         assert (PackedCard.isValid(pkCard));
 
-        return trumpAboveTab[Bits32.extract(pkCard, 4, 2)][Bits32
-                .extract(pkCard, 0, 4)];
+        return trumpAboveTab[Bits32.extract(pkCard, ColorStart,
+                ColorSize)][Bits32.extract(pkCard, rankStart, rankSize)];
     }
 
     /**
@@ -56,24 +66,31 @@ public final class PackedCardSet {
      * @return A tab with the sets of cards superior to each card
      */
     private static long[] supTrumpCardTab(Card.Color color) {
-        long JACK = 1L << 5;
-        long NINE = 1L << 3;
-        long tab[] = new long[9];
+        long JACK = 1L << Card.Rank.JACK.ordinal();
+        long NINE = 1L << Card.Rank.NINE.ordinal();
+        long tab[] = new long[Card.Rank.COUNT];
         int c = color.ordinal();
+
+        /*
+         * The numbers {1,2,3,5,7,8} of this function correspond to the
+         * Card.Rank.<rank>.ordinal() + 1. I used numbers instead of writing the
+         * above as the function became impossible to read.
+         */
+
         tab[Card.Rank.SIX.ordinal()] = Bits64.mask(1, Jass.HAND_SIZE - 1) << c
-                * 16;
+                * SIZE;
         tab[Card.Rank.SEVEN.ordinal()] = Bits64.mask(2, Jass.HAND_SIZE - 2) << c
-                * 16;
+                * SIZE;
         tab[Card.Rank.EIGHT.ordinal()] = Bits64.mask(3, Jass.HAND_SIZE - 3) << c
-                * 16;
+                * SIZE;
         tab[Card.Rank.TEN.ordinal()] = Bits64.mask(5, Jass.HAND_SIZE - 5)
-                + NINE << c * 16;
+                + NINE << c * SIZE;
         tab[Card.Rank.QUEEN.ordinal()] = Bits64.mask(7, Jass.HAND_SIZE - 7)
-                + NINE + JACK << c * 16;
+                + NINE + JACK << c * SIZE;
         tab[Card.Rank.KING.ordinal()] = Bits64.mask(8, Jass.HAND_SIZE - 8)
-                + NINE + JACK << c * 16;
-        tab[Card.Rank.ACE.ordinal()] = NINE + JACK << c * 16;
-        tab[Card.Rank.NINE.ordinal()] = JACK << c * 16;
+                + NINE + JACK << c * SIZE;
+        tab[Card.Rank.ACE.ordinal()] = NINE + JACK << c * SIZE;
+        tab[Card.Rank.NINE.ordinal()] = JACK << c * SIZE;
         tab[Card.Rank.JACK.ordinal()] = 0L;
 
         return tab;

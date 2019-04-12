@@ -17,6 +17,8 @@ public final class PacedPlayer implements Player {
     private Player underlyingPlayer;
     private double minTime;
 
+    private static final int milliSeconds = 1000;
+
     /**
      * @param underlyingPlayer
      *            The player to be paced.
@@ -36,7 +38,8 @@ public final class PacedPlayer implements Player {
         if (currentTime - startTime >= minTime)
             return card;
         try {
-            Thread.sleep((int) (minTime + startTime - currentTime) * 1000);
+            Thread.sleep(
+                    (int) (minTime + startTime - currentTime) * milliSeconds);
         } catch (InterruptedException e) {
             /* do nothing */ }
 

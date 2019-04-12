@@ -10,6 +10,9 @@ import ch.epfl.javass.jass.Card.Color;
 
 public final class Trick {
 
+    private final static int MAX_INDEX = 4;
+    private final static int zero = 0;
+
     private Trick(int pkTrick) {
         this.pkTrick = pkTrick;
     }
@@ -100,7 +103,7 @@ public final class Trick {
      * @return The player at index, index in the trick
      */
     public PlayerId player(int index) {
-        if (!(index >= 0 && index < 4))
+        if (!(index >= zero && index < MAX_INDEX))
             throw new IndexOutOfBoundsException();
         return PackedTrick.player(pkTrick, index);
     }
@@ -111,7 +114,7 @@ public final class Trick {
      * @return The card at index index in the trick
      */
     public Card card(int index) {
-        if (!(index >= 0 && index < 4))
+        if (!(index >= zero && index < MAX_INDEX))
             throw new IndexOutOfBoundsException();
         return Card.ofPacked(PackedTrick.card(pkTrick, index));
     }

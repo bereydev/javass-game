@@ -19,6 +19,9 @@ public final class TurnState {
         currentTrick = pkTrick;
     }
 
+    private static final int indexSize = 4;
+    private static final int trumpSize = 2;
+    private static final int playerSize = 2;
     private long currentScore = PackedScore.INITIAL;
     private long unplayedCards = PackedCardSet.ALL_CARDS;
     private int currentTrick = PackedTrick.INVALID;
@@ -35,8 +38,8 @@ public final class TurnState {
             PlayerId firstPlayer) {
         int pkTrick = Bits32.pack(PackedCard.INVALID, CARD_SIZE,
                 PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID, CARD_SIZE,
-                PackedCard.INVALID, CARD_SIZE, 0, 4, firstPlayer.ordinal(), 2,
-                trump.ordinal(), 2);
+                PackedCard.INVALID, CARD_SIZE, 0, indexSize,
+                firstPlayer.ordinal(), playerSize, trump.ordinal(), trumpSize);
         return new TurnState(score.packed(), PackedCardSet.ALL_CARDS, pkTrick);
     }
 

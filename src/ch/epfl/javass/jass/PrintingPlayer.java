@@ -7,34 +7,36 @@ import ch.epfl.javass.jass.Card.Color;
 public final class PrintingPlayer implements Player {
     private final Player underlyingPlayer;
 
+    private static final int first = 0;
+
     /**
-     * @param underlyingPlayer  The player to print 
+     * @param underlyingPlayer
+     *            The player to print
      */
     public PrintingPlayer(Player underlyingPlayer) {
-      this.underlyingPlayer = underlyingPlayer;
+        this.underlyingPlayer = underlyingPlayer;
     }
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-      System.out.print("C'est à moi de jouer... Je joue : ");
-      Card c = underlyingPlayer.cardToPlay(state, hand);
-      System.out.println(c);
-      return c;
+        System.out.print("C'est à moi de jouer... Je joue : ");
+        Card c = underlyingPlayer.cardToPlay(state, hand);
+        System.out.println(c);
+        return c;
     }
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         System.out.println("Les joueurs sont : ");
-        //TODO comment ittérer sur une map ?
-        for(PlayerId p : playerNames.keySet()) {
+        // TODO comment ittérer sur une map ?
+        for (PlayerId p : playerNames.keySet()) {
             System.out.print(p);
-            if(p.ordinal() == ownId.ordinal())
+            if (p.ordinal() == ownId.ordinal())
                 System.out.println("(that's me)");
-            else 
+            else
                 System.out.println("");
         }
-            
-            
+
     }
 
     @Override
@@ -51,16 +53,17 @@ public final class PrintingPlayer implements Player {
 
     @Override
     public void updateTrick(Trick newTrick) {
-        System.out.print("Pli " + newTrick.index() + ", commencé par " + newTrick.player(0) + " :");
+        System.out.print("Pli " + newTrick.index() + ", commencé par "
+                + newTrick.player(first) + " :");
         System.out.println(newTrick);
-        
+
     }
 
     @Override
     public void updateScore(Score score) {
         System.out.print("Scores : ");
         System.out.println(score);
-        
+
     }
 
     @Override
@@ -68,7 +71,7 @@ public final class PrintingPlayer implements Player {
         System.out.print("Et le vainqueur est ... l'équipe : ");
         System.out.println(winningTeam.name());
         System.out.println("Bravo !");
-        
+
     }
 
 }

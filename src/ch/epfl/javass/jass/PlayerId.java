@@ -22,7 +22,7 @@ public enum PlayerId {
      * @return The team a player belongs to
      */
     public TeamId team() {
-        if (this.ordinal() % 2 == 0)
+        if (this.ordinal() % TeamId.COUNT == 0)
             return TeamId.TEAM_1;
 
         return TeamId.TEAM_2;

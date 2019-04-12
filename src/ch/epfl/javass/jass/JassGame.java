@@ -61,7 +61,7 @@ public final class JassGame {
                     .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
                             ? TeamId.TEAM_1
                             : TeamId.TEAM_2;
-                    System.out.println(winningTeam);
+            System.out.println(winningTeam);
             for (PlayerId p : playersInOrder) {
                 players.get(p).setWinningTeam(winningTeam);
                 players.get(p).updateScore(turnState.score().nextTurn());
@@ -82,7 +82,8 @@ public final class JassGame {
             deal();
             player1 = turnStarter();
             organizePlayers(player1);
-            turnState = TurnState.initial(Color.values()[trumpRng.nextInt(4)],
+            turnState = TurnState.initial(
+                    Color.values()[trumpRng.nextInt(Color.COUNT)],
                     Score.INITIAL, player1);
         } else {
             turnState = turnState.withTrickCollected();
@@ -91,7 +92,7 @@ public final class JassGame {
                 player1 = turnStarter();
                 organizePlayers(player1);
                 turnState = TurnState.initial(
-                        Color.values()[trumpRng.nextInt(4)],
+                        Color.values()[trumpRng.nextInt(Color.COUNT)],
                         turnState.score().nextTurn(), player1);
             } else {
                 organizePlayers(player1);
@@ -173,8 +174,8 @@ public final class JassGame {
     private void organizePlayers(PlayerId firstPlayer) {
         playersInOrder.clear();
         for (int i = firstPlayer.ordinal(); i < firstPlayer.ordinal()
-                + 4; i++) {
-            playersInOrder.add(PlayerId.values()[i % 4]);
+                + PlayerId.COUNT; i++) {
+            playersInOrder.add(PlayerId.values()[i % PlayerId.COUNT]);
         }
     }
 
@@ -185,7 +186,8 @@ public final class JassGame {
         if (newGame)
             turnStarter = firstPlayer();
         else
-            turnStarter = PlayerId.values()[(turnStarter.ordinal() + 1) % 4];
+            turnStarter = PlayerId.values()[(turnStarter.ordinal() + 1)
+                    % PlayerId.COUNT];
         return turnStarter;
     }
 
