@@ -13,31 +13,32 @@ import java.util.Map;
 import ch.epfl.javass.jass.Card.Color;
 
 public final class PacedPlayer implements Player {
-    
-    private Player underlyingPlayer; 
-    private double minTime; 
-    
+
+    private Player underlyingPlayer;
+    private double minTime;
+
     /**
-     * @param underlyingPlayer  The player to be paced. 
-     * @param minTime   The minimal wait time. 
+     * @param underlyingPlayer
+     *            The player to be paced.
+     * @param minTime
+     *            The minimal wait time.
      */
-    public PacedPlayer(Player underlyingPlayer, double minTime){
-        this.underlyingPlayer = underlyingPlayer; 
-        this.minTime = minTime; 
+    public PacedPlayer(Player underlyingPlayer, double minTime) {
+        this.underlyingPlayer = underlyingPlayer;
+        this.minTime = minTime;
     }
-    
+
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        double startTime = System.currentTimeMillis(); 
-        Card card = underlyingPlayer.cardToPlay(state, hand); 
-        double currentTime = System.currentTimeMillis(); 
-        if(currentTime - startTime >= minTime) {
-            return card; 
-        }
+        double startTime = System.currentTimeMillis();
+        double currentTime = System.currentTimeMillis();
+        Card card = underlyingPlayer.cardToPlay(state, hand);
+        if (currentTime - startTime >= minTime)
+            return card;
         try {
-            Thread.sleep((int)(minTime + startTime - currentTime)*1000);
-        }
-        catch(InterruptedException e) { /* do nothing */ }
+            Thread.sleep((int) (minTime + startTime - currentTime) * 1000);
+        } catch (InterruptedException e) {
+            /* do nothing */ }
 
         return card;
     }

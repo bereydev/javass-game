@@ -40,23 +40,26 @@ public final class JassGame {
         this.players = Collections.unmodifiableMap(new EnumMap<>(players));
         this.playerNames = Collections
                 .unmodifiableMap(new EnumMap<>(playerNames));
-        
+
         // Initialization of turnState (to be modified later)
-        turnState = TurnState.initial(Color.values()[0],
-                Score.INITIAL, PlayerId.PLAYER_1);
+        turnState = TurnState.initial(Color.values()[0], Score.INITIAL,
+                PlayerId.PLAYER_1);
     }
 
     /**
-     * @return True if the game is over. 
+     * @return True if the game is over.
      */
 
     public boolean isGameOver() {
-        boolean GameOver = turnState.score().totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
-                || turnState.score().totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS;
+        boolean GameOver = turnState.score()
+                .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
+                || turnState.score()
+                        .totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS;
 
         if (GameOver) {
             TeamId winningTeam = turnState.score()
-                    .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS? TeamId.TEAM_1
+                    .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
+                            ? TeamId.TEAM_1
                             : TeamId.TEAM_2;
             for (PlayerId p : playersInOrder) {
                 players.get(p).setWinningTeam(winningTeam);
@@ -71,7 +74,7 @@ public final class JassGame {
      */
 
     public void advanceToEndOfNextTrick() {
-        if (isGameOver()) 
+        if (isGameOver())
             return;
 
         if (newGame) {
@@ -102,14 +105,13 @@ public final class JassGame {
                 players.get(p).setTrump(turnState.trick().trump());
             }
         }
-        for (PlayerId p : playersInOrder) 
+        for (PlayerId p : playersInOrder)
             players.get(p).updateScore(turnState.score());
 
         for (PlayerId p : playersInOrder) {
 
-            for (PlayerId q : playersInOrder) 
+            for (PlayerId q : playersInOrder)
                 players.get(q).updateTrick(turnState.trick());
-            
 
             Card cardToPlay = players.get(p).cardToPlay(turnState,
                     hands.get(p));
@@ -118,15 +120,15 @@ public final class JassGame {
 
             turnState = turnState.withNewCardPlayed(cardToPlay);
         }
-        for (PlayerId q : playersInOrder) 
+        for (PlayerId q : playersInOrder)
             players.get(q).updateTrick(turnState.trick());
-        
+
         player1 = turnState.trick().winningPlayer();
 
     }
 
     /**
-     * Shuffles and distributes the card to each player 
+     * Shuffles and distributes the card to each player
      */
     private void deal() {
         List<Card> cards = new LinkedList<Card>();
@@ -148,12 +150,12 @@ public final class JassGame {
     }
 
     /**
-     * @return  The player that has the seven of diamonds. 
+     * @return The player that has the seven of diamonds.
      */
     private PlayerId firstPlayer() {
 
         for (PlayerId p : hands.keySet()) {
-            if (hands.get(p).contains(Card.of(Color.DIAMOND, Rank.SEVEN))) 
+            if (hands.get(p).contains(Card.of(Color.DIAMOND, Rank.SEVEN)))
                 return p;
         }
         // This shouldn't happen
@@ -161,9 +163,11 @@ public final class JassGame {
     }
 
     /**
-     * @param firstPlayer   The player who plays first.
+     * @param firstPlayer
+     *            The player who plays first.
      * 
-     * Orders the list "playersInOrder" which dictates in which order the players play.  
+     *            Orders the list "playersInOrder" which dictates in which order
+     *            the players play.
      */
     private void organizePlayers(PlayerId firstPlayer) {
         playersInOrder.clear();
@@ -174,7 +178,7 @@ public final class JassGame {
     }
 
     /**
-     * @return  The player that starts the turn. 
+     * @return The player that starts the turn.
      */
     private PlayerId turnStarter() {
         if (newGame)
@@ -183,5 +187,5 @@ public final class JassGame {
             turnStarter = PlayerId.values()[(turnStarter.ordinal() + 1) % 4];
         return turnStarter;
     }
-    
+
 }

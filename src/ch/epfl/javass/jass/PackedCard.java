@@ -80,21 +80,20 @@ public class PackedCard {
      */
     public static boolean isBetter(Card.Color trump, int pkCardL, int pkCardR) {
         assert (isValid(pkCardL) && isValid(pkCardR));
+        int colorL = Bits32.extract(pkCardL, COLOR_START, COLOR_SIZE);
+        int colorR = Bits32.extract(pkCardR, COLOR_START, COLOR_SIZE);
+        int rankL = Bits32.extract(pkCardL, RANK_START, RANK_SIZE);
+        int rankR = Bits32.extract(pkCardR, RANK_START, RANK_SIZE);
+        int trumpC = trump.ordinal();
 
-        if (color(pkCardL) == trump && color(pkCardR) == trump) {
+        if (colorL == trumpC && colorR == trumpC)
             return rank(pkCardL).trumpOrdinal() > rank(pkCardR).trumpOrdinal();
-        } else if (color(pkCardL) == trump || color(pkCardR) == trump) {
-            if (color(pkCardL) == trump)
-                return true;
-            else
-                return false;
-        } else if (Bits32.extract(pkCardR, COLOR_START, COLOR_SIZE) != Bits32
-                .extract(pkCardL, COLOR_START, COLOR_SIZE))
-            return false; // Not comparable as they are not of the same kind and
-                          // not trump
+        else if (colorL == trumpC || colorR == trumpC)
+            return colorL == trumpC;
+        else if (colorR != colorL)
+            return false; // Not comparable : not of the same kind and not trump
         else
-            return Bits32.extract(pkCardL, RANK_START, RANK_SIZE) > Bits32
-                    .extract(pkCardR, RANK_START, RANK_SIZE);
+            return rankL > rankR;
     }
 
     /**
@@ -106,14 +105,14 @@ public class PackedCard {
      */
     public static int points(Card.Color trump, int pkCard) {
         assert (isValid(pkCard));
-        Rank rank = rank(pkCard);
 
-        if (trump.ordinal() == Bits32.extract(pkCard, COLOR_START,
-                COLOR_SIZE)) { // Card has trump
-            // color
-            if (rank.equals(Rank.NINE))
+        Rank rank = rank(pkCard);
+        Color color = color(pkCard);
+
+        if (trump == color) { // Card has trump color
+            if (rank == Rank.NINE)
                 return 14;
-            else if (rank.equals(Rank.JACK))
+            else if (rank == Rank.JACK)
                 return 20;
         }
         switch (rank) {

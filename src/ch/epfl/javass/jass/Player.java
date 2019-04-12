@@ -17,51 +17,58 @@ public interface Player {
      *         cards hand in the hand
      */
     abstract Card cardToPlay(TurnState state, CardSet hand);
-    default public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
+
+    default public void setPlayers(PlayerId ownId,
+            Map<PlayerId, String> playerNames) {
     }
-    
+
     /**
-     * @param newHand   The new hand of the player 
+     * @param newHand
+     *            The new hand of the player
      * 
-     * Updates the hand of the player with newHand 
+     *            Updates the hand of the player with newHand
      */
     default void updateHand(CardSet newHand) {
-        
+
     }
-    
+
     /**
-     * @param trump The trump color of the trick. 
+     * @param trump
+     *            The trump color of the trick.
      * 
-     * Informs the player of the current trump color. 
+     *            Informs the player of the current trump color.
      */
     default void setTrump(Color trump) {
-        
+
     }
-    
+
     /**
-     * @param newTrick  The current Trick. 
+     * @param newTrick
+     *            The current Trick.
      * 
-     * Updates the trick of the player to newTrick. 
+     *            Updates the trick of the player to newTrick.
      */
     default void updateTrick(Trick newTrick) {
-        
+
     }
-    
+
     /**
-     * @param score The current score 
+     * @param score
+     *            The current score
      * 
-     * Updates the score of the player to 'score'.  
+     *            Updates the score of the player to 'score'.
      */
     default void updateScore(Score score) {
-        
+
     }
-    
+
     /**
-     * @param winningTeam   The team whose score is superior or equal to 1000 
+     * @param winningTeam
+     *            The team whose score is superior or equal to 1000
      * 
-     * Informs the player of the winningTeam 
+     *            Informs the player of the winningTeam
      */
     default void setWinningTeam(TeamId winningTeam) {
-        
+
     }
 }

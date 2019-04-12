@@ -8,7 +8,7 @@ import ch.epfl.javass.bits.Bits64;
  *
  */
 public final class PackedScore {
-    
+
     /**
      * Private constructor you can't instantiate
      */

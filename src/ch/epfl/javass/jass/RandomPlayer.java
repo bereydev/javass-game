@@ -6,7 +6,8 @@ public final class RandomPlayer implements Player {
     private final Random rng;
 
     /**
-     * @param rngSeed   The seed used for random generations of numbers 
+     * @param rngSeed
+     *            The seed used for random generations of numbers
      */
     public RandomPlayer(long rngSeed) {
         this.rng = new Random(rngSeed);
@@ -17,5 +18,5 @@ public final class RandomPlayer implements Player {
         CardSet playable = state.trick().playableCards(hand);
         return playable.get(rng.nextInt(playable.size()));
     }
-   
+
 }

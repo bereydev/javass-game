@@ -10,10 +10,10 @@ import java.util.Arrays;
  */
 public final class Card {
 
-    private int pkCard; 
+    private int pkCard;
 
     private Card(Color c, Rank r) {
-        pkCard = PackedCard.pack(c, r);  
+        pkCard = PackedCard.pack(c, r);
     }
 
     /**
@@ -43,7 +43,7 @@ public final class Card {
      * @return The packed version of the card
      */
     public int packed() {
-        return pkCard; 
+        return pkCard;
     }
 
     /**
@@ -57,7 +57,7 @@ public final class Card {
      * @return The rank of the card
      */
     public Rank rank() {
-       return PackedCard.rank(pkCard); 
+        return PackedCard.rank(pkCard);
     }
 
     /**
@@ -69,7 +69,7 @@ public final class Card {
      *         other one
      */
     public boolean isBetter(Color trump, Card that) {
-        return PackedCard.isBetter(trump, this.packed(), that.packed());
+        return PackedCard.isBetter(trump, pkCard, that.packed());
     }
 
     /**
@@ -78,27 +78,24 @@ public final class Card {
      * @return The points assigned to that card
      */
     public int points(Color trump) {
-        return PackedCard.points(trump, this.packed());
+        return PackedCard.points(trump, pkCard);
     }
 
-    @Override 
-    public boolean equals(Object thatO) {
-        
-        if (thatO instanceof Card) {
-            if (((Card) thatO).packed() == this.packed())
-                return true;
-        }
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof Card)
+            return ((Card) other).packed() == pkCard;
         return false;
     }
 
-    @Override 
+    @Override
     public int hashCode() {
-        return this.packed();
+        return pkCard;
     }
 
     @Override
     public String toString() {
-        return PackedCard.toString(this.packed());
+        return PackedCard.toString(pkCard);
     }
 
     public enum Color {
@@ -110,13 +107,14 @@ public final class Card {
         private String symbol;
 
         /**
-         * @param symbol    The symbol to print. 
+         * @param symbol
+         *            The symbol to print.
          */
         private Color(String symbol) {
             this.symbol = symbol;
         }
-        
-        @Override 
+
+        @Override
         public String toString() {
             return symbol;
         }
@@ -136,33 +134,33 @@ public final class Card {
          * @return The ordinal of a card whose color is the same as the trump
          */
         public int trumpOrdinal() {
-            int num = this.ordinal();
-            switch (num) {
-            case 3:
+            switch (this) {
+            case NINE:
                 return 7;
-            case 4:
+            case TEN:
                 return 3;
-            case 5:
+            case JACK:
                 return 8;
-            case 6:
+            case QUEEN:
                 return 4;
-            case 7:
+            case KING:
                 return 5;
-            case 8:
+            case ACE:
                 return 6;
             // the 3 first cards don't change of value when trump
             default:
-                return num;
+                return this.ordinal();
             }
         }
 
         /**
-         * @param symbol    The symbol to print. 
+         * @param symbol
+         *            The symbol to print.
          */
         private Rank(String symbol) {
             this.symbol = symbol;
         }
-        
+
         @Override
         public String toString() {
             return symbol;

@@ -11,12 +11,13 @@ import ch.epfl.javass.bits.Bits64;
  * @date Mar 1, 2019
  */
 public final class PackedCardSet {
-    
+
     /**
      * Private constructor you can't instantiate
      */
     private PackedCardSet() {
     }
+
     public final static long EMPTY = 0L;
     public final static long ALL_CARDS = Bits64.mask(0, 9) | Bits64.mask(16, 9)
             | Bits64.mask(32, 9) | Bits64.mask(48, 9);
@@ -67,10 +68,10 @@ public final class PackedCardSet {
                 * 16;
         tab[Card.Rank.TEN.ordinal()] = Bits64.mask(5, Jass.HAND_SIZE - 5)
                 + NINE << c * 16;
-        tab[Card.Rank.QUEEN.ordinal()] = Bits64.mask(7, Jass.HAND_SIZE - 7) + NINE
-                + JACK << c * 16;
-        tab[Card.Rank.KING.ordinal()] = Bits64.mask(8, Jass.HAND_SIZE - 8) + NINE
-                + JACK << c * 16;
+        tab[Card.Rank.QUEEN.ordinal()] = Bits64.mask(7, Jass.HAND_SIZE - 7)
+                + NINE + JACK << c * 16;
+        tab[Card.Rank.KING.ordinal()] = Bits64.mask(8, Jass.HAND_SIZE - 8)
+                + NINE + JACK << c * 16;
         tab[Card.Rank.ACE.ordinal()] = NINE + JACK << c * 16;
         tab[Card.Rank.NINE.ordinal()] = JACK << c * 16;
         tab[Card.Rank.JACK.ordinal()] = 0L;

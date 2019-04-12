@@ -22,7 +22,6 @@ public final class PackedTrick {
 
     public static final int INVALID = ~0;
     private static final int CARD_SIZE = 6;
-    private static final int TRICKS_BY_TURN = 8;
 
     /**
      * @param pkTrick
@@ -88,7 +87,7 @@ public final class PackedTrick {
      */
     public static boolean isLast(int pkTrick) {
         assert (isValid(pkTrick));
-        return index(pkTrick) == TRICKS_BY_TURN;
+        return index(pkTrick) == Jass.TRICKS_PER_TURN - 1;
     }
 
     /**
@@ -143,7 +142,8 @@ public final class PackedTrick {
     /**
      * @param pkTrick
      *            A packed trick.
-     * @param index Of the player you want 
+     * @param index
+     *            Of the player you want
      * @return
      */
     public static PlayerId player(int pkTrick, int index) {
@@ -237,6 +237,9 @@ public final class PackedTrick {
             if (!(trumpSet == 0L)) {
                 playableCardSet = PackedCardSet.EMPTY;
                 if (isCut) {
+                    if (pkHand == trumpSet && trumpAboveSet == 0L) {
+                        return pkHand;
+                    }
                     for (int i = 0; i < 4; i++) {
                         if (Card.Color.values()[i] != trumpColor) {
                             playableCardSet = PackedCardSet.union(
@@ -247,9 +250,6 @@ public final class PackedTrick {
                     }
                     playableCardSet = PackedCardSet.union(playableCardSet,
                             trumpAboveSet);
-                    if (pkHand == trumpSet && trumpAboveSet == 0L) {
-                        playableCardSet = pkHand;
-                    }
                 } else {
                     playableCardSet = pkHand;
                 }
@@ -257,7 +257,7 @@ public final class PackedTrick {
                 playableCardSet = pkHand;
             }
         }
-        return playableCardSet; 
+        return playableCardSet;
     }
 
     /**
@@ -269,7 +269,7 @@ public final class PackedTrick {
         int winningCard = card(pkTrick, 0);
         for (int i = 0; i < size(pkTrick); i++) {
             int pkCard = card(pkTrick, i);
-            if (PackedCard.isBetter(trump(pkTrick), pkCard, winningCard)) 
+            if (PackedCard.isBetter(trump(pkTrick), pkCard, winningCard))
                 winningCard = pkCard;
         }
         if (PackedCard.isValid(winningCard))
@@ -286,9 +286,9 @@ public final class PackedTrick {
         assert (isValid(pkTrick));
         int total = 0;
         Color trump = trump(pkTrick);
-        for (int i = 0; i < size(pkTrick); i++) 
+        for (int i = 0; i < size(pkTrick); i++)
             total += PackedCard.points(trump, card(pkTrick, i));
-        
+
         if (isLast(pkTrick))
             total += 5;
 
@@ -306,7 +306,7 @@ public final class PackedTrick {
         int winningCard = winningCard(pkTrick);
         int index = 0;
         for (int i = 0; i < size(pkTrick); i++) {
-            if (card(pkTrick, i) == winningCard) 
+            if (card(pkTrick, i) == winningCard)
                 index = i;
         }
         return player(pkTrick, index);
