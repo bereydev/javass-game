@@ -66,32 +66,19 @@ public final class PackedCardSet {
      * @return A tab with the sets of cards superior to each card
      */
     private static long[] supTrumpCardTab(Card.Color color) {
-        long JACK = 1L << Card.Rank.JACK.ordinal();
-        long NINE = 1L << Card.Rank.NINE.ordinal();
         long tab[] = new long[Card.Rank.COUNT];
-        int c = color.ordinal();
-
-        /*
-         * The numbers {1,2,3,5,7,8} of this function correspond to the
-         * Card.Rank.<rank>.ordinal() + 1. I used numbers instead of writing the
-         * above as the function became impossible to read.
-         */
-
-        tab[Card.Rank.SIX.ordinal()] = Bits64.mask(1, Jass.HAND_SIZE - 1) << c
-                * SIZE;
-        tab[Card.Rank.SEVEN.ordinal()] = Bits64.mask(2, Jass.HAND_SIZE - 2) << c
-                * SIZE;
-        tab[Card.Rank.EIGHT.ordinal()] = Bits64.mask(3, Jass.HAND_SIZE - 3) << c
-                * SIZE;
-        tab[Card.Rank.TEN.ordinal()] = Bits64.mask(5, Jass.HAND_SIZE - 5)
-                + NINE << c * SIZE;
-        tab[Card.Rank.QUEEN.ordinal()] = Bits64.mask(7, Jass.HAND_SIZE - 7)
-                + NINE + JACK << c * SIZE;
-        tab[Card.Rank.KING.ordinal()] = Bits64.mask(8, Jass.HAND_SIZE - 8)
-                + NINE + JACK << c * SIZE;
-        tab[Card.Rank.ACE.ordinal()] = NINE + JACK << c * SIZE;
-        tab[Card.Rank.NINE.ordinal()] = JACK << c * SIZE;
-        tab[Card.Rank.JACK.ordinal()] = 0L;
+        
+        for(int i=0; i<Card.Rank.COUNT; i++) {
+            long set = EMPTY; 
+            Card card = Card.of(color, Card.Rank.values()[i]); 
+            
+            for(int j=0; j<Card.Rank.COUNT; j++) {
+                Card card1 = Card.of(color, Card.Rank.values()[j]);
+                if(card1.isBetter(color, card))
+                    set = add(set,card1.packed()); 
+            }
+            tab[i]= set; 
+        }
 
         return tab;
     }
