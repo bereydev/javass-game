@@ -19,10 +19,10 @@ public final class PackedCardSet {
     }
 
     private static final int SIZE = Long.SIZE / 4;
-    private static final int ColorSize = 2;
-    private static final int ColorStart = 4;
-    private static final int rankSize = 4;
-    private static final int rankStart = 0;
+    private static final int COLOR_SIZE = 2;
+    private static final int COLOR_START = 4;
+    private static final int RANK_SIZE = 4;
+    private static final int RANK_START = 0;
 
     public final static long EMPTY = 0L;
     public final static long ALL_CARDS = Bits64.mask(0, Card.Rank.COUNT)
@@ -56,8 +56,8 @@ public final class PackedCardSet {
     public static long trumpAbove(int pkCard) {
         assert (PackedCard.isValid(pkCard));
 
-        return trumpAboveTab[Bits32.extract(pkCard, ColorStart,
-                ColorSize)][Bits32.extract(pkCard, rankStart, rankSize)];
+        return trumpAboveTab[Bits32.extract(pkCard, COLOR_START,
+                COLOR_SIZE)][Bits32.extract(pkCard, RANK_START, RANK_SIZE)];
     }
 
     /**

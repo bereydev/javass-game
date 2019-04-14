@@ -7,7 +7,7 @@ import ch.epfl.javass.jass.Card.Color;
 public final class PrintingPlayer implements Player {
     private final Player underlyingPlayer;
 
-    private static final int first = 0;
+    private static final int FIRST = 0;
 
     /**
      * @param underlyingPlayer
@@ -54,7 +54,7 @@ public final class PrintingPlayer implements Player {
     @Override
     public void updateTrick(Trick newTrick) {
         System.out.print("Pli " + newTrick.index() + ", commencé par "
-                + newTrick.player(first) + " :");
+                + newTrick.player(FIRST) + " :");
         System.out.println(newTrick);
 
     }

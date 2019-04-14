@@ -17,7 +17,7 @@ public final class PacedPlayer implements Player {
     private Player underlyingPlayer;
     private double minTime;
 
-    private static final int milliSeconds = 1000;
+    private static final int MILLI_SECONDS = 1000;
 
     /**
      * @param underlyingPlayer
@@ -39,7 +39,7 @@ public final class PacedPlayer implements Player {
             return card;
         try {
             Thread.sleep(
-                    (int) (minTime + startTime - currentTime) * milliSeconds);
+                    (int) (minTime + startTime - currentTime) * MILLI_SECONDS);
         } catch (InterruptedException e) {
             /* do nothing */ }
 
