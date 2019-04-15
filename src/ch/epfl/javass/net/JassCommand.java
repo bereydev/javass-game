@@ -10,7 +10,7 @@ import java.util.List;
 
 public enum JassCommand {
 
-    PLRS(), TRMP(), HAND(), TRCK(), CARD(), SCOR(), WINR();
+    PLRS, TRMP, HAND, TRCK, CARD, SCOR, WINR;
     
     public static final List<JassCommand> ALL = Collections
             .unmodifiableList(Arrays.asList(values()));
