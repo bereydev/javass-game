@@ -8,10 +8,14 @@
  */
 package ch.epfl.javass.net;
 
-/**
- * @author astra
- *
- */
 public enum JassCommand {
+    
+    PLRS(), 
+    TRMP(),
+    HAND(),
+    TRCK(),
+    CARD(),
+    SCOR(),
+    WINR(); 
 
 }
