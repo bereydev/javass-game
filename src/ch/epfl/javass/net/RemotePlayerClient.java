@@ -17,20 +17,19 @@ import ch.epfl.javass.jass.TurnState;
  * @author astra
  *
  */
-public class RemotePlayerClient implements Player, AutoCloseable {
-
-    /* (non-Javadoc)
-     * @see java.lang.AutoCloseable#close()
-     */
+public final class RemotePlayerClient implements Player, AutoCloseable {
+    
+    public RemotePlayerClient(String name) {
+        
+    }
+    
+    
     @Override
     public void close() throws Exception {
-        // TODO Auto-generated method stub
+        // TODO Close every stream 
 
     }
 
-    /* (non-Javadoc)
-     * @see ch.epfl.javass.jass.Player#cardToPlay(ch.epfl.javass.jass.TurnState, ch.epfl.javass.jass.CardSet)
-     */
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
         // TODO Auto-generated method stub
