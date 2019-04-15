@@ -8,10 +8,6 @@
  */
 package ch.epfl.javass.net;
 
-/**
- * @author astra
- *
- */
 public enum JassCommand {
 
 }
