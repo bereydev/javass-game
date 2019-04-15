@@ -17,6 +17,8 @@ import ch.epfl.javass.jass.TurnState;
  * @author astra
  *
  */
+import static java.nio.charset.StandardCharsets.US_ASCII; 
+
 public final class RemotePlayerClient implements Player, AutoCloseable {
     
     public RemotePlayerClient(String name) {

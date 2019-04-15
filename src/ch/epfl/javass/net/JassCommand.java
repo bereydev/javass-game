@@ -4,24 +4,16 @@
 */
 package ch.epfl.javass.net;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public enum JassCommand {
+
+    PLRS(), TRMP(), HAND(), TRCK(), CARD(), SCOR(), WINR();
     
-    PLRS("setPlayers"), 
-    TRMP("setTrump"),
-    HAND("updateHand"),
-    TRCK("updateTrick"),
-    CARD("cardToPlay"),
-    SCOR("updateScore"),
-    WINR("setWinningTeam"); 
-    
-    private String commandValue;
-    
-    JassCommand(String s){
-        commandValue = s;
-    }
-    
-    @Override
-    public String toString() {
-        return commandValue;
-    }
+    public static final List<JassCommand> ALL = Collections
+            .unmodifiableList(Arrays.asList(values()));
+    public static int COUNT = 7;
+
 }

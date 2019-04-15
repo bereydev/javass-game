@@ -11,10 +11,6 @@ package ch.epfl.javass.net;
 import java.util.Base64; 
 import java.nio.charset.StandardCharsets; 
 
-/**
- * @author astra
- *
- */
 public final class StringSerializer {
     
     private StringSerializer() {
