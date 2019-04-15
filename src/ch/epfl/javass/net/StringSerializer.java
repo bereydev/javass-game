@@ -42,4 +42,12 @@ public final class StringSerializer {
        return "bye"; 
    }
    
+   private String combine(String...strings) {
+       return "hellobye"; 
+   }
+   
+   private String[] split(String string) {
+       return null; 
+   }
+   
 }
