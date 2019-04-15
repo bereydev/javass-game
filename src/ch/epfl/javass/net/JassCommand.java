@@ -2,30 +2,18 @@
  *	Author : Alexandre Santangelo 
  *	Date   : Apr 15, 2019	
 */
-
-/**
- * 
- */
 package ch.epfl.javass.net;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public enum JassCommand {
-    
-    PLRS("setPlayers"), 
-    TRMP("setTrump"),
-    HAND("updateHand"),
-    TRCK("updateTrick"),
-    CARD("cardToPlay"),
-    SCOR("updateScore"),
-    WINR("setWinningTeam"); 
-    
-    private String commandValue;
-    
-    JassCommand(String s){
-        commandValue = s;
-    }
-    
-    @Override
-    public String toString() {
-        return commandValue;
-    }
+
+    PLRS, TRMP, HAND, TRCK, CARD, SCOR, WINR;
+
+    public static final List<JassCommand> ALL = Collections
+            .unmodifiableList(Arrays.asList(values()));
+    public static final int COUNT = 7;
+
 }

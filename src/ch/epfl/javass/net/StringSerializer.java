@@ -8,6 +8,9 @@
  */
 package ch.epfl.javass.net;
 
+import java.util.Base64; 
+import java.nio.charset.StandardCharsets; 
+
 /**
  * @author astra
  *
@@ -35,19 +38,19 @@ public final class StringSerializer {
    }
    
    public static String serializeString(String param) {
-       return "hello"; 
+       return Base64.getEncoder().encodeToString(param.getBytes(StandardCharsets.UTF_8)); 
    }
    
    public static String deserializeString(String param) {
-       return "bye"; 
+       return new String(param.getBytes(),StandardCharsets.UTF_8); 
    }
    
-   public static String combine(char splitter, String...strings) {
-       return "hellobye"; 
+   public static String combine(String...strings) {
+       return String.join(",",strings); 
    }
    
-   public static String[] split(char splitter, String string) {
-       return null; 
+   public static String[] split(String string) {
+       return string.split(","); 
    }
    
 }
