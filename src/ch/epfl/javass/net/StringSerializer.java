@@ -8,6 +8,9 @@
  */
 package ch.epfl.javass.net;
 
+import java.util.Base64; 
+import java.nio.charset.StandardCharsets; 
+
 /**
  * @author astra
  *
@@ -18,36 +21,36 @@ public final class StringSerializer {
         //Not instantiable. 
     }
 
-   public static int serializeInt(int param) {
-       return 0; 
+   public static String serializeInt(int param) {
+       return Integer.toUnsignedString(param); 
    }
    
-   public static int deserializeInt(int param) {
-       return 0; 
+   public static int deserializeInt(String param) {
+       return Integer.parseUnsignedInt(param); 
    }
    
-   public static long serializeLong(long param) {
-       return 0; 
+   public static String serializeLong(long param) {
+       return Long.toUnsignedString(param); 
    }
    
-   public static long deserializeLong(long param) {
-       return 0; 
+   public static long deserializeLong(String param) {
+       return Long.parseUnsignedLong(param); 
    }
    
    public static String serializeString(String param) {
-       return "hello"; 
+       return Base64.getEncoder().encodeToString(param.getBytes(StandardCharsets.UTF_8)); 
    }
    
    public static String deserializeString(String param) {
-       return "bye"; 
+       return new String(param.getBytes(),StandardCharsets.UTF_8); 
    }
    
-   private String combine(String...strings) {
-       return "hellobye"; 
+   public static String combine(String...strings) {
+       return String.join(",",strings); 
    }
    
-   private String[] split(String string) {
-       return null; 
+   public static String[] split(String string) {
+       return string.split(","); 
    }
    
 }
