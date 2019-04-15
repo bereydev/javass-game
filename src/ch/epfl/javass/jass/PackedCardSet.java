@@ -79,7 +79,6 @@ public final class PackedCardSet {
             }
             tab[i]= set; 
         }
-
         return tab;
     }
 
