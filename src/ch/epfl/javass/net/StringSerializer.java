@@ -18,20 +18,20 @@ public final class StringSerializer {
         //Not instantiable. 
     }
 
-   public static int serializeInt(int param) {
-       return 0; 
+   public static String serializeInt(int param) {
+       return Integer.toUnsignedString(param);
    }
    
-   public static int deserializeInt(int param) {
-       return 0; 
+   public static int deserializeInt(String param) {
+       return Integer.parseUnsignedInt(param);
    }
    
-   public static long serializeLong(long param) {
-       return 0; 
+   public static String serializeLong(long param) {
+       return Long.toUnsignedString(param);
    }
    
-   public static long deserializeLong(long param) {
-       return 0; 
+   public static long deserializeLong(String param) {
+       return Long.parseUnsignedLong(param);
    }
    
    public static String serializeString(String param) {
@@ -42,11 +42,11 @@ public final class StringSerializer {
        return "bye"; 
    }
    
-   private String combine(String...strings) {
+   public static String combine(char splitter, String...strings) {
        return "hellobye"; 
    }
    
-   private String[] split(String string) {
+   public static String[] split(char splitter, String string) {
        return null; 
    }
    
