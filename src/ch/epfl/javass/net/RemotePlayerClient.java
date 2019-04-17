@@ -40,7 +40,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
     private final Socket s;
 
     public RemotePlayerClient(String hostName) throws IOException {
-        s = new Socket(hostName, 5108);
+        s = new Socket("localhost", 5108);
         r = new BufferedReader(
                 new InputStreamReader(s.getInputStream(), US_ASCII));
         w = new BufferedWriter(
@@ -123,13 +123,14 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
     public Card cardToPlay(TurnState state, CardSet hand) {
         Card card = null;
         try {
-            w.write(JassCommand.CARD.name());
             String score = StringSerializer.serializeLong(state.packedScore());
             String unplayedCards = StringSerializer.serializeLong(state.packedUnplayedCards());
             String trick = StringSerializer.serializeInt(state.packedTrick());
+            w.write(JassCommand.CARD.name());
             w.write(SPACE + StringSerializer.combine(score,unplayedCards,trick));
             w.write(SPACE + StringSerializer.serializeLong(hand.packed()));
             w.write("\n");
+            w.flush();
             //wait for the response
             int pkCard = StringSerializer.deserializeInt(r.readLine());
             card = Card.ofPacked(pkCard);

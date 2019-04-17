@@ -66,16 +66,17 @@ public final class RemotePlayerServer {
                 case CARD:
                     String[] stateTab = StringSerializer.split(message[1]);
                     TurnState state = TurnState.ofPackedComponents(
-                            StringSerializer.deserializeLong(stateTab[0]),
-                            StringSerializer.deserializeLong(stateTab[1]),
-                            StringSerializer.deserializeInt(stateTab[2]));
+                            StringSerializer.deserializeLong(stateTab[0]),  //Score
+                            StringSerializer.deserializeLong(stateTab[1]),  //CardSet not played
+                            StringSerializer.deserializeInt(stateTab[2]));  //Trick
                     CardSet hand = CardSet.ofPacked(StringSerializer.deserializeLong(message[2])); 
                     
                     Card card = player.cardToPlay(state, hand); 
                     
                     //Answering 
-                    w.write(StringSerializer.serializeInt(card.hashCode()));
+                    w.write(StringSerializer.serializeInt(card.packed()));
                     w.write("\n");
+                    w.flush();
                     break;
                 case HAND:
                     CardSet set = CardSet
