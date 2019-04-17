@@ -74,7 +74,7 @@ public final class RemotePlayerServer {
                     Card card = player.cardToPlay(state, hand); 
                     
                     //Answering 
-                    w.write(StringSerializer.serializeInt(card.hashCode()));
+                    w.write(StringSerializer.serializeInt(card.packed()));
                     w.write("\n");
                     w.flush();
                     break;
