@@ -51,7 +51,7 @@ public final class RemotePlayerServer {
                         s.getOutputStream(), US_ASCII))) {
             //TODO : Figure what to do here 
             while(true) {
-                String[] message = r.readLine().trim().split("\\s+");
+                String[] message = r.readLine().trim().split(" ");
                 JassCommand command = JassCommand.valueOf(message[0]);
           
                 switch (command) {
@@ -70,9 +70,9 @@ public final class RemotePlayerServer {
                 case CARD:
                     String[] stateTab = StringSerializer.split(message[1]);
                     TurnState state = TurnState.ofPackedComponents(
-                            StringSerializer.deserializeLong(stateTab[0]),
-                            StringSerializer.deserializeLong(stateTab[1]),
-                            StringSerializer.deserializeInt(stateTab[2]));
+                            StringSerializer.deserializeLong(stateTab[0]),  //Score
+                            StringSerializer.deserializeLong(stateTab[1]),  //CardSet not played
+                            StringSerializer.deserializeInt(stateTab[2]));  //Trick
                     CardSet hand = CardSet.ofPacked(StringSerializer.deserializeLong(message[2])); 
                     
                     Card card = player.cardToPlay(state, hand); 
@@ -80,6 +80,7 @@ public final class RemotePlayerServer {
                     //Answering 
                     w.write(StringSerializer.serializeInt(card.hashCode()));
                     w.write("\n");
+                    w.flush();
                     break;
                 case HAND:
                     CardSet set = CardSet
