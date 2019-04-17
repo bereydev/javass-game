@@ -138,6 +138,16 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
         }
         return card;
     }
+    private void IOWriteAndCheck(String...string) {
+        try {
+            for (String s : string) {
+                w.write(s + SPACE);
+            }
+            w.write("\n");
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
     @Override
     public void close() throws Exception {
