@@ -40,7 +40,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
     private final Socket s;
 
     public RemotePlayerClient(String hostName) throws IOException {
-        s = new Socket("localhost", 5108);
+        s = new Socket(hostName, 5108);
         r = new BufferedReader(
                 new InputStreamReader(s.getInputStream(), US_ASCII));
         w = new BufferedWriter(
@@ -54,11 +54,12 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
             w.write(JassCommand.TRMP.name());
             String players = "";
             for (String p : playerNames.values()) {
-                StringSerializer.combine(players,p);
+                players = StringSerializer.combine(players,StringSerializer.serializeString(p));
             }
             w.write(SPACE + StringSerializer.serializeInt(ownId.ordinal()));
-            w.write(SPACE + StringSerializer.serializeString(players));
+            w.write(SPACE + players);
             w.write("\n");
+            w.flush();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -70,6 +71,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
         w.write(JassCommand.HAND.name());
             w.write(SPACE + StringSerializer.serializeLong(newHand.packed()));
             w.write("\n");
+            w.flush();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -81,6 +83,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
             w.write(JassCommand.TRMP.name());
             w.write(SPACE + StringSerializer.serializeInt(trump.ordinal()));
             w.write("\n");
+            w.flush();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -92,6 +95,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
             w.write(JassCommand.TRCK.name());
             w.write(SPACE + StringSerializer.serializeInt(newTrick.packed()));
             w.write("\n");
+            w.flush();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -103,6 +107,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
             w.write(JassCommand.SCOR.name());
             w.write(SPACE + StringSerializer.serializeLong(score.packed()));
             w.write("\n");
+            w.flush();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -114,6 +119,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
             w.write(JassCommand.WINR.name());
             w.write(SPACE + StringSerializer.serializeInt(winningTeam.ordinal()));
             w.write("\n");
+            w.flush();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -152,6 +158,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 
     @Override
     public void close() throws Exception {
+        w.flush();
         w.close();
         r.close();
         s.close();

@@ -6,6 +6,7 @@
 package ch.epfl.javass.net;
 
 import ch.epfl.javass.jass.Player;
+
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.CardSet;
@@ -27,7 +28,6 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public final class RemotePlayerServer {
 
     private Player player;
@@ -46,7 +46,7 @@ public final class RemotePlayerServer {
                 BufferedWriter w = new BufferedWriter(new OutputStreamWriter(
                         s.getOutputStream(), US_ASCII))) {
             //TODO : Figure what to do here 
-            while(true) {
+            while(!s.isClosed()){
                 String[] message = r.readLine().trim().split(" ");
                 JassCommand command = JassCommand.valueOf(message[0]);
           
@@ -74,6 +74,7 @@ public final class RemotePlayerServer {
                     Card card = player.cardToPlay(state, hand); 
                     
                     //Answering 
+                   // System.out.println(command);
                     w.write(StringSerializer.serializeInt(card.packed()));
                     w.write("\n");
                     w.flush();
@@ -102,19 +103,20 @@ public final class RemotePlayerServer {
                     break;
                 case WINR:
                     player.setWinningTeam(TeamId.values()[Integer.parseInt(message[1])]);
-        
-                    break;
+                    System.out.println("server closed");
+                    w.close();
+                    r.close();
+                    s.close();
+                    s0.close();
+                    return; 
                 default:
                     System.out.println("Huston we have a problem");
                     break;
                 }
             }
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new UncheckedIOException(e); 
         }
-        // TODO waits for the clients message
-        // calls the correspondent function from the local player,
-        // If cardToPlay, sends the value to the client
     }
 
 }

@@ -27,6 +27,7 @@ public final class PrintingPlayer implements Player {
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
+        underlyingPlayer.setPlayers(ownId, playerNames);
         System.out.println("Les joueurs sont : ");
         // TODO comment ittérer sur une map ?
         for (PlayerId p : playerNames.keySet()) {
@@ -41,18 +42,21 @@ public final class PrintingPlayer implements Player {
 
     @Override
     public void updateHand(CardSet newHand) {
+        underlyingPlayer.updateHand(newHand);
         System.out.print("Ma nouvelle main : ");
         System.out.println(newHand);
     }
 
     @Override
     public void setTrump(Color trump) {
+        underlyingPlayer.setTrump(trump);
         System.out.print("Atout : ");
         System.out.println(trump);
     }
 
     @Override
     public void updateTrick(Trick newTrick) {
+        underlyingPlayer.updateTrick(newTrick);
         System.out.print("Pli " + newTrick.index() + ", commencé par "
                 + newTrick.player(FIRST) + " :");
         System.out.println(newTrick);
@@ -61,6 +65,7 @@ public final class PrintingPlayer implements Player {
 
     @Override
     public void updateScore(Score score) {
+        underlyingPlayer.updateScore(score);
         System.out.print("Scores : ");
         System.out.println(score);
 
@@ -68,6 +73,7 @@ public final class PrintingPlayer implements Player {
 
     @Override
     public void setWinningTeam(TeamId winningTeam) {
+        underlyingPlayer.setWinningTeam(winningTeam);
         System.out.print("Et le vainqueur est ... l'équipe : ");
         System.out.println(winningTeam.name());
         System.out.println("Bravo !");

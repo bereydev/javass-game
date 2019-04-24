@@ -38,5 +38,6 @@ public final class RandomJassGame {
         while (!g.isGameOver()) {
             g.advanceToEndOfNextTrick();
         }
+        
     }
 }
