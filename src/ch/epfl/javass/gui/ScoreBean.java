@@ -15,6 +15,19 @@ public final class ScoreBean {
     public ReadOnlyIntegerProperty turnPointsProperty(TeamId team) {
         return team==TeamId.TEAM_1 ? turnPoints1 : turnPoints2;
     }
+    
+    public ReadOnlyIntegerProperty gamePointsProperty(TeamId team) {
+        return team==TeamId.TEAM_1 ? gamePoints1 : gamePoints2;
+    }
+    
+    public ReadOnlyIntegerProperty totalPointsProperty(TeamId team) {
+        return team==TeamId.TEAM_1 ? totalPoints1 : totalPoints2;
+    }
+    
+    public ReadOnlyObjectProperty<TeamId> winningTeamProperty(){
+        return winningTeam; 
+    }
+    
 
     public void setTurnPoints(TeamId team, int newTurnPoints) {
         if (team == TeamId.TEAM_1)
@@ -22,9 +35,15 @@ public final class ScoreBean {
         else
             turnPoints2.setValue(newTurnPoints);
     }
-    
-    public ReadOnlyIntegerProperty gamePointsProperty(TeamId team) {
-        return team==TeamId.TEAM_1 ? gamePoints1 : gamePoint2;
+
+    public void setTotalPoints(TeamId team, int newTotalPoints) {
+        if (team.equals(TeamId.TEAM_1))
+            turnPoints1.setValue(newTotalPoints);
+        else
+            turnPoints2.setValue(newTotalPoints);
+    }
+    public void setWinningTeam(TeamId team) {
+        winningTeam.setValue(team);; 
     }
     
     public void setGamePoints(TeamId team, int newGamePoints) {
@@ -32,13 +51,6 @@ public final class ScoreBean {
             turnPoints1.setValue(newGamePoints);
         else
             turnPoints2.setValue(newGamePoints);
-    }
-    
-    public ReadOnlyObjectProperty<TeamId> winningTeamProperty() {
-        return winningTeam;
-    }
-    
-    
-    
+    }  
 
 }

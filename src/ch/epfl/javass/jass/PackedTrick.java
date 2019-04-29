@@ -24,7 +24,6 @@ public final class PackedTrick {
     private static final int SINGLE = 1;
     private static final int CARD_SIZE = 6;
     private static final int NUMBER_OF_CARDS = 4;
-    private static final int NUMBER_OF_PLAYERS = 4;
     private static final int INDEX_START = 24;
     private static final int INDEX_SIZE = 4;
     private static final int MAX_INDEX = 8;
@@ -164,7 +163,7 @@ public final class PackedTrick {
         assert (isValid(pkTrick));
         return PlayerId
                 .values()[(Bits32.extract(pkTrick, PLAYER_START, PLAYER_SIZE)
-                        + index) % NUMBER_OF_PLAYERS];
+                        + index) % PlayerId.COUNT];
     }
 
     /**
