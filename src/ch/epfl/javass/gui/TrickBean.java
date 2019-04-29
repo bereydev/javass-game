@@ -17,7 +17,6 @@ import ch.epfl.javass.jass.Trick;
 import javafx.collections.ObservableMap;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections; 
 
 public final class TrickBean {
