@@ -1,64 +1,56 @@
 package ch.epfl.javass.gui;
 
 import ch.epfl.javass.jass.TeamId;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
 
 public final class ScoreBean {
-    private int turnPoints1, turnPoints2;
-    private int gamePoints1, gamePoints2;
-    private int totalPoints1, totalPoints2;
-    private TeamId winningTeam;
+    private IntegerProperty turnPoints1, turnPoints2;
+    private IntegerProperty gamePoints1, gamePoints2;
+    private IntegerProperty totalPoints1, totalPoints2;
+    private ObjectProperty<TeamId> winningTeam;
 
     public ReadOnlyIntegerProperty turnPointsProperty(TeamId team) {
-        if(team.equals(TeamId.TEAM_1))
-            return new SimpleIntegerProperty(turnPoints1); 
-        return  new SimpleIntegerProperty(turnPoints2); 
+        return team==TeamId.TEAM_1 ? turnPoints1 : turnPoints2;
     }
     
     public ReadOnlyIntegerProperty gamePointsProperty(TeamId team) {
-        if(team.equals(TeamId.TEAM_1))
-            return new SimpleIntegerProperty(gamePoints1); 
-        return  new SimpleIntegerProperty(gamePoints2); 
+        return team==TeamId.TEAM_1 ? gamePoints1 : gamePoints2;
     }
     
     public ReadOnlyIntegerProperty totalPointsProperty(TeamId team) {
-        if(team.equals(TeamId.TEAM_1))
-            return new SimpleIntegerProperty(totalPoints1); 
-        return  new SimpleIntegerProperty(totalPoints2); 
+        return team==TeamId.TEAM_1 ? totalPoints1 : totalPoints2;
     }
     
     public ReadOnlyObjectProperty<TeamId> winningTeamProperty(){
-        return new SimpleObjectProperty<TeamId>(winningTeam); 
+        return winningTeam; 
     }
     
 
     public void setTurnPoints(TeamId team, int newTurnPoints) {
-        if (team.equals(TeamId.TEAM_1))
-            turnPoints1 = newTurnPoints;
+        if (team == TeamId.TEAM_1)
+            turnPoints1.setValue(newTurnPoints);
         else
-            turnPoints2 = newTurnPoints;
+            turnPoints2.setValue(newTurnPoints);
     }
-    public void setGamePoints(TeamId team, int newGamePoints) {
-        if (team.equals(TeamId.TEAM_1))
-            turnPoints1 = newGamePoints;
-        else
-            turnPoints2 = newGamePoints;
-    }
+
     public void setTotalPoints(TeamId team, int newTotalPoints) {
         if (team.equals(TeamId.TEAM_1))
-            turnPoints1 = newTotalPoints;
+            turnPoints1.setValue(newTotalPoints);
         else
-            turnPoints2 = newTotalPoints;
+            turnPoints2.setValue(newTotalPoints);
     }
     public void setWinningTeam(TeamId team) {
-        winningTeam = team; 
+        winningTeam.setValue(team);; 
     }
     
-    
-    
-    
+    public void setGamePoints(TeamId team, int newGamePoints) {
+        if (team == TeamId.TEAM_1)
+            turnPoints1.setValue(newGamePoints);
+        else
+            turnPoints2.setValue(newGamePoints);
+    }  
 
 }
