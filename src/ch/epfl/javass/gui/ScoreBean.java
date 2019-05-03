@@ -5,12 +5,24 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 public final class ScoreBean {
     private IntegerProperty turnPoints1, turnPoints2;
     private IntegerProperty gamePoints1, gamePoints2;
     private IntegerProperty totalPoints1, totalPoints2;
     private ObjectProperty<TeamId> winningTeam;
+    
+    ScoreBean(){
+        turnPoints1 = new SimpleIntegerProperty(); 
+        turnPoints2 = new SimpleIntegerProperty(); 
+        gamePoints1 = new SimpleIntegerProperty(); 
+        gamePoints2 = new SimpleIntegerProperty(); 
+        totalPoints1 = new SimpleIntegerProperty(); 
+        totalPoints2 = new SimpleIntegerProperty(); 
+        winningTeam = new SimpleObjectProperty<>(); 
+    }
 
     public ReadOnlyIntegerProperty turnPointsProperty(TeamId team) {
         return team==TeamId.TEAM_1 ? turnPoints1 : turnPoints2;
