@@ -8,8 +8,6 @@
  */
 package ch.epfl.javass.gui;
 
-import java.util.Map;
-
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.PlayerId;
@@ -22,7 +20,7 @@ import javafx.collections.FXCollections;
 public final class TrickBean {
     
     private ObjectProperty<Color> trump; 
-    private Map<PlayerId,Card> trick; 
+    private ObservableMap<PlayerId,Card> trick; 
     private ObjectProperty<PlayerId> winningPlayer; 
     
     
@@ -44,7 +42,7 @@ public final class TrickBean {
     }
     
     public ObservableMap<PlayerId, Card> trick(){
-       return FXCollections.unmodifiableObservableMap(FXCollections.observableMap(trick)); 
+       return FXCollections.unmodifiableObservableMap(trick); 
     }
     
     public ReadOnlyObjectProperty<Color> ColorProperty(){
