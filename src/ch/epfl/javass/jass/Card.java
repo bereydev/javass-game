@@ -10,7 +10,7 @@ import java.util.Arrays;
  */
 public final class Card {
 
-    private int pkCard;
+    private final int pkCard;
 
     private Card(Color c, Rank r) {
         pkCard = PackedCard.pack(c, r);
@@ -104,7 +104,7 @@ public final class Card {
         public static final List<Color> ALL = Collections
                 .unmodifiableList(Arrays.asList(values()));
         public static final int COUNT = 4;
-        private String symbol;
+        private final String symbol;
 
         /**
          * @param symbol

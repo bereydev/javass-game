@@ -1,6 +1,3 @@
-/**
- * 
- */
 package ch.epfl.javass.jass;
 
 import java.util.List;
@@ -11,9 +8,9 @@ import ch.epfl.javass.Preconditions;
  * @author Jonathan Bereyziat
  *
  */
-public class CardSet {
+public final class CardSet {
 
-    private long pkCardSet;
+    private final long pkCardSet;
 
     /**
      * private constructor, can't instantiate
