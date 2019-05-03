@@ -9,6 +9,7 @@
 package ch.epfl.javass.gui;
 
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.PlayerId;
@@ -23,6 +24,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -43,7 +45,6 @@ public class GraphicalPlayer {
 
     public Stage createStage() {
         Stage stage = new Stage();
-
         return stage;
     }
 
@@ -141,10 +142,16 @@ public class GraphicalPlayer {
         text.setStyle("-fx-font: 14 Optima;");
 
         winningPane.getChildren().add(text);
-
+        winningPane.setStyle("-fx-background-color: lightgray;\r\n"
+                + "-fx-spacing: 5px;\r\n" + "-fx-padding: 5px;");
         return winningPane;
     }
+    private HBox createHandPane(HandBean hand, PlayerId player, ArrayBlockingQueue<Card> cardQueue) {
+        HBox handPane = new HBox();
 
+        return handPane;
+    }
+    
     private static final ObservableMap<Card, Image> mapCreator(int quality) {
         assert (quality == 240 || quality == 160);
 
@@ -158,5 +165,6 @@ public class GraphicalPlayer {
 
         return map;
     }
+
 
 }

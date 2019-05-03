@@ -15,14 +15,13 @@ public class PackedCard {
     private PackedCard() {
     }
 
-    public static int INVALID = 63;
+    public static final int INVALID = 63;
     private static final int RANK_SIZE = 4;
     private static final int RANK_START = 0;
     private static final int COLOR_SIZE = 2;
     private static final int COLOR_START = 4;
     private static final int MAX_RANK = 8;
     private static final int MAX_COLOR = 3;
-    private static final int ZERO = 0;
 
     /**
      * @param pkCard
@@ -35,8 +34,8 @@ public class PackedCard {
         // bits that should be 0
         int rest = Bits32.extract(pkCard, RANK_SIZE + COLOR_SIZE,
                 Integer.SIZE - (RANK_SIZE + COLOR_SIZE));
-        return (rank <= MAX_RANK && rank >= ZERO)
-                && (color >= ZERO && color <= MAX_COLOR) && (rest == ZERO);
+        return (rank <= MAX_RANK && rank >= 0)
+                && (color >= 0 && color <= MAX_COLOR) && (rest == 0);
     }
 
     /**

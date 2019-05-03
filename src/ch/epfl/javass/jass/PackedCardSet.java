@@ -1,10 +1,10 @@
-
 package ch.epfl.javass.jass;
 
 import java.util.StringJoiner;
 
-import ch.epfl.javass.bits.Bits32;
 import ch.epfl.javass.bits.Bits64;
+import ch.epfl.javass.jass.Card.Color;
+import ch.epfl.javass.jass.Card.Rank;
 
 /**
  * @author Jonathan Bereyziat and Alexandre Santangelo
@@ -18,22 +18,21 @@ public final class PackedCardSet {
     private PackedCardSet() {
     }
 
-    private static final int SIZE = Long.SIZE / 4;
-    private static final int COLOR_SIZE = 2;
-    private static final int COLOR_START = 4;
-    private static final int RANK_SIZE = 4;
-    private static final int RANK_START = 0;
-
+    private static final int SIZE = Long.SIZE / Color.COUNT;
+    
     public final static long EMPTY = 0L;
+    
     public final static long ALL_CARDS = Bits64.mask(0, Card.Rank.COUNT)
             | Bits64.mask(SIZE, Card.Rank.COUNT)
             | Bits64.mask(SIZE * 2, Card.Rank.COUNT)
             | Bits64.mask(SIZE * 3, Card.Rank.COUNT);
+    
     private final static long trumpAboveTab[][] = {
             supTrumpCardTab(Card.Color.SPADE),
             supTrumpCardTab(Card.Color.HEART),
             supTrumpCardTab(Card.Color.DIAMOND),
             supTrumpCardTab(Card.Color.CLUB) };
+    
     private final static long colorSetTab[] = { Bits64.mask(0, Card.Rank.COUNT),
             Bits64.mask(SIZE, Card.Rank.COUNT),
             Bits64.mask(SIZE * 2, Card.Rank.COUNT),
@@ -56,8 +55,7 @@ public final class PackedCardSet {
     public static long trumpAbove(int pkCard) {
         assert (PackedCard.isValid(pkCard));
 
-        return trumpAboveTab[Bits32.extract(pkCard, COLOR_START,
-                COLOR_SIZE)][Bits32.extract(pkCard, RANK_START, RANK_SIZE)];
+        return trumpAboveTab[PackedCard.color(pkCard).ordinal()][PackedCard.rank(pkCard).ordinal()];
     }
 
     /**
@@ -66,16 +64,16 @@ public final class PackedCardSet {
      * @return A tab with the sets of cards superior to each card
      */
     private static long[] supTrumpCardTab(Card.Color color) {
-        long tab[] = new long[Card.Rank.COUNT];
+        long tab[] = new long[Rank.COUNT];
         
-        for(int i=0; i<Card.Rank.COUNT; i++) {
+        for(int i=0; i<Rank.COUNT; i++) {
             long set = EMPTY; 
-            Card card = Card.of(color, Card.Rank.values()[i]); 
+            int card = PackedCard.pack(color, Rank.values()[i]); 
             
-            for(int j=0; j<Card.Rank.COUNT; j++) {
-                Card card1 = Card.of(color, Card.Rank.values()[j]);
-                if(card1.isBetter(color, card))
-                    set = add(set,card1.packed()); 
+            for(int j=0; j<Rank.COUNT; j++) {
+                int card1 = PackedCard.pack(color, Rank.values()[j]);
+                if(PackedCard.isBetter(color, card1, card))
+                   set = add(set,card1); 
             }
             tab[i]= set; 
         }
@@ -121,6 +119,7 @@ public final class PackedCardSet {
      * @return The packed card version of the card at position index
      */
     public static int get(long pkCardSet, int index) {
+        assert (index >= 0);
         assert (isValid(pkCardSet) && size(pkCardSet) > index);
         for (int i = 0; i < index; i++) {
             pkCardSet = pkCardSet & ~Long.lowestOneBit(pkCardSet);
@@ -243,7 +242,6 @@ public final class PackedCardSet {
         for (int i = 0; i < size(pkCardSet); i++) {
             int pkCard = get(pkCardSet, i);
             cardList.add(PackedCard.toString(pkCard));
-            remove(pkCardSet, pkCard);
         }
 
         return cardList.toString();

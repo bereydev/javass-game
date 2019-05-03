@@ -38,9 +38,9 @@ public final class ScoreBean {
 
     public void setTotalPoints(TeamId team, int newTotalPoints) {
         if (team.equals(TeamId.TEAM_1))
-            turnPoints1.setValue(newTotalPoints);
+            totalPoints1.setValue(newTotalPoints);
         else
-            turnPoints2.setValue(newTotalPoints);
+            totalPoints2.setValue(newTotalPoints);
     }
     public void setWinningTeam(TeamId team) {
         winningTeam.setValue(team);; 
@@ -48,9 +48,9 @@ public final class ScoreBean {
     
     public void setGamePoints(TeamId team, int newGamePoints) {
         if (team == TeamId.TEAM_1)
-            turnPoints1.setValue(newGamePoints);
+            gamePoints1.setValue(newGamePoints);
         else
-            turnPoints2.setValue(newGamePoints);
+            gamePoints2.setValue(newGamePoints);
     }  
 
 }

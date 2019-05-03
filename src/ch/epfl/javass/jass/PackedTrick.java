@@ -32,7 +32,6 @@ public final class PackedTrick {
     private static final int PLAYER_SIZE = 2;
     private static final int TRUMP_START = 30;
     private static final int TRUMP_SIZE = 2;
-    private static final int FINAL_TRICK_BONUS = 5;
 
     /**
      * @param pkTrick
@@ -109,11 +108,8 @@ public final class PackedTrick {
      */
     public static boolean isEmpty(int pkTrick) {
         assert (isValid(pkTrick));
-        for (int i = 0; i < NUMBER_OF_CARDS; i++) {
-            if (card(pkTrick, i) != PackedCard.INVALID)
-                return false;
-        }
-        return true;
+        //since the trick has to be valid the trick is empty if the first card is invalid
+        return card(pkTrick, 0) == PackedCard.INVALID;
     }
 
     /**
@@ -123,7 +119,8 @@ public final class PackedTrick {
      */
     public static boolean isFull(int pkTrick) {
         assert (isValid(pkTrick));
-        return size(pkTrick) == NUMBER_OF_CARDS;
+      //since the trick has to be valid the trick is full if the last card is not invalid
+        return card(pkTrick, 3) != PackedCard.INVALID;
     }
 
     /**
@@ -160,6 +157,7 @@ public final class PackedTrick {
      * @return
      */
     public static PlayerId player(int pkTrick, int index) {
+        assert (index >= 0 &&  index < PlayerId.COUNT);
         assert (isValid(pkTrick));
         return PlayerId
                 .values()[(Bits32.extract(pkTrick, PLAYER_START, PLAYER_SIZE)
@@ -184,6 +182,7 @@ public final class PackedTrick {
      * @return The pkCard at that index
      */
     public static int card(int pkTrick, int index) {
+        assert (index >= 0 &&  index < NUMBER_OF_CARDS);
         assert (isValid(pkTrick));
         // HERE I SUPPOSE THAT THE INDEX IS BETWEEN 0 AND 3
         return Bits32.extract(pkTrick, index * CARD_SIZE, CARD_SIZE);
@@ -305,7 +304,7 @@ public final class PackedTrick {
             total += PackedCard.points(trump, card(pkTrick, i));
 
         if (isLast(pkTrick))
-            total += FINAL_TRICK_BONUS;
+            total += Jass.LAST_TRICK_ADDITIONAL_POINTS;
 
         return total;
     }
