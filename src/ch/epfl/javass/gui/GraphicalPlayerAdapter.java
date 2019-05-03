@@ -20,20 +20,24 @@ public class GraphicalPlayerAdapter implements Player {
     private ScoreBean scoreBean;
     private TrickBean trickBean;
     private GraphicalPlayer graphicalPlayer;
-    private ArrayBlockingQueue<Card> cardQueue;
+    private ArrayBlockingQueue<Card> cardQueue = new ArrayBlockingQueue<>(1);
 
     public GraphicalPlayerAdapter(HandBean hand, ScoreBean score,
-            TrickBean trick, ArrayBlockingQueue<Card> cards) {
+            TrickBean trick, ArrayBlockingQueue<Card> card) {
         handBean = hand;
         scoreBean = score;
         trickBean = trick;
-        cardQueue = cards;
+        cardQueue = card;
     }
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
- //TODO in a runLater ? And why ...
-        return cardQueue.poll();
+        Platform.runLater(() -> {
+            CardSet playableCards = state.trick().playableCards(hand);
+            handBean.setPlayableCards(playableCards);
+        });
+        Card cardToPlay = cardQueue.take();
+        return cardToPlay;
     }
 
     @Override
@@ -42,6 +46,7 @@ public class GraphicalPlayerAdapter implements Player {
                 scoreBean, handBean, cardQueue);
 
         Platform.runLater(() -> {
+            trickBean.set
             graphicalPlayer.createStage().show();
         });
     }
