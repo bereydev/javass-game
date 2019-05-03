@@ -8,8 +8,6 @@
  */
 package ch.epfl.javass.gui;
 
-import java.util.HashMap;
-
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -17,25 +15,37 @@ import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 public class GraphicalPlayer {
 
-    private static final Map<Card, String> images = mapCreator(240);
+    private static final ObservableMap<Card, Image> images = mapCreator(240);
 
     public GraphicalPlayer(PlayerId player, Map<PlayerId, String> map,
-            TrickBean trick, ScoreBean score, HandBean hand,
-            ArrayBlockingQueue<Card> cardQueue) {
-        createScorePane(score, map);
-        createTrickPane(trick, player, map);
-        createWinningPane(score, map);
+            TrickBean trick, ScoreBean score) {
+        BorderPane scorePane = new BorderPane();
+        BorderPane trickPane = new BorderPane();
+        StackPane winningPane = new StackPane();
+        winningPane.getChildren().add(createWinningPane(score, map));
+        trickPane.getChildren().add(createTrickPane(trick, player, map));
+        scorePane.getChildren().add(createScorePane(score, map));
+    }
+
+    public Stage createStage() {
+        Stage stage = new Stage();
+        return stage;
     }
 
     private GridPane createScorePane(ScoreBean score,
@@ -91,8 +101,11 @@ public class GraphicalPlayer {
                 "/trump_" + trick.ColorProperty().get().ordinal() + ".png");
 
         for (int i = 0; i < PlayerId.COUNT; i++) {
-            cardImages[i] = new ImageView(images.get(trick.trick()
-                    .get(PlayerId.values()[(player.ordinal() + i) % 4])));
+            cardImages[i] = new ImageView();
+            cardImages[i].imageProperty()
+                    .bind(Bindings.valueAt(images, Bindings.valueAt(
+                            trick.trick(),
+                            PlayerId.values()[(player.ordinal() + i) % 4])));
             cardImages[i].setFitWidth(120);
             cardImages[i].setFitHeight(180);
             names[i] = new Text(
@@ -133,24 +146,25 @@ public class GraphicalPlayer {
                 + "-fx-spacing: 5px;\r\n" + "-fx-padding: 5px;");
         return winningPane;
     }
-
     private HBox createHandPane(HandBean hand, PlayerId player, ArrayBlockingQueue<Card> cardQueue) {
         HBox handPane = new HBox();
 
         return handPane;
     }
-
-    private static final Map<Card, String> mapCreator(int quality) {
+    
+    private static final ObservableMap<Card, Image> mapCreator(int quality) {
         assert (quality == 240 || quality == 160);
-        HashMap<Card, String> map = new HashMap<>();
+
+        ObservableMap<Card, Image> map = FXCollections.observableHashMap();
         for (Card.Color c : Card.Color.ALL) {
             for (Card.Rank r : Card.Rank.ALL) {
-                map.put(Card.of(c, r), "/card_" + c.ordinal() + "_"
-                        + r.ordinal() + "_" + quality + ".png");
+                map.put(Card.of(c, r), new Image("/card_" + c.ordinal() + "_"
+                        + r.ordinal() + "_" + quality + ".png"));
             }
         }
 
         return map;
     }
+
 
 }
