@@ -11,6 +11,7 @@ package ch.epfl.javass.gui;
 import java.util.HashMap;
 
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.PlayerId;
@@ -21,6 +22,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
@@ -29,7 +31,8 @@ public class GraphicalPlayer {
     private static final Map<Card, String> images = mapCreator(240);
 
     public GraphicalPlayer(PlayerId player, Map<PlayerId, String> map,
-            TrickBean trick, ScoreBean score) {
+            TrickBean trick, ScoreBean score, HandBean hand,
+            ArrayBlockingQueue<Card> cardQueue) {
         createScorePane(score, map);
         createTrickPane(trick, player, map);
         createWinningPane(score, map);
@@ -126,8 +129,15 @@ public class GraphicalPlayer {
         text.setStyle("-fx-font: 14 Optima;");
 
         winningPane.getChildren().add(text);
-
+        winningPane.setStyle("-fx-background-color: lightgray;\r\n"
+                + "-fx-spacing: 5px;\r\n" + "-fx-padding: 5px;");
         return winningPane;
+    }
+
+    private HBox createHandPane(HandBean hand, PlayerId player, ArrayBlockingQueue<Card> cardQueue) {
+        HBox handPane = new HBox();
+
+        return handPane;
     }
 
     private static final Map<Card, String> mapCreator(int quality) {
