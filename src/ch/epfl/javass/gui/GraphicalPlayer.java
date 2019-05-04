@@ -44,9 +44,10 @@ public class GraphicalPlayer {
     private static final ObservableMap<Color, Image> trumps = trumps();
 
     private Scene scene;
-
+    private String player; 
     public GraphicalPlayer(PlayerId player, Map<PlayerId, String> map,
             TrickBean trick, ScoreBean score) {
+        this.player = player.toString(); 
         BorderPane borderPane = new BorderPane();
         StackPane winningPane = new StackPane();
         borderPane.setCenter(createTrickPane(trick, player, map));
@@ -59,6 +60,7 @@ public class GraphicalPlayer {
 
     public Stage createStage() {
         Stage stage = new Stage();
+        stage.setTitle("Javass - "+player);
         stage.setScene(scene);
         return stage;
     }
