@@ -43,7 +43,7 @@ public final class TrickBean {
     public void setTrick(Trick trick) {
         if(!trick.isEmpty())
             winningPlayer.setValue(trick.winningPlayer()); 
-        
+        this.trick.clear();
         for(int i=0; i<trick.size(); i++) 
             this.trick.put(trick.player(i), trick.card(i)); 
         
