@@ -44,9 +44,7 @@ public class GraphicalPlayerAdapter implements Player {
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trickBean,
                 scoreBean, handBean, cardQueue);
-
         Platform.runLater(() -> {
-            trickBean.set
             graphicalPlayer.createStage().show();
         });
     }
