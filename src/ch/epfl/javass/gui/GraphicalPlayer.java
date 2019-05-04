@@ -183,6 +183,7 @@ public class GraphicalPlayer {
         BorderPane[] teamPane = new BorderPane[TeamId.COUNT];
         Text[] teamText = new Text[TeamId.COUNT];
         teamText[0] = new Text();
+        teamText[1] = new Text();
         teamText[0].textProperty()
                 .bind(Bindings.format(
                         "-fx-font: 16 Optima;-fx-background-color: white;",
@@ -203,7 +204,7 @@ public class GraphicalPlayer {
             teamPane[i] = new BorderPane();
             teamText[i].visibleProperty().bind(
                     score.winningTeamProperty().isEqualTo(TeamId.values()[i]));
-            teamPane[i].setCenter(teamPane[i]);
+            teamPane[i].setCenter(teamText[i]);
             winningPane.getChildren().add(teamPane[i]); 
         }
 
