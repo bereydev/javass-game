@@ -158,10 +158,7 @@ public final class CardSet {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof CardSet)
-            return pkCardSet == ((CardSet) other).packed();
-        return false;
-
+        return other instanceof CardSet && ((CardSet) other).pkCardSet == pkCardSet;
     }
 
 }
