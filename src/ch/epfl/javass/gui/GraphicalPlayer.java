@@ -126,7 +126,6 @@ public class GraphicalPlayer {
     private GridPane createTrickPane(TrickBean trick, PlayerId player,
             Map<PlayerId, String> map) {
         GridPane trickPane = new GridPane();
-        StackPane stack = new StackPane();
 
         ImageView[] cardImages = new ImageView[4];
         Text[] names = new Text[4];
@@ -138,31 +137,31 @@ public class GraphicalPlayer {
         trumpImage.setFitHeight(101);
         trumpImage.setFitWidth(101);
 
-        Rectangle rect = new Rectangle(120, 180);
-        rect.setStyle(
-                "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: lightpink; -fx-stroke-width: 5; -fx-opacity: 0.5;");
-        rect.setEffect(new GaussianBlur(4));
-        stack.getChildren().add(rect);
+        Rectangle[] rect = new Rectangle[4];
+        
 
         for (int i = 0; i < PlayerId.COUNT; i++) {
-            panes[i] = new StackPane(rect);
-            panes[i].visibleProperty().bind(trick.winningPlayerProperty()
-                    .isEqualTo(PlayerId.values()[(player.ordinal() + i) % 4]));
+            rect[i] = new Rectangle(120,180); 
+            rect[i].setStyle(
+                    "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: lightpink; -fx-stroke-width: 5; -fx-opacity: 0.5;");
+            rect[i].setEffect(new GaussianBlur(4));
             ObjectBinding<Card> card = Bindings.valueAt(trick.trick(),
                     PlayerId.values()[(player.ordinal() + i) % 4]);
             cardImages[i] = new ImageView();
             cardImages[i].imageProperty().bind(Bindings.valueAt(cards, card));
             cardImages[i].setFitWidth(120);
             cardImages[i].setFitHeight(180);
+            panes[i] = new StackPane(rect[i],cardImages[i]);
+            rect[i].visibleProperty().bind(trick.winningPlayerProperty()
+                    .isEqualTo(PlayerId.values()[(player.ordinal() + i) % 4]));
             names[i] = new Text(
                     map.get(PlayerId.values()[(player.ordinal() + i) % 4]));
             names[i].setStyle("-fx-font: 14 Optima;");
             if (i != 0)
-                pairs[i] = new VBox(names[i], cardImages[i]);
+                pairs[i] = new VBox(names[i], panes[i]);
             else
-                pairs[i] = new VBox(cardImages[i], names[i]);
+                pairs[i] = new VBox(panes[i], names[i]);
             pairs[i].setStyle("-fx-padding: 5px; -fx-alignment: center;");
-            stack.getChildren().add(panes[i]);
         }
 
         trickPane.add(pairs[0], 1, 2, 1, 1);
@@ -173,7 +172,7 @@ public class GraphicalPlayer {
         GridPane.setHalignment(trumpImage, HPos.CENTER);
         trickPane.setStyle(
                 "-fx-background-color: whitesmoke; -fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center;");
-        stack.getChildren().add(trickPane);
+ 
         return trickPane;
     }
 
