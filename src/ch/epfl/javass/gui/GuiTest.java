@@ -27,7 +27,7 @@ public final class GuiTest extends Application {
     ScoreBean sB = new ScoreBean();
     TrickBean tB = new TrickBean();
     GraphicalPlayer g =
-      new GraphicalPlayer(PlayerId.PLAYER_2, ns, tB, sB);
+      new GraphicalPlayer(PlayerId.PLAYER_2, ns, tB, sB,null,null);
     g.createStage().show();
 
     new AnimationTimer() {

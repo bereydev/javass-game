@@ -1,6 +1,6 @@
 /*
- *	Author : Alexandre Santangelo 
- *	Date   : Apr 29, 2019	
+ *  Author : Alexandre Santangelo 
+ *  Date   : Apr 29, 2019   
 */
 
 /**
@@ -46,12 +46,13 @@ public class GraphicalPlayer {
     private Scene scene;
     private String player; 
     public GraphicalPlayer(PlayerId player, Map<PlayerId, String> map,
-            TrickBean trick, ScoreBean score) {
+            TrickBean trick, ScoreBean score, HandBean hand, ArrayBlockingQueue<Card> cardToPlay) {
         this.player = player.toString(); 
         BorderPane borderPane = new BorderPane();
         StackPane winningPane = new StackPane();
         borderPane.setCenter(createTrickPane(trick, player, map));
         borderPane.setTop(createScorePane(score, map));
+        borderPane.setBottom(createHandPane(hand, player, cardToPlay));
         winningPane.getChildren().add(borderPane);
         winningPane.getChildren().add(createWinningPane(score, map));
 
@@ -133,14 +134,13 @@ public class GraphicalPlayer {
         Text[] names = new Text[4];
         VBox[] pairs = new VBox[4];
         StackPane[] panes = new StackPane[4];
-        Rectangle[] rect = new Rectangle[4];
         ImageView trumpImage = new ImageView();
         trumpImage.imageProperty()
                 .bind(Bindings.valueAt(trumps, trick.ColorProperty()));
         trumpImage.setFitHeight(101);
         trumpImage.setFitWidth(101);
 
-        
+        Rectangle[] rect = new Rectangle[4];
         
 
         for (int i = 0; i < PlayerId.COUNT; i++) {
