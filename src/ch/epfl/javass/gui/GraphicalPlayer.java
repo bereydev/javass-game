@@ -133,13 +133,14 @@ public class GraphicalPlayer {
         Text[] names = new Text[4];
         VBox[] pairs = new VBox[4];
         StackPane[] panes = new StackPane[4];
+        Rectangle[] rect = new Rectangle[4];
         ImageView trumpImage = new ImageView();
         trumpImage.imageProperty()
                 .bind(Bindings.valueAt(trumps, trick.ColorProperty()));
         trumpImage.setFitHeight(101);
         trumpImage.setFitWidth(101);
 
-        Rectangle[] rect = new Rectangle[4];
+        
         
 
         for (int i = 0; i < PlayerId.COUNT; i++) {
