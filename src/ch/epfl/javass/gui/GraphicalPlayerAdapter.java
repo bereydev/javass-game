@@ -20,14 +20,13 @@ public class GraphicalPlayerAdapter implements Player {
     private ScoreBean scoreBean;
     private TrickBean trickBean;
     private GraphicalPlayer graphicalPlayer;
-    private ArrayBlockingQueue<Card> cardQueue = new ArrayBlockingQueue<>(1);
+    private ArrayBlockingQueue<Card> cardQueue;
 
-    public GraphicalPlayerAdapter(HandBean hand, ScoreBean score,
-            TrickBean trick, ArrayBlockingQueue<Card> card) {
-        handBean = hand;
-        scoreBean = score;
-        trickBean = trick;
-        cardQueue = card;
+    public GraphicalPlayerAdapter() {
+        handBean = new HandBean();
+        scoreBean = new ScoreBean();
+        trickBean = new TrickBean();
+        cardQueue = new ArrayBlockingQueue<>(1);
     }
 
     @Override
@@ -36,8 +35,13 @@ public class GraphicalPlayerAdapter implements Player {
             CardSet playableCards = state.trick().playableCards(hand);
             handBean.setPlayableCards(playableCards);
         });
-        Card cardToPlay = cardQueue.take();
-        return cardToPlay;
+        Card cardToPlay;
+        try {
+            cardToPlay = cardQueue.take();
+            return cardToPlay;
+        } catch (InterruptedException e) {
+            throw new Error(e);
+        }
     }
 
     @Override

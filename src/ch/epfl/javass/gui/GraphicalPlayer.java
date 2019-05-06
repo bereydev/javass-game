@@ -46,12 +46,13 @@ public class GraphicalPlayer {
     private Scene scene;
     private String player; 
     public GraphicalPlayer(PlayerId player, Map<PlayerId, String> map,
-            TrickBean trick, ScoreBean score) {
+            TrickBean trick, ScoreBean score, HandBean hand, ArrayBlockingQueue<Card> cardToPlay) {
         this.player = player.toString(); 
         BorderPane borderPane = new BorderPane();
         StackPane winningPane = new StackPane();
         borderPane.setCenter(createTrickPane(trick, player, map));
         borderPane.setTop(createScorePane(score, map));
+        borderPane.setBottom(createHandPane(hand, player, cardToPlay));
         winningPane.getChildren().add(borderPane);
         winningPane.getChildren().add(createWinningPane(score, map));
 
