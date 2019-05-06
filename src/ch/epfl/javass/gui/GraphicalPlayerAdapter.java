@@ -36,18 +36,18 @@ public class GraphicalPlayerAdapter implements Player {
             CardSet playableCards = state.trick().playableCards(hand);
             handBean.setPlayableCards(playableCards);
         });
-        Card cardToPlay = cardQueue.take();
-        return cardToPlay;
+       // Card cardToPlay = cardQueue.take();
+        return null;
     }
 
-    @Override
-    public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trickBean,
-                scoreBean, handBean, cardQueue);
-        Platform.runLater(() -> {
-            graphicalPlayer.createStage().show();
-        });
-    }
+//    @Override
+//    public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
+//        graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trickBean,
+//                scoreBean, handBean, cardQueue);
+//        Platform.runLater(() -> {
+//            graphicalPlayer.createStage().show();
+//        });
+//    }
 
     @Override
     public void updateHand(CardSet newHand) {
