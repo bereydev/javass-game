@@ -38,6 +38,7 @@ public class GraphicalPlayerAdapter implements Player {
         Card cardToPlay;
         try {
             cardToPlay = cardQueue.take();
+            System.out.println(cardToPlay);
             return cardToPlay;
         } catch (InterruptedException e) {
             throw new Error(e);

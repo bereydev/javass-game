@@ -215,9 +215,34 @@ public class GraphicalPlayer {
 
     private HBox createHandPane(HandBean hand, PlayerId player,
             ArrayBlockingQueue<Card> cardQueue) {
-        HBox handPane = new HBox();
+        HBox handBox = new HBox();
+        ImageView cardImages[] = new ImageView[9];
+        for (int i = 0; i < cardImages.length; i++) {
+            cardImages[i] = createHandCard(i, hand, cardQueue); 
+        }
+        handBox.getChildren().addAll(cardImages);
+        handBox.setStyle("-fx-background-color: lightgray;\r\n" + 
+                "-fx-spacing: 5px;\r\n" + 
+                "-fx-padding: 5px;");
+        return handBox;
+    }
 
-        return handPane;
+    private ImageView createHandCard(int i, HandBean hand, 
+            ArrayBlockingQueue<Card> cardQueue) {
+        ImageView bob = new ImageView();
+        bob.imageProperty().bind(Bindings.valueAt(cards, Bindings.valueAt(hand.hand(), i)));
+        bob.setFitWidth(80);
+        bob.setFitHeight(120);
+        bob.setOnMouseClicked(e -> {
+            try {
+                System.out.println("Hello");
+                cardQueue.put(hand.hand().get(i));
+                System.out.println(hand.hand().get(i));
+            } catch (InterruptedException e1) {
+                throw new Error(e1); 
+            } 
+        });
+        return bob;
     }
 
     private static final ObservableMap<Card, Image> mapCreator(int quality) {
