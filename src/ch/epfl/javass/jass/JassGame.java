@@ -78,7 +78,6 @@ public final class JassGame {
             return;
 
         if (newGame) {
-            System.out.println("New Game");
             deal();
             player1 = turnStarter();
             organizePlayers(player1);
@@ -92,7 +91,6 @@ public final class JassGame {
         } else {
             turnState = turnState.withTrickCollected();
             if (turnState.isTerminal()) {
-                System.out.println("2nd Game");
                 deal();
                 player1 = turnStarter();
                 organizePlayers(player1);

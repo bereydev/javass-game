@@ -2,10 +2,6 @@
  *  Author : Alexandre Santangelo 
  *  Date   : Apr 29, 2019   
 */
-
-/**
- * 
- */
 package ch.epfl.javass.gui;
 
 import java.util.Map;
@@ -45,21 +41,24 @@ public class GraphicalPlayer {
     private static final ObservableMap<Color, Image> trumps = trumps();
 
     private Scene scene;
-    private String player; 
+    private String player;
+
     public GraphicalPlayer(PlayerId player, Map<PlayerId, String> map,
-            TrickBean trick, ScoreBean score, HandBean hand, ArrayBlockingQueue<Card> cardToPlay) {
-        this.player = player.toString(); 
+            TrickBean trick, ScoreBean score, HandBean hand,
+            ArrayBlockingQueue<Card> cardToPlay) {
+        this.player = player.toString();
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(createTrickPane(trick, player, map));
         borderPane.setTop(createScorePane(score, map));
         borderPane.setBottom(createHandPane(hand, player, cardToPlay));
-        StackPane winningPane = new StackPane(createWinningPane(score, map),borderPane);
+        StackPane winningPane = new StackPane(createWinningPane(score, map),
+                borderPane);
         scene = new Scene(winningPane);
     }
 
     public Stage createStage() {
         Stage stage = new Stage();
-        stage.setTitle("Javass - "+player);
+        stage.setTitle("Javass - " + player);
         stage.setScene(scene);
         return stage;
     }
@@ -71,13 +70,15 @@ public class GraphicalPlayer {
         StringProperty diff2 = new SimpleStringProperty();
 
         score.turnPointsProperty(TeamId.TEAM_1).addListener((o, oV, nV) -> {
+            int diffInt = nV.intValue() - oV.intValue();
             IntegerProperty diff = new SimpleIntegerProperty(
-                    nV.intValue() - oV.intValue());
+                    diffInt < 0 ? 0 : diffInt);
             diff1.bind(Bindings.concat("(+", Bindings.convert(diff), ")"));
         });
         score.turnPointsProperty(TeamId.TEAM_2).addListener((o, oV, nV) -> {
+            int diffInt = nV.intValue() - oV.intValue();
             IntegerProperty diff = new SimpleIntegerProperty(
-                    nV.intValue() - oV.intValue());
+                    diffInt < 0 ? 0 : diffInt);
             diff2.bind(Bindings.concat("(+", Bindings.convert(diff), ")"));
         });
 
@@ -139,10 +140,9 @@ public class GraphicalPlayer {
         trumpImage.setFitWidth(101);
 
         Rectangle[] rect = new Rectangle[4];
-        
 
         for (int i = 0; i < PlayerId.COUNT; i++) {
-            rect[i] = new Rectangle(120,180); 
+            rect[i] = new Rectangle(120, 180);
             rect[i].setStyle(
                     "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: lightpink; -fx-stroke-width: 5; -fx-opacity: 0.5;");
             rect[i].setEffect(new GaussianBlur(4));
@@ -152,7 +152,7 @@ public class GraphicalPlayer {
             cardImages[i].imageProperty().bind(Bindings.valueAt(cards, card));
             cardImages[i].setFitWidth(120);
             cardImages[i].setFitHeight(180);
-            panes[i] = new StackPane(rect[i],cardImages[i]);
+            panes[i] = new StackPane(rect[i], cardImages[i]);
             rect[i].visibleProperty().bind(trick.winningPlayerProperty()
                     .isEqualTo(PlayerId.values()[(player.ordinal() + i) % 4]));
             names[i] = new Text(
@@ -173,7 +173,7 @@ public class GraphicalPlayer {
         GridPane.setHalignment(trumpImage, HPos.CENTER);
         trickPane.setStyle(
                 "-fx-background-color: whitesmoke; -fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center;");
- 
+
         return trickPane;
     }
 
@@ -205,7 +205,7 @@ public class GraphicalPlayer {
             teamText[i].visibleProperty().bind(
                     score.winningTeamProperty().isEqualTo(TeamId.values()[i]));
             teamPane[i].setCenter(teamText[i]);
-            winningPane.getChildren().add(teamPane[i]); 
+            winningPane.getChildren().add(teamPane[i]);
         }
 
         return winningPane;
@@ -214,39 +214,51 @@ public class GraphicalPlayer {
     private HBox createHandPane(HandBean hand, PlayerId player,
             ArrayBlockingQueue<Card> cardQueue) {
         HBox handBox = new HBox();
-        ImageView cardImages[] = new ImageView[9];
+        StackPane cardImages[] = new StackPane[9];
         for (int i = 0; i < cardImages.length; i++) {
-            cardImages[i] = createHandCard(i, hand, cardQueue); 
+            cardImages[i] = createHandCard(i, hand, cardQueue);
         }
         handBox.getChildren().addAll(cardImages);
-        handBox.setStyle("-fx-background-color: lightgray;\r\n" + 
-                "-fx-spacing: 5px;\r\n" + 
-                "-fx-padding: 5px;");
+        handBox.setStyle("-fx-background-color: lightgray;\r\n"
+                + "-fx-spacing: 5px;\r\n" + "-fx-padding: 5px;");
         return handBox;
     }
 
-    private ImageView createHandCard(int i, HandBean hand, 
+    private StackPane createHandCard(int i, HandBean hand,
             ArrayBlockingQueue<Card> cardQueue) {
-        ImageView bob = new ImageView();
-        bob.imageProperty().bind(Bindings.valueAt(cards, Bindings.valueAt(hand.hand(), i)));
-        bob.setFitWidth(80);
-        bob.setFitHeight(120);
+        BooleanProperty b = new SimpleBooleanProperty(false); 
+        ImageView cardImage = new ImageView();
+        Rectangle blackR = new Rectangle(80,120); 
+        StackPane pair = new StackPane(cardImage,blackR); 
+        blackR.setStyle(
+                "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: black; -fx-stroke-width: 2; -fx-opacity: 0.7;");
+        blackR.visibleProperty().bind(b);
+        cardImage.imageProperty().bind(
+                Bindings.valueAt(cards, Bindings.valueAt(hand.hand(), i)));
+        cardImage.setFitWidth(80);
+        cardImage.setFitHeight(120);
         BooleanProperty isPlayable = new SimpleBooleanProperty();
-        isPlayable.bind(Bindings.createBooleanBinding( () -> hand.playableCards().contains(hand.hand().get(i)), hand.playableCards(), hand.hand()));
-//        System.out.println("Sentence value : "+ hand.playableCards().contains(hand.hand().get(i)));
-//        System.out.println("Card : " + hand.hand().get(i));
-//        System.out.println("Playable cards set : " + hand.playableCards());
-//        System.out.println("IsPlayable value : " + isPlayable.getValue());
-        bob.opacityProperty().bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
-        bob.disableProperty().bind(Bindings.when(isPlayable).then(false).otherwise(true));
-        bob.setOnMouseClicked(e -> {
+        isPlayable.bind(Bindings.createBooleanBinding(
+                () -> hand.playableCards().contains(hand.hand().get(i)),
+                hand.playableCards(), hand.hand()));
+        pair.opacityProperty()
+                .bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
+        pair.disableProperty()
+                .bind(Bindings.when(isPlayable).then(false).otherwise(true));
+        pair.setOnMouseEntered(e ->{
+            b.set(true); 
+        });
+        pair.setOnMouseExited(e ->{
+            b.set(false);
+        });
+        pair.setOnMouseClicked(e -> {
             try {
                 cardQueue.put(hand.hand().get(i));
             } catch (InterruptedException e1) {
-                throw new Error(e1); 
-            } 
+                throw new Error(e1);
+            }
         });
-        return bob;
+        return pair;
     }
 
     private static final ObservableMap<Card, Image> mapCreator(int quality) {
