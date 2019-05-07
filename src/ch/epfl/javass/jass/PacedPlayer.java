@@ -39,7 +39,7 @@ public final class PacedPlayer implements Player {
             return card;
         try {
             Thread.sleep(
-                    (int) (minTime + startTime - currentTime) * MILLI_SECONDS);
+                    (int) (minTime * MILLI_SECONDS - (currentTime - startTime)));
         } catch (InterruptedException e) {
             /* do nothing */ }
 

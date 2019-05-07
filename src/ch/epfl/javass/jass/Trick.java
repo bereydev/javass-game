@@ -164,9 +164,7 @@ public final class Trick {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof Trick)
-            return ((Trick) other).pkTrick == pkTrick;
-        return false;
+        return other instanceof Trick && ((Trick) other).pkTrick == pkTrick;
     }
 
     @Override

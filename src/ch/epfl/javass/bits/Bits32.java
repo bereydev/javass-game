@@ -15,24 +15,6 @@ public final class Bits32 {
     }
 
     /**
-     * Private method that find the "size" of an integer bit string
-     * 
-     * @param bits
-     *            the integer you wan't to find the size of
-     * @return the size of the binary representation of the integer (based on
-     *         the position of the most significant bit)
-     */
-    private static int bitsSize(int bits) {
-        int size = 0;
-        int number = bits;
-        while (number != 0) {
-            number = number >> 1; // divide by 2
-            size++;
-        }
-        return size;
-    }
-
-    /**
      * Public method that give an integer which binary representation is '1'
      * between start(include) and size(exclude) and '0' otherwise
      * 
@@ -79,11 +61,11 @@ public final class Bits32 {
      * @return the concatenated integer 'v1 + v2'
      */
     public static int pack(int v1, int s1, int v2, int s2) {
-        Preconditions.checkArgument(
-                s1 > 0 && s1 < Integer.SIZE && bitsSize(v1) <= s1);
-        Preconditions.checkArgument(
-                s2 > 0 && s2 < Integer.SIZE && bitsSize(v2) <= s2);
         Preconditions.checkArgument(s1 + s2 <= Integer.SIZE);
+        Preconditions.checkArgument(
+                s1 > 0 && s1 < Integer.SIZE && extract(v1, 0, s1) == v1);
+        Preconditions.checkArgument(
+                s2 > 0 && s2 < Integer.SIZE && extract(v2, 0, s2) == v2);
         return v1 | v2 << s1;
     }
 
