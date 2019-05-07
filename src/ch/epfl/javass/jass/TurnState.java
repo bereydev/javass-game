@@ -19,13 +19,9 @@ public final class TurnState {
         currentTrick = pkTrick;
     }
 
-    private static final int INDEX_SIZE = 4;
-    private static final int TRUMP_SIZE = 2;
-    private static final int PLAYER_SIZE = 2;
-    private static final int CARD_SIZE = 6;
-    private long currentScore = PackedScore.INITIAL;
-    private long unplayedCards = PackedCardSet.ALL_CARDS;
-    private int currentTrick = PackedTrick.INVALID;
+    private final long currentScore;
+    private final long unplayedCards;
+    private final int currentTrick;
 
     /**
      * @param trump
@@ -36,11 +32,7 @@ public final class TurnState {
      */
     public static TurnState initial(Color trump, Score score,
             PlayerId firstPlayer) {
-        int pkTrick = Bits32.pack(PackedCard.INVALID, CARD_SIZE,
-                PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID, CARD_SIZE,
-                PackedCard.INVALID, CARD_SIZE, 0, INDEX_SIZE,
-                firstPlayer.ordinal(), PLAYER_SIZE, trump.ordinal(),
-                TRUMP_SIZE);
+        int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
         return new TurnState(score.packed(), PackedCardSet.ALL_CARDS, pkTrick);
     }
 
@@ -128,6 +120,8 @@ public final class TurnState {
     public TurnState withNewCardPlayed(Card card) {
         if (PackedTrick.isFull(currentTrick))
             throw new IllegalStateException();
+        //TODO est-ce qu'il faut lancer une exception ou un assert suffit
+        assert (PackedCardSet.contains(unplayedCards, card.packed()));
 
         int pkTrick = PackedTrick.withAddedCard(currentTrick, card.packed());
         long pkUnplayedCards = PackedCardSet.remove(unplayedCards,

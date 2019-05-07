@@ -19,8 +19,8 @@ import java.util.List;
 
 public final class JassGame {
 
-    private Map<PlayerId, Player> players;
-    private Map<PlayerId, String> playerNames;
+    private final Map<PlayerId, Player> players;
+    private final Map<PlayerId, String> playerNames;
     private Map<PlayerId, CardSet> hands = new HashMap<PlayerId, CardSet>();
     private List<PlayerId> playersInOrder = new LinkedList<PlayerId>();
     private PlayerId turnStarter;
