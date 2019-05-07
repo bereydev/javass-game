@@ -22,6 +22,7 @@ public class PackedCard {
     private static final int COLOR_START = 4;
     private static final int MAX_RANK = 8;
     private static final int MAX_COLOR = 3;
+    private static final int CARD_POINTS[][] = {{0,0,0,0,10,2,3,4,11},{0,0,0,14,10,20,3,4,11}};
 
     /**
      * @param pkCard
@@ -107,31 +108,9 @@ public class PackedCard {
      */
     public static int points(Card.Color trump, int pkCard) {
         assert (isValid(pkCard));
-
-        Rank rank = rank(pkCard);
-        Color color = color(pkCard);
-
-        if (trump == color) { // Card has trump color
-            if (rank == Rank.NINE)
-                return 14;
-            else if (rank == Rank.JACK)
-                return 20;
-        }
-        switch (rank) {
-        case TEN:
-            return 10;
-        case JACK:
-            return 2;
-        case QUEEN:
-            return 3;
-        case KING:
-            return 4;
-        case ACE:
-            return 11;
-
-        default:
-            return 0; // For all the other cards
-        }
+        int rank = PackedCard.rank(pkCard).ordinal();
+        Color color = PackedCard.color(pkCard);
+        return color != trump ? CARD_POINTS[0][rank]: CARD_POINTS[1][rank];
     }
 
     /**

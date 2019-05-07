@@ -19,8 +19,8 @@ import java.util.List;
 
 public final class JassGame {
 
-    private Map<PlayerId, Player> players;
-    private Map<PlayerId, String> playerNames;
+    private final Map<PlayerId, Player> players;
+    private final Map<PlayerId, String> playerNames;
     private Map<PlayerId, CardSet> hands = new HashMap<PlayerId, CardSet>();
     private List<PlayerId> playersInOrder = new LinkedList<PlayerId>();
     private PlayerId turnStarter;
@@ -78,21 +78,31 @@ public final class JassGame {
             return;
 
         if (newGame) {
+            System.out.println("New Game");
             deal();
             player1 = turnStarter();
             organizePlayers(player1);
             turnState = TurnState.initial(
                     Color.values()[trumpRng.nextInt(Color.COUNT)],
                     Score.INITIAL, player1);
+            for (PlayerId p : playersInOrder) {
+                players.get(p).updateHand(hands.get(p));
+                players.get(p).setTrump(turnState.trick().trump());
+            }
         } else {
             turnState = turnState.withTrickCollected();
             if (turnState.isTerminal()) {
+                System.out.println("2nd Game");
                 deal();
                 player1 = turnStarter();
                 organizePlayers(player1);
                 turnState = TurnState.initial(
                         Color.values()[trumpRng.nextInt(Color.COUNT)],
                         turnState.score().nextTurn(), player1);
+                for (PlayerId p : playersInOrder) {
+                    players.get(p).updateHand(hands.get(p));
+                    players.get(p).setTrump(turnState.trick().trump());
+                }
             } else {
                 organizePlayers(player1);
             }
@@ -106,11 +116,8 @@ public final class JassGame {
                 players.get(p).setTrump(turnState.trick().trump());
             }
         }
-        for (PlayerId p : playersInOrder)
-            players.get(p).updateScore(turnState.score());
-
         for (PlayerId p : playersInOrder) {
-
+            players.get(p).updateScore(turnState.score());
             for (PlayerId q : playersInOrder)
                 players.get(q).updateTrick(turnState.trick());
 

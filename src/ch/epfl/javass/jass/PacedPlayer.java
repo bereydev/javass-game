@@ -14,8 +14,8 @@ import ch.epfl.javass.jass.Card.Color;
 
 public final class PacedPlayer implements Player {
 
-    private Player underlyingPlayer;
-    private double minTime;
+    private final Player underlyingPlayer;
+    private final double minTime;
 
     private static final int MILLI_SECONDS = 1000;
 
@@ -26,6 +26,7 @@ public final class PacedPlayer implements Player {
      *            The minimal wait time.
      */
     public PacedPlayer(Player underlyingPlayer, double minTime) {
+        assert (minTime >= 0);
         this.underlyingPlayer = underlyingPlayer;
         this.minTime = minTime;
     }
@@ -39,7 +40,7 @@ public final class PacedPlayer implements Player {
             return card;
         try {
             Thread.sleep(
-                    (int) (minTime + startTime - currentTime) * MILLI_SECONDS);
+                    (int) (minTime * MILLI_SECONDS - (double)(currentTime - startTime)));
         } catch (InterruptedException e) {
             /* do nothing */ }
 

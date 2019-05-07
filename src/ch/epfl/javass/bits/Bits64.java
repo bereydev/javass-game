@@ -11,23 +11,6 @@ public class Bits64 {
     private Bits64() {
     }
 
-    /**
-     * Private method that find the "size" of an integer bit string
-     * 
-     * @param bits
-     *            the integer you wan't to find the size of
-     * @return the size of the binary representation of the integer (based on
-     *         the position of the most significant bit)
-     */
-    private static int bitsSize(long bits) {
-        int size = 0;
-        long number = bits;
-        while (number != 0) {
-            number = number >> 1; // divide by 2
-            size++;
-        }
-        return size;
-    }
 
     /**
      * @param start
@@ -71,9 +54,9 @@ public class Bits64 {
      */
     public static long pack(long v1, int s1, long v2, int s2) {
         Preconditions
-                .checkArgument(s1 > 0 && s1 < Long.SIZE && bitsSize(v1) <= s1);
+                .checkArgument(s1 > 0 && s1 < Long.SIZE && extract(v1, 0, s1) == v1);
         Preconditions
-                .checkArgument(s2 > 0 && s2 < Long.SIZE && bitsSize(v2) <= s2);
+                .checkArgument(s2 > 0 && s2 < Long.SIZE && extract(v2, 0, s2) == v2);
         Preconditions.checkArgument(s1 + s2 <= Long.SIZE);
         return v1 | v2 << s1;
     }
