@@ -11,15 +11,14 @@ import ch.epfl.javass.jass.Card.Color;
 public final class Trick {
 
     private final static int MAX_INDEX = 4;
-    private final static int ZERO = 0;
+    
+    public final static Trick INVALID = new Trick(PackedTrick.INVALID);
+    
+    private final int pkTrick;
 
     private Trick(int pkTrick) {
         this.pkTrick = pkTrick;
     }
-
-    public final static Trick INVALID = new Trick(PackedTrick.INVALID);
-
-    private int pkTrick;
 
     /**
      * @param trump
@@ -67,6 +66,7 @@ public final class Trick {
      * @return True if the trick has 4 cards, false if not.
      */
     public boolean isFull() {
+        
         return PackedTrick.isFull(pkTrick);
     }
 
@@ -103,8 +103,7 @@ public final class Trick {
      * @return The player at index, index in the trick
      */
     public PlayerId player(int index) {
-        if (!(index >= ZERO && index < MAX_INDEX))
-            throw new IndexOutOfBoundsException();
+        Preconditions.checkIndex(index, MAX_INDEX);
         return PackedTrick.player(pkTrick, index);
     }
 
@@ -114,8 +113,7 @@ public final class Trick {
      * @return The card at index index in the trick
      */
     public Card card(int index) {
-        if (!(index >= ZERO && index < MAX_INDEX))
-            throw new IndexOutOfBoundsException();
+        Preconditions.checkIndex(index, MAX_INDEX);
         return Card.ofPacked(PackedTrick.card(pkTrick, index));
     }
 
@@ -125,6 +123,8 @@ public final class Trick {
      * @return The trick with an added card.
      */
     public Trick withAddedCard(Card c) {
+        if (isFull())
+            throw new IllegalStateException();
         return new Trick(PackedTrick.withAddedCard(pkTrick, c.packed()));
     }
 
@@ -132,6 +132,8 @@ public final class Trick {
      * @return The base color of the trick
      */
     public Color baseColor() {
+        if (isEmpty())
+            throw new IllegalStateException();
         return PackedTrick.baseColor(pkTrick);
     }
 
@@ -141,7 +143,8 @@ public final class Trick {
      * @return The set of playable cards given your hand and Jass rules
      */
     public CardSet playableCards(CardSet hand) {
-
+        if (isFull())
+            throw new IllegalStateException();
         return CardSet
                 .ofPacked(PackedTrick.playableCards(pkTrick, hand.packed()));
     }
