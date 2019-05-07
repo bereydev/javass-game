@@ -109,6 +109,6 @@ public final class Score {
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof Score && pkScore == ((Score) other).packed();
+        return other instanceof Score && pkScore == ((Score) other).pkScore;
     }
 }

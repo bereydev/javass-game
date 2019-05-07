@@ -9,7 +9,6 @@
 package ch.epfl.javass.gui;
 
 import java.util.Map;
-
 import java.util.concurrent.ArrayBlockingQueue;
 
 import ch.epfl.javass.jass.Card;
@@ -18,7 +17,9 @@ import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -31,9 +32,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -49,13 +50,10 @@ public class GraphicalPlayer {
             TrickBean trick, ScoreBean score, HandBean hand, ArrayBlockingQueue<Card> cardToPlay) {
         this.player = player.toString(); 
         BorderPane borderPane = new BorderPane();
-        StackPane winningPane = new StackPane();
         borderPane.setCenter(createTrickPane(trick, player, map));
         borderPane.setTop(createScorePane(score, map));
         borderPane.setBottom(createHandPane(hand, player, cardToPlay));
-        winningPane.getChildren().add(borderPane);
-        winningPane.getChildren().add(createWinningPane(score, map));
-
+        StackPane winningPane = new StackPane(createWinningPane(score, map),borderPane);
         scene = new Scene(winningPane);
     }
 
@@ -215,9 +213,40 @@ public class GraphicalPlayer {
 
     private HBox createHandPane(HandBean hand, PlayerId player,
             ArrayBlockingQueue<Card> cardQueue) {
-        HBox handPane = new HBox();
+        HBox handBox = new HBox();
+        ImageView cardImages[] = new ImageView[9];
+        for (int i = 0; i < cardImages.length; i++) {
+            cardImages[i] = createHandCard(i, hand, cardQueue); 
+        }
+        handBox.getChildren().addAll(cardImages);
+        handBox.setStyle("-fx-background-color: lightgray;\r\n" + 
+                "-fx-spacing: 5px;\r\n" + 
+                "-fx-padding: 5px;");
+        return handBox;
+    }
 
-        return handPane;
+    private ImageView createHandCard(int i, HandBean hand, 
+            ArrayBlockingQueue<Card> cardQueue) {
+        ImageView bob = new ImageView();
+        bob.imageProperty().bind(Bindings.valueAt(cards, Bindings.valueAt(hand.hand(), i)));
+        bob.setFitWidth(80);
+        bob.setFitHeight(120);
+        BooleanProperty isPlayable = new SimpleBooleanProperty();
+        isPlayable.bind(Bindings.createBooleanBinding( () -> hand.playableCards().contains(hand.hand().get(i)), hand.playableCards(), hand.hand()));
+//        System.out.println("Sentence value : "+ hand.playableCards().contains(hand.hand().get(i)));
+//        System.out.println("Card : " + hand.hand().get(i));
+//        System.out.println("Playable cards set : " + hand.playableCards());
+//        System.out.println("IsPlayable value : " + isPlayable.getValue());
+        bob.opacityProperty().bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
+        bob.disableProperty().bind(Bindings.when(isPlayable).then(false).otherwise(true));
+        bob.setOnMouseClicked(e -> {
+            try {
+                cardQueue.put(hand.hand().get(i));
+            } catch (InterruptedException e1) {
+                throw new Error(e1); 
+            } 
+        });
+        return bob;
     }
 
     private static final ObservableMap<Card, Image> mapCreator(int quality) {

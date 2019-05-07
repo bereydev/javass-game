@@ -27,7 +27,6 @@ public final class PackedTrick {
     private static final int INDEX_START = 24;
     private static final int INDEX_SIZE = 4;
     private static final int MAX_INDEX = 8;
-    private static final int ZERO = 0;
     private static final int PLAYER_START = 28;
     private static final int PLAYER_SIZE = 2;
     private static final int TRUMP_START = 30;
@@ -57,7 +56,7 @@ public final class PackedTrick {
         }
         int index = Bits32.extract(pkTrick, INDEX_START, INDEX_SIZE);
 
-        return index <= MAX_INDEX && index >= ZERO;
+        return index <= MAX_INDEX && index >= 0;
     }
 
     /**
@@ -71,7 +70,7 @@ public final class PackedTrick {
 
         return Bits32.pack(PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID,
                 CARD_SIZE, PackedCard.INVALID, CARD_SIZE, PackedCard.INVALID,
-                CARD_SIZE, ZERO, INDEX_SIZE, firstPlayer.ordinal(), PLAYER_SIZE,
+                CARD_SIZE, 0, INDEX_SIZE, firstPlayer.ordinal(), PLAYER_SIZE,
                 trump.ordinal(), TRUMP_SIZE);
     }
 
@@ -160,7 +159,7 @@ public final class PackedTrick {
      * @return
      */
     public static PlayerId player(int pkTrick, int index) {
-        assert (isValid(pkTrick));
+        assert (isValid(pkTrick) && 0 <= index && index < PlayerId.COUNT);
         return PlayerId
                 .values()[(Bits32.extract(pkTrick, PLAYER_START, PLAYER_SIZE)
                         + index) % PlayerId.COUNT];
@@ -184,7 +183,7 @@ public final class PackedTrick {
      * @return The pkCard at that index
      */
     public static int card(int pkTrick, int index) {
-        assert (isValid(pkTrick));
+        assert (isValid(pkTrick) && 0 <= index && index < NUMBER_OF_CARDS);
         // HERE I SUPPOSE THAT THE INDEX IS BETWEEN 0 AND 3
         return Bits32.extract(pkTrick, index * CARD_SIZE, CARD_SIZE);
     }
@@ -234,44 +233,21 @@ public final class PackedTrick {
         long playableCardSet = pkHand;
         long baseSet = PackedCardSet.subsetOfColor(pkHand, baseColor);
         long trumpSet = PackedCardSet.subsetOfColor(pkHand, trumpColor);
-
         long trumpAboveSet = PackedCardSet.intersection(pkHand,
                 PackedCardSet.trumpAbove(winningCard(pkTrick)));
 
         if (baseSet != 0L) {
             playableCardSet = PackedCardSet.union(baseSet, trumpSet);
-            if (trumpTrick && PackedCardSet.size(baseSet) == SINGLE
-                    && PackedCardSet.contains(baseSet,
-                            PackedCard.pack(trumpColor, Rank.JACK))) {
+            if (trumpTrick 
+                    && PackedCardSet.size(baseSet) == SINGLE
+                        && PackedCardSet.contains(baseSet,
+                                PackedCard.pack(trumpColor, Rank.JACK)))
                 playableCardSet = pkHand;
-            }
-            if (isCut) {
+            if (isCut)
                 playableCardSet = PackedCardSet.union(baseSet, trumpAboveSet);
-            }
-        } else {
-            if (!(trumpSet == 0L)) {
-                playableCardSet = PackedCardSet.EMPTY;
-                if (isCut) {
-                    if (pkHand == trumpSet && trumpAboveSet == 0L) {
-                        return pkHand;
-                    }
-                    for (int i = 0; i < 4; i++) {
-                        if (Card.Color.values()[i] != trumpColor) {
-                            playableCardSet = PackedCardSet.union(
-                                    playableCardSet,
-                                    PackedCardSet.subsetOfColor(pkHand,
-                                            Card.Color.values()[i]));
-                        }
-                    }
-                    playableCardSet = PackedCardSet.union(playableCardSet,
-                            trumpAboveSet);
-                } else {
-                    playableCardSet = pkHand;
-                }
-            } else {
-                playableCardSet = pkHand;
-            }
-        }
+        } else if (isCut && trumpAboveSet != 0L)
+            playableCardSet = PackedCardSet.union(
+                    PackedCardSet.difference(pkHand, trumpSet), trumpAboveSet);
         return playableCardSet;
     }
 
@@ -281,7 +257,7 @@ public final class PackedTrick {
      */
     private static int winningCard(int pkTrick) {
         assert (isValid(pkTrick));
-        int winningCard = card(pkTrick, ZERO);
+        int winningCard = card(pkTrick, 0);
         for (int i = 0; i < size(pkTrick); i++) {
             int pkCard = card(pkTrick, i);
             if (PackedCard.isBetter(trump(pkTrick), pkCard, winningCard))
@@ -319,7 +295,7 @@ public final class PackedTrick {
 
         assert isValid(pkTrick);
         int winningCard = winningCard(pkTrick);
-        int index = ZERO;
+        int index = 0;
         for (int i = 0; i < size(pkTrick); i++) {
             if (card(pkTrick, i) == winningCard)
                 index = i;

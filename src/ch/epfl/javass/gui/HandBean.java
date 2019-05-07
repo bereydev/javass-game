@@ -20,8 +20,7 @@ public final class HandBean {
     
     public HandBean() {
         for(int i=0; i<9; i++) {
-            hand.add(null); 
-            playableCards.add(null); 
+            hand.add(null);  
         }
     }
 
@@ -41,20 +40,10 @@ public final class HandBean {
     }
 
     public void setPlayableCards(CardSet newPlayableCards) {
-        if(newPlayableCards.size()==9) {
-            playableCards.clear();
-            for(int i=0; i<9; i++) {
-                playableCards.add(newPlayableCards.get(i)); 
-            }
+        playableCards.clear();
+        for (int i = 0; i < newPlayableCards.size(); i++) {
+            playableCards.add(newPlayableCards.get(i));
         }
-        else
-            for(Card c : playableCards) {
-                if(c == null)
-                    continue; 
-                if(!newPlayableCards.contains(c))
-                    playableCards.remove(c); 
-                    playableCards.add(null); 
-            }
     }
 
     public ObservableList<Card> hand() {
@@ -63,5 +52,6 @@ public final class HandBean {
 
     public ObservableSet<Card> playableCards() {
         return FXCollections.unmodifiableObservableSet(playableCards);
+        
     }
 }

@@ -151,10 +151,7 @@ public final class PackedCardSet {
     public static long remove(long pkCardSet, int pkCard) {
         assert (isValid(pkCardSet) && PackedCard.isValid(pkCard));
 
-        return add(pkCardSet, pkCard) - singleton(pkCard);
-        // We add the card (no effect if already there)
-        // just in case it wasn't there (won't be there in the end anyway).
-
+        return difference(pkCardSet, singleton(pkCard));
     }
 
     /**
@@ -214,7 +211,7 @@ public final class PackedCardSet {
      * @return A set with the cards that are in one set but not the other
      */
     public static long difference(long pkCardSet1, long pkCardSet2) {
-        assert (isValid(pkCardSet1));
+        assert (isValid(pkCardSet1) && isValid(pkCardSet2));
 
         return intersection(pkCardSet1, complement(pkCardSet2));
     }
