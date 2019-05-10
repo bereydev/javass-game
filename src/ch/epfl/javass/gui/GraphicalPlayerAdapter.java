@@ -33,10 +33,7 @@ public class GraphicalPlayerAdapter implements Player {
     public Card cardToPlay(TurnState state, CardSet hand) {
         Platform.runLater(() -> {
             CardSet playableCards = state.trick().playableCards(hand);
-            System.out.println(playableCards);
             handBean.setPlayableCards(playableCards);
-            System.out.println(handBean.playableCards());
-            System.out.println(handBean.hand());
         });
         Card cardToPlay;
         try {
@@ -58,10 +55,8 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public void updateHand(CardSet newHand) {
-        System.out.println("Main données : " + newHand);
         Platform.runLater(() -> {
             handBean.setHand(newHand);
-            System.out.println("Main reçue : " + handBean.hand());
         });
     }
 

@@ -1,0 +1,135 @@
+package ch.epfl.javass;
+
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import ch.epfl.javass.gui.GraphicalPlayerAdapter;
+import ch.epfl.javass.jass.JassGame;
+import ch.epfl.javass.jass.MctsPlayer;
+import ch.epfl.javass.jass.PacedPlayer;
+import ch.epfl.javass.jass.Player;
+import ch.epfl.javass.jass.PlayerId;
+import ch.epfl.javass.net.RemotePlayerClient;
+import javafx.application.Application;
+import javafx.stage.Stage;
+
+public class LocalMain extends Application {
+
+    private static final String NAME[] = { "Aline", "Bastien", "Colette", "David" };
+    private static final int ITTERATIONS = 10_000;
+    private static final String DEFAULT_HOST = "localhost";
+    private static final int PLAY_TIME = 2; //time expressed in second
+    private Random rng = new Random(0);
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage arg0) throws Exception {
+        Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);
+        Map<PlayerId, String> ns = new EnumMap<>(PlayerId.class);
+        List<String> parameters = getParameters().getRaw();
+        if (parameters.size() > 5 || parameters.size() < 4) {
+            System.err.println("Erreur : Nombre d'arguments invalide");
+            System.exit(1);
+        }
+            try {
+              rng = new Random(Long.parseLong(parameters.get(5)));
+            } catch (Exception e) {
+                if(e instanceof NumberFormatException) {
+                    System.err.println("Erreur : la graine passée en argument doit être de type long");
+                    System.exit(1);
+                }  
+                // if instance of IndexOutOfBoundsException do nothing the generator because the 5th element is optional
+            }
+        for (PlayerId player : PlayerId.ALL) {
+            String sets[] = parameters.get(player.ordinal()).split(":");
+            if (sets.length > 3) {
+                System.err.println(
+                        "Erreur : Les spécification d'un joueur comportent trop de composantes");
+                System.exit(1);
+            }
+            switch (sets[0]) {
+            case "h":
+                if (sets.length > 2) {
+                    System.err.println(
+                            "Erreur : Les spécification du joueur humain comportent trop de composantes");
+                    System.exit(1);
+                }
+                ps.put(player, new GraphicalPlayerAdapter());
+                try {
+                    ns.put(player, sets[1]);
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    ns.put(player, NAME[player.ordinal()]);
+                }
+                System.out.println("Joueur humain nommé " + ns.get(player));
+                break;
+            case "s":
+                int itterations = ITTERATIONS;
+                    try {
+                        itterations = Integer.parseInt(sets[2]);
+                    } catch (Exception e) {
+                        if (e instanceof NumberFormatException) {
+                            System.err.println(
+                                    "Erreur : Le nombre d'ittération doit être un nombre");
+                            System.exit(1);
+                        }  
+                    }
+                try {
+                    if (sets[1].trim().isEmpty()) {
+                        ns.put(player, NAME[player.ordinal()]);
+                    }else {
+                        ns.put(player, sets[1]);
+                    }
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    ns.put(player, NAME[player.ordinal()]);
+                }
+                ps.put(player, new PacedPlayer(new MctsPlayer(player, rng.nextInt(), itterations), PLAY_TIME));
+                System.out.println("Joueur simulé nommé " + ns.get(player));
+                break;
+            case "r":
+                String host = DEFAULT_HOST;
+                try {
+                    host = sets[2];
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    //nothing
+                }
+                try {
+                    ns.put(player, sets[1]);
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    ns.put(player, NAME[player.ordinal()]);
+                }
+                try {
+                    if (sets[1].trim().isEmpty()) {
+                        ns.put(player, NAME[player.ordinal()]);
+                    }else {
+                        ns.put(player, sets[1]);
+                    }
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    ns.put(player, NAME[player.ordinal()]);
+                }
+                ps.put(player, new RemotePlayerClient(host));
+                System.out.println("Joueur distant nommé " + ns.get(player));
+                break;
+                
+            default:
+                System.err.println("Erreur : l'argument pour le type de joueur est invalide");
+                System.exit(1);
+            }
+        }
+        Thread gameThread = new Thread(() -> {
+            JassGame g = new JassGame(rng.nextInt(), ps, ns);
+            while (! g.isGameOver()) {
+              g.advanceToEndOfNextTrick();
+              try { Thread.sleep(1000); } catch (Exception e) {}
+            }
+            });
+        gameThread.setDaemon(true);
+        gameThread.start();
+
+    }
+
+}
