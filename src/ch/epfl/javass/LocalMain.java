@@ -98,11 +98,6 @@ public class LocalMain extends Application {
                     //nothing
                 }
                 try {
-                    ns.put(player, sets[1]);
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    ns.put(player, NAME[player.ordinal()]);
-                }
-                try {
                     if (sets[1].trim().isEmpty()) {
                         ns.put(player, NAME[player.ordinal()]);
                     }else {
@@ -111,6 +106,7 @@ public class LocalMain extends Application {
                 } catch (ArrayIndexOutOfBoundsException e) {
                     ns.put(player, NAME[player.ordinal()]);
                 }
+                System.out.println(host);
                 ps.put(player, new RemotePlayerClient(host));
                 System.out.println("Joueur distant nommé " + ns.get(player));
                 break;

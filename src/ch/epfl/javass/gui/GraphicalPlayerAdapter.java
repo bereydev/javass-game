@@ -38,6 +38,10 @@ public class GraphicalPlayerAdapter implements Player {
         Card cardToPlay;
         try {
             cardToPlay = cardQueue.take();
+            Platform.runLater(() -> {
+                CardSet playableCards = CardSet.EMPTY;
+                handBean.setPlayableCards(playableCards);
+            });
             return cardToPlay;
         } catch (InterruptedException e) {
             throw new Error(e);
@@ -46,6 +50,7 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
+        System.out.println("setPlayers");
         graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trickBean,
                 scoreBean, handBean, cardQueue);
         Platform.runLater(() -> {

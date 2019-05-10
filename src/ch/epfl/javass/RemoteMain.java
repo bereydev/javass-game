@@ -19,10 +19,6 @@ public class RemoteMain extends Application {
             RemotePlayerServer server = new RemotePlayerServer(player);
             System.out.println("La partie commencera à la connexion du client...");
             server.run();
-            try {
-                Thread.sleep(1000);
-            } catch (Exception e) {
-            }
         });
         serverThread.setDaemon(true);
         serverThread.start();

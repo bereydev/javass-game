@@ -85,6 +85,8 @@ public final class JassGame {
                     Color.values()[trumpRng.nextInt(Color.COUNT)],
                     Score.INITIAL, player1);
             for (PlayerId p : playersInOrder) {
+                System.out.println("Coucou");
+                players.get(p).setPlayers(p, playerNames);
                 players.get(p).updateHand(hands.get(p));
                 players.get(p).setTrump(turnState.trick().trump());
             }
@@ -109,7 +111,7 @@ public final class JassGame {
         if (newGame) {
             newGame = false;
             for (PlayerId p : playersInOrder) {
-                players.get(p).setPlayers(p, playerNames);
+//                players.get(p).setPlayers(p, playerNames);
                 players.get(p).updateHand(hands.get(p));
                 players.get(p).setTrump(turnState.trick().trump());
             }

@@ -51,13 +51,15 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         try {
-            w.write(JassCommand.TRMP.name());
-            String players = "";
-            for (String p : playerNames.values()) {
-                players = StringSerializer.combine(players,StringSerializer.serializeString(p));
+            w.write(JassCommand.PLRS.name());
+            String players[] = new String[4];
+            for (int i = 0; i < players.length; i++) {
+                players[i] = StringSerializer.serializeString(playerNames.get(PlayerId.values()[i]));
             }
+            System.out.println(playerNames);
+            String serializedPlayers = StringSerializer.combine(players);
             w.write(SPACE + StringSerializer.serializeInt(ownId.ordinal()));
-            w.write(SPACE + players);
+            w.write(SPACE + serializedPlayers);
             w.write("\n");
             w.flush();
         } catch (IOException e) {

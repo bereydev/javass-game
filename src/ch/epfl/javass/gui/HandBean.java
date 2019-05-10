@@ -52,5 +52,6 @@ public final class HandBean {
 
     public ObservableSet<Card> playableCards() {
         return FXCollections.unmodifiableObservableSet(playableCards);
+        
     }
 }
