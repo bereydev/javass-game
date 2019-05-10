@@ -148,6 +148,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
         return card;
     }
     private void IOWriteAndCheck(String...string) {
+        //for optimisation
         try {
             for (String s : string) {
                 w.write(s + SPACE);
