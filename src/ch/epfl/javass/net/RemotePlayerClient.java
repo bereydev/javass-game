@@ -34,7 +34,7 @@ import java.net.Socket;
 import java.util.Map;
 
 public final class RemotePlayerClient implements Player, AutoCloseable {
-    private final String SPACE = " ";
+    private static final String SPACE = " ";
     private final BufferedReader r;
     private final BufferedWriter w;
     private final Socket s;
@@ -45,100 +45,51 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
                 new InputStreamReader(s.getInputStream(), US_ASCII));
         w = new BufferedWriter(
                 new OutputStreamWriter(s.getOutputStream(), US_ASCII));
-
     }
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        try {
-            w.write(JassCommand.PLRS.name());
-            String players[] = new String[4];
-            for (int i = 0; i < players.length; i++) {
-                players[i] = StringSerializer.serializeString(playerNames.get(PlayerId.values()[i]));
-            }
-            System.out.println(playerNames);
-            String serializedPlayers = StringSerializer.combine(players);
-            w.write(SPACE + StringSerializer.serializeInt(ownId.ordinal()));
-            w.write(SPACE + serializedPlayers);
-            w.write("\n");
-            w.flush();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        String players[] = new String[4];
+        for (int i = 0; i < players.length; i++) {
+            players[i] = StringSerializer.serializeString(playerNames.get(PlayerId.values()[i]));
         }
+        String serializedPlayers = StringSerializer.combine(players);
+        IOWriteAndCheck(JassCommand.PLRS.name(),StringSerializer.serializeInt(ownId.ordinal()),serializedPlayers);
     }
 
     @Override
     public void updateHand(CardSet newHand) {
-        try {
-        w.write(JassCommand.HAND.name());
-            w.write(SPACE + StringSerializer.serializeLong(newHand.packed()));
-            w.write("\n");
-            w.flush();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        IOWriteAndCheck(JassCommand.HAND.name(),StringSerializer.serializeLong(newHand.packed()));
     }
 
     @Override
     public void setTrump(Color trump) {
-        try {
-            w.write(JassCommand.TRMP.name());
-            w.write(SPACE + StringSerializer.serializeInt(trump.ordinal()));
-            w.write("\n");
-            w.flush();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        IOWriteAndCheck(JassCommand.TRMP.name(),StringSerializer.serializeInt(trump.ordinal()));
     }
 
     @Override
     public void updateTrick(Trick newTrick) {
-        try {
-            w.write(JassCommand.TRCK.name());
-            w.write(SPACE + StringSerializer.serializeInt(newTrick.packed()));
-            w.write("\n");
-            w.flush();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        IOWriteAndCheck(JassCommand.TRCK.name(),StringSerializer.serializeInt(newTrick.packed()));
     }
 
     @Override
     public void updateScore(Score score) {
-        try {
-            w.write(JassCommand.SCOR.name());
-            w.write(SPACE + StringSerializer.serializeLong(score.packed()));
-            w.write("\n");
-            w.flush();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        IOWriteAndCheck(JassCommand.SCOR.name(),StringSerializer.serializeLong(score.packed()));
     }
 
     @Override
     public void setWinningTeam(TeamId winningTeam) {
-        try {
-            w.write(JassCommand.WINR.name());
-            w.write(SPACE + StringSerializer.serializeInt(winningTeam.ordinal()));
-            w.write("\n");
-            w.flush();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        IOWriteAndCheck(JassCommand.WINR.name(),StringSerializer.serializeInt(winningTeam.ordinal()));
     }
     
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
         Card card = null;
+        String score = StringSerializer.serializeLong(state.packedScore());
+        String unplayedCards = StringSerializer.serializeLong(state.packedUnplayedCards());
+        String trick = StringSerializer.serializeInt(state.packedTrick());
+        IOWriteAndCheck(JassCommand.CARD.name(),StringSerializer.combine(score,unplayedCards,trick),StringSerializer.serializeLong(hand.packed()));
         try {
-            String score = StringSerializer.serializeLong(state.packedScore());
-            String unplayedCards = StringSerializer.serializeLong(state.packedUnplayedCards());
-            String trick = StringSerializer.serializeInt(state.packedTrick());
-            w.write(JassCommand.CARD.name());
-            w.write(SPACE + StringSerializer.combine(score,unplayedCards,trick));
-            w.write(SPACE + StringSerializer.serializeLong(hand.packed()));
-            w.write("\n");
-            w.flush();
             //wait for the response
             int pkCard = StringSerializer.deserializeInt(r.readLine());
             card = Card.ofPacked(pkCard);
@@ -148,12 +99,12 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
         return card;
     }
     private void IOWriteAndCheck(String...string) {
-        //for optimisation
         try {
             for (String s : string) {
                 w.write(s + SPACE);
             }
             w.write("\n");
+            w.flush();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

@@ -50,7 +50,6 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        System.out.println("setPlayers");
         graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trickBean,
                 scoreBean, handBean, cardQueue);
         Platform.runLater(() -> {

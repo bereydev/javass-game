@@ -20,7 +20,7 @@ public class LocalMain extends Application {
     private static final String NAME[] = { "Aline", "Bastien", "Colette", "David" };
     private static final int ITTERATIONS = 10_000;
     private static final String DEFAULT_HOST = "localhost";
-    private static final int PLAY_TIME = 2; //time expressed in second
+    private static final int PLAY_TIME = 0; //time expressed in second
     private Random rng = new Random(0);
 
     public static void main(String[] args) {
@@ -106,7 +106,6 @@ public class LocalMain extends Application {
                 } catch (ArrayIndexOutOfBoundsException e) {
                     ns.put(player, NAME[player.ordinal()]);
                 }
-                System.out.println(host);
                 ps.put(player, new RemotePlayerClient(host));
                 System.out.println("Joueur distant nommé " + ns.get(player));
                 break;

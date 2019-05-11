@@ -32,7 +32,6 @@ public final class MctsPlayer implements Player {
     public MctsPlayer(PlayerId ownId, long rngSeed, int iterations) {
 
         Preconditions.checkArgument(iterations >= Jass.HAND_SIZE);
-        Preconditions.checkArgument(iterations < (Integer.MAX_VALUE / 257));
 
         this.ownId = ownId;
         this.rng = new SplittableRandom(rngSeed);
@@ -105,12 +104,12 @@ public final class MctsPlayer implements Player {
      */
     private void updateNodes(List<Node> nodes) {
         long score = randomPlay(nodes.get(0));
-        for (Node node2 : nodes) {
-            TeamId team = node2.team();
+        for (Node node : nodes) {
+            TeamId team = node.team();
             if (team != null)
-                node2.totalPoints += PackedScore.totalPoints(score,
-                        node2.team());
-            node2.turnsCompleted++;
+                node.totalPoints += PackedScore.totalPoints(score,
+                        node.team());
+            node.turnsCompleted++;
         }
     }
 
@@ -120,7 +119,7 @@ public final class MctsPlayer implements Player {
      * 
      * @author Jonathan Bereyziat Alexandre Santangelo
      */
-    private static class Node {
+    private static final class Node {
 
         private final TurnState currentState;
         private final Node[] children;
@@ -198,18 +197,6 @@ public final class MctsPlayer implements Player {
         }
 
         /**
-         * @return the number of that are already created
-         */
-        private int nbrOfChild() {
-            int i = 0;
-            for (Node child : children) {
-                if (child != null)
-                    ++i;
-            }
-            return i;
-        }
-
-        /**
          * @param parent
          * @param c
          *            constant of exploration (arbitrary chosen to be 40)
@@ -246,19 +233,6 @@ public final class MctsPlayer implements Player {
                 }
             }
             return indexOfTheBestChild;
-        }
-
-        @Override
-        public String toString() {
-            return new StringBuilder().append("Node : [")
-                    .append(currentState.trick()).append('\t')
-                    .append(PackedCardSet.toString(hand)).append('\t')
-                    .append("child : ").append(nbrOfChild()).append('/')
-                    .append(children.length).append('\t')
-                    .append("totalPoints : ")
-                    .append((float) totalPoints / (float) turnsCompleted)
-                    .append('\t').append("turnsCompleted : ")
-                    .append(turnsCompleted).append("]").toString();
         }
     }
 }

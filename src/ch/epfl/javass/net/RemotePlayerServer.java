@@ -45,24 +45,16 @@ public final class RemotePlayerServer {
                         new InputStreamReader(s.getInputStream(), US_ASCII));
                 BufferedWriter w = new BufferedWriter(new OutputStreamWriter(
                         s.getOutputStream(), US_ASCII))) {
-            //TODO : Figure what to do here 
             while(!s.isClosed()){
                 String[] message = r.readLine().trim().split(" ");
                 JassCommand command = JassCommand.valueOf(message[0]);
-                System.out.println(command);
                 switch (command) {
                 case PLRS:
                     PlayerId ownId = PlayerId.values()[Integer
                             .parseInt(message[1])];
                     String[] names = StringSerializer.split(message[2]);
-                    System.out.println(message[2]);
                     Map<PlayerId, String> map = new HashMap<>();
-                    System.out.println("0 : " + names[0]);
-                    System.out.println("1 : " + names[1]);
-                    System.out.println("2 : " + names[2]);
-                    System.out.println("3 : " + names[3]);
                     for (int i = 0; i < PlayerId.COUNT; i++) {
-                        System.out.println(StringSerializer.deserializeString(names[i]));
                         map.put(PlayerId.values()[i],
                                 StringSerializer.deserializeString(names[i]));
                     }
