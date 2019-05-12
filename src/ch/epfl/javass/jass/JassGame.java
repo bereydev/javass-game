@@ -24,22 +24,19 @@ public final class JassGame {
     private Map<PlayerId, CardSet> hands = new HashMap<PlayerId, CardSet>();
     private PlayerId turnStarter;
     private final Random shuffleRng;
-    private PlayerId player1 = PlayerId.PLAYER_1;
     private final Random trumpRng;
+    private static final int SEVEN_DIAMOND = PackedCard.pack(Color.DIAMOND, Rank.SEVEN);
     private Boolean newGame = true;
     private TurnState turnState;
 
     public JassGame(long rngSeed, Map<PlayerId, Player> players,
             Map<PlayerId, String> playerNames) {
-
         Random rng = new Random(rngSeed);
-        this.shuffleRng = new Random(rng.nextLong());
-        this.trumpRng = new Random(rng.nextLong());
-
+        shuffleRng = new Random(rng.nextLong());
+        trumpRng = new Random(rng.nextLong());
         this.players = Collections.unmodifiableMap(new EnumMap<>(players));
         this.playerNames = Collections
                 .unmodifiableMap(new EnumMap<>(playerNames));
-
         // Initialization of turnState (to be modified later)
         turnState = TurnState.initial(Color.values()[0], Score.INITIAL,
                 PlayerId.PLAYER_1);
@@ -50,22 +47,21 @@ public final class JassGame {
      */
 
     public boolean isGameOver() {
-        boolean GameOver = turnState.score()
+        return turnState.score()
                 .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
                 || turnState.score()
                         .totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS;
-
-        if (GameOver) {
-            TeamId winningTeam = turnState.score()
-                    .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
-                            ? TeamId.TEAM_1
-                            : TeamId.TEAM_2;
-            for (PlayerId p : PlayerId.ALL) {
-                players.get(p).setWinningTeam(winningTeam);
-                players.get(p).updateScore(turnState.score().nextTurn());
-            }
+    }
+    
+    private void finalPlayerUpdate() {
+        TeamId winningTeam = turnState.score()
+                .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
+                        ? TeamId.TEAM_1
+                        : TeamId.TEAM_2;
+        for (PlayerId p : PlayerId.ALL) {
+            players.get(p).setWinningTeam(winningTeam);
+            players.get(p).updateScore(turnState.score().nextTurn());
         }
-        return GameOver;
     }
 
     /**
@@ -74,28 +70,27 @@ public final class JassGame {
 
     public void advanceToEndOfNextTrick() {
         if (isGameOver()) {
+            finalPlayerUpdate();
             return;
         }
         if (newGame) {
             deal();
-            player1 = turnStarter();
-            newGame = false;
             turnState = TurnState.initial(
                     Color.values()[trumpRng.nextInt(Color.COUNT)],
-                    Score.INITIAL, player1);
+                    Score.INITIAL, turnStarter());
             for (PlayerId p : PlayerId.ALL) {
                 players.get(p).setPlayers(p, playerNames);
                 players.get(p).updateHand(hands.get(p));
                 players.get(p).setTrump(turnState.trick().trump());
             }
+            newGame = false;
         } else {
             turnState = turnState.withTrickCollected();
             if (turnState.isTerminal()) {
                 deal();
-                player1 = turnStarter();
                 turnState = TurnState.initial(
                         Color.values()[trumpRng.nextInt(Color.COUNT)],
-                        turnState.score().nextTurn(), player1);
+                        turnState.score().nextTurn(), turnStarter());
                 for (PlayerId p : PlayerId.ALL) {
                     players.get(p).updateHand(hands.get(p));
                     players.get(p).setTrump(turnState.trick().trump());
@@ -103,25 +98,25 @@ public final class JassGame {
             }
         }
         if (isGameOver()) {
+            finalPlayerUpdate();
             return;
         } 
         for (int i = 0; i < PlayerId.COUNT; i++ ) {
-            players.get(turnState.nextPlayer()).updateScore(turnState.score());
-            for (PlayerId q : PlayerId.ALL)
-                players.get(q).updateTrick(turnState.trick());
-
-            Card cardToPlay = players.get(turnState.nextPlayer()).cardToPlay(turnState,
-                    hands.get(turnState.nextPlayer()));
-            hands.replace(turnState.nextPlayer(), hands.get(turnState.nextPlayer()).remove(cardToPlay));
-            players.get(turnState.nextPlayer()).updateHand(hands.get(turnState.nextPlayer()));
-
-            turnState = turnState.withNewCardPlayed(cardToPlay);
+            playTrick(turnState.nextPlayer());
         }
         for (PlayerId p : PlayerId.ALL)
             players.get(p).updateTrick(turnState.trick());
-
-        player1 = turnState.trick().winningPlayer();
-
+    }
+    
+    private void playTrick(PlayerId player) {
+        players.get(player).updateScore(turnState.score());
+        Card cardToPlay = players.get(player).cardToPlay(turnState,
+                hands.get(player));
+        hands.replace(player, hands.get(player).remove(cardToPlay));
+        players.get(player).updateHand(hands.get(player));
+        for (PlayerId p : PlayerId.ALL)
+            players.get(p).updateTrick(turnState.trick());
+        turnState = turnState.withNewCardPlayed(cardToPlay);
     }
 
     /**
@@ -136,12 +131,9 @@ public final class JassGame {
         Collections.shuffle(cards, shuffleRng);
 
         hands.clear();
-        for (PlayerId p : players.keySet()) {
+        for (PlayerId p : PlayerId.ALL) {
             CardSet hand = CardSet.EMPTY;
-            for (int i = Jass.HAND_SIZE * p.ordinal(); i < Jass.HAND_SIZE
-                    * (p.ordinal() + 1); i++) {
-                hand = hand.add(cards.get(i));
-            }
+            hand = CardSet.of(cards.subList(p.ordinal()*9, (p.ordinal()+1)*9));
             hands.put(p, hand);
         }
     }
@@ -152,10 +144,9 @@ public final class JassGame {
     private PlayerId firstPlayer() {
         PlayerId firstPlayer = PlayerId.PLAYER_1;
         for (PlayerId p : hands.keySet()) {
-            if (hands.get(p).contains(Card.of(Color.DIAMOND, Rank.SEVEN)))
+            if (PackedCardSet.contains(hands.get(p).packed(), SEVEN_DIAMOND))
                 firstPlayer = p;
         }
-        // This shouldn't happen
         return firstPlayer;
     }
 

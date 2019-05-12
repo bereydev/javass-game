@@ -40,8 +40,8 @@ public class GraphicalPlayer {
     private static final ObservableMap<Card, Image> cards = mapCreator(240);
     private static final ObservableMap<Color, Image> trumps = trumps();
 
-    private Scene scene;
-    private String player;
+    private final Scene scene;
+    private final String player;
 
     public GraphicalPlayer(PlayerId player, Map<PlayerId, String> map,
             TrickBean trick, ScoreBean score, HandBean hand,

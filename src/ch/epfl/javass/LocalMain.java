@@ -1,5 +1,6 @@
 package ch.epfl.javass;
 
+import java.io.IOError;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -17,10 +18,11 @@ import javafx.stage.Stage;
 
 public class LocalMain extends Application {
 
-    private static final String NAME[] = { "Aline", "Bastien", "Colette", "David" };
+    private static final String NAME[] = { "Aline", "Bastien", "Colette",
+            "David" };
     private static final int ITTERATIONS = 10_000;
     private static final String DEFAULT_HOST = "localhost";
-    private static final int PLAY_TIME = 0; //time expressed in second
+    private static final int PLAY_TIME = 2; // time expressed in second
     private Random rng = new Random(0);
 
     public static void main(String[] args) {
@@ -36,14 +38,13 @@ public class LocalMain extends Application {
             System.err.println("Erreur : Nombre d'arguments invalide");
             System.exit(1);
         }
+        if (parameters.size() == 5)
             try {
-              rng = new Random(Long.parseLong(parameters.get(5)));
-            } catch (Exception e) {
-                if(e instanceof NumberFormatException) {
-                    System.err.println("Erreur : la graine passée en argument doit être de type long");
-                    System.exit(1);
-                }  
-                // if instance of IndexOutOfBoundsException do nothing the generator because the 5th element is optional
+                rng = new Random(Long.parseLong(parameters.get(4)));
+            } catch (NumberFormatException e) {
+                System.err.println(
+                        "Erreur : la graine passée en argument doit être de type long");
+                System.exit(1);
             }
         for (PlayerId player : PlayerId.ALL) {
             String sets[] = parameters.get(player.ordinal()).split(":");
@@ -53,6 +54,7 @@ public class LocalMain extends Application {
                 System.exit(1);
             }
             switch (sets[0]) {
+            
             case "h":
                 if (sets.length > 2) {
                     System.err.println(
@@ -60,68 +62,71 @@ public class LocalMain extends Application {
                     System.exit(1);
                 }
                 ps.put(player, new GraphicalPlayerAdapter());
-                try {
+                if (sets.length == 2)
                     ns.put(player, sets[1]);
-                } catch (ArrayIndexOutOfBoundsException e) {
+                else
                     ns.put(player, NAME[player.ordinal()]);
-                }
                 System.out.println("Joueur humain nommé " + ns.get(player));
                 break;
+                
             case "s":
                 int itterations = ITTERATIONS;
+                if (sets.length == 3)
                     try {
                         itterations = Integer.parseInt(sets[2]);
-                    } catch (Exception e) {
-                        if (e instanceof NumberFormatException) {
-                            System.err.println(
-                                    "Erreur : Le nombre d'ittération doit être un nombre");
-                            System.exit(1);
-                        }  
+                    } catch (NumberFormatException e) {
+                        System.err.println(
+                                "Erreur : Le nombre d'ittération doit être un nombre");
+                        System.exit(1);
                     }
-                try {
-                    if (sets[1].trim().isEmpty()) {
-                        ns.put(player, NAME[player.ordinal()]);
-                    }else {
-                        ns.put(player, sets[1]);
-                    }
-                } catch (ArrayIndexOutOfBoundsException e) {
+                if (sets.length >= 2 && !sets[1].trim().isEmpty()) {
+                    ns.put(player, sets[1]);
+                } else {
                     ns.put(player, NAME[player.ordinal()]);
                 }
-                ps.put(player, new PacedPlayer(new MctsPlayer(player, rng.nextInt(), itterations), PLAY_TIME));
+                ps.put(player, new PacedPlayer(
+                        new MctsPlayer(player, rng.nextInt(), itterations),
+                        PLAY_TIME));
                 System.out.println("Joueur simulé nommé " + ns.get(player));
                 break;
+                
             case "r":
                 String host = DEFAULT_HOST;
-                try {
+                if (sets.length == 3)
                     host = sets[2];
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    //nothing
-                }
-                try {
-                    if (sets[1].trim().isEmpty()) {
-                        ns.put(player, NAME[player.ordinal()]);
-                    }else {
-                        ns.put(player, sets[1]);
-                    }
-                } catch (ArrayIndexOutOfBoundsException e) {
+                if (sets.length >= 2 && !sets[1].trim().isEmpty())
+                    ns.put(player, sets[1]);
+                else
                     ns.put(player, NAME[player.ordinal()]);
+                try {
+                    ps.put(player, new RemotePlayerClient(host));
+                } catch (IOError e) {
+                    System.err.println(
+                            "Erreur : Connexion au serveur impossible ou refusée "
+                                    + "veuillez vérifier les paramètre d'hôte passé "
+                                    + "en paramètre ou désactiver votre anti-virus");
                 }
-                ps.put(player, new RemotePlayerClient(host));
+
                 System.out.println("Joueur distant nommé " + ns.get(player));
                 break;
                 
             default:
-                System.err.println("Erreur : l'argument pour le type de joueur est invalide");
+                System.err.println(
+                        "Erreur : l'argument pour le type de joueur est invalide");
                 System.exit(1);
             }
         }
+        
         Thread gameThread = new Thread(() -> {
             JassGame g = new JassGame(rng.nextInt(), ps, ns);
-            while (! g.isGameOver()) {
-              g.advanceToEndOfNextTrick();
-              try { Thread.sleep(1000); } catch (Exception e) {}
+            while (!g.isGameOver()) {
+                g.advanceToEndOfNextTrick();
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                }
             }
-            });
+        });
         gameThread.setDaemon(true);
         gameThread.start();
 

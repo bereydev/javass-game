@@ -30,7 +30,7 @@ import java.util.Map;
 
 public final class RemotePlayerServer {
 
-    private Player player;
+    private final Player player;
 
     public RemotePlayerServer(Player player) {
         this.player = player;
@@ -72,7 +72,6 @@ public final class RemotePlayerServer {
                     Card card = player.cardToPlay(state, hand); 
                     
                     //Answering 
-                   // System.out.println(command);
                     w.write(StringSerializer.serializeInt(card.packed()));
                     w.write("\n");
                     w.flush();
