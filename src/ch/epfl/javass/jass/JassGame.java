@@ -110,12 +110,12 @@ public final class JassGame {
     
     private void playTrick(PlayerId player) {
         players.get(player).updateScore(turnState.score());
+        for (PlayerId p : PlayerId.ALL)
+            players.get(p).updateTrick(turnState.trick());
         Card cardToPlay = players.get(player).cardToPlay(turnState,
                 hands.get(player));
         hands.replace(player, hands.get(player).remove(cardToPlay));
         players.get(player).updateHand(hands.get(player));
-        for (PlayerId p : PlayerId.ALL)
-            players.get(p).updateTrick(turnState.trick());
         turnState = turnState.withNewCardPlayed(cardToPlay);
     }
 

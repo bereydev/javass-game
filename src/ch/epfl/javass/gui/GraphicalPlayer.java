@@ -43,15 +43,15 @@ public class GraphicalPlayer {
     private final Scene scene;
     private final String player;
 
-    public GraphicalPlayer(PlayerId player, Map<PlayerId, String> map,
+    public GraphicalPlayer(PlayerId player, Map<PlayerId, String> names,
             TrickBean trick, ScoreBean score, HandBean hand,
             ArrayBlockingQueue<Card> cardToPlay) {
-        this.player = player.toString();
+        this.player = names.get(player);
         BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(createTrickPane(trick, player, map));
-        borderPane.setTop(createScorePane(score, map));
+        borderPane.setCenter(createTrickPane(trick, player, names));
+        borderPane.setTop(createScorePane(score, names));
         borderPane.setBottom(createHandPane(hand, player, cardToPlay));
-        StackPane winningPane = new StackPane(createWinningPane(score, map),
+        StackPane winningPane = new StackPane(createWinningPane(score, names),
                 borderPane);
         scene = new Scene(winningPane);
     }
