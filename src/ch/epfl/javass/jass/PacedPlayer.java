@@ -15,7 +15,7 @@ import ch.epfl.javass.jass.Card.Color;
 public final class PacedPlayer implements Player {
 
     private final Player underlyingPlayer;
-    private final double minTime;
+    private final long minTime;
 
     private static final int MILLI_SECONDS = 1000;
 
@@ -28,22 +28,21 @@ public final class PacedPlayer implements Player {
     public PacedPlayer(Player underlyingPlayer, double minTime) {
         assert (minTime >= 0);
         this.underlyingPlayer = underlyingPlayer;
-        this.minTime = minTime;
+        //in miliseconds
+        this.minTime = (long)minTime * 1000;
     }
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        double startTime = System.currentTimeMillis();
-        double currentTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         Card card = underlyingPlayer.cardToPlay(state, hand);
+        long currentTime = System.currentTimeMillis();
         if (currentTime - startTime >= minTime)
             return card;
         try {
-            Thread.sleep(
-                    (int) (minTime * MILLI_SECONDS - (double)(currentTime - startTime)));
+            Thread.sleep((minTime - (currentTime - startTime)));
         } catch (InterruptedException e) {
             /* do nothing */ }
-
         return card;
     }
 

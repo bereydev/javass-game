@@ -191,10 +191,24 @@ public class GraphicalPlayer {
 
     private void imageThrowAnimation(ImageView cardImage, int index) {
         cardImage.imageProperty().addListener((o, oV, nV) -> {
-            cardImage.setRotate(360);
             Timeline timeline = new Timeline();
-            timeline.getKeyFrames().addAll(new KeyFrame(Duration.millis(200),
-                    "Rotate", new KeyValue(cardImage.rotateProperty(), 0)));
+            if ( index == 0) {
+                cardImage.setRotate(360);
+                cardImage.setTranslateY(400);
+            }else if (index == 1) {
+                cardImage.setRotate(-360);
+                cardImage.setTranslateX(400);
+            }else if (index == 2) {
+                cardImage.setRotate(360);
+                cardImage.setTranslateY(-400);
+            }else {
+                cardImage.setRotate(360);
+                cardImage.setTranslateX(-400);
+            }
+            timeline.getKeyFrames().addAll(new KeyFrame(Duration.millis(500),
+                    "Throw", new KeyValue(cardImage.rotateProperty(), 0),
+                            new KeyValue(cardImage.translateXProperty(),0),
+                            new KeyValue(cardImage.translateYProperty(),0)));
             timeline.play();
         });
     }
@@ -259,6 +273,8 @@ public class GraphicalPlayer {
                 Bindings.valueAt(cards, Bindings.valueAt(hand.hand(), i)));
         cardImage.setFitWidth(HANDCARD_WIDTH);
         cardImage.setFitHeight(HANDCARD_HEIGHT);
+        cardImage.setTranslateX(0);
+        cardImage.setTranslateY(0);
         BooleanProperty isPlayable = new SimpleBooleanProperty(true);
         cardImage.imageProperty().addListener((o, oV, nV) -> {
             cardImage.setTranslateY(-HANDCARD_HEIGHT * 3);
