@@ -242,12 +242,9 @@ public class GraphicalPlayer {
             PlayerId player) {
         ObjectBinding<Card> card = Bindings.valueAt(hand.hand(), i); 
         BooleanProperty b = new SimpleBooleanProperty(false);
-        BooleanProperty f = new SimpleBooleanProperty(false);
         ImageView cardImage = new ImageView();
         Rectangle blackR = new Rectangle(80, 120);
-        Circle circleG = new Circle(4, javafx.scene.paint.Color.MEDIUMSEAGREEN);
-        StackPane pair = new StackPane(cardImage, blackR, circleG);
-        StackPane.setAlignment(circleG, Pos.TOP_RIGHT);
+        StackPane pair = new StackPane(cardImage, blackR);
         blackR.setStyle(
                 "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: black; -fx-stroke-width: 2; -fx-opacity: 0.7;");
         blackR.visibleProperty().bind(b);
@@ -302,5 +299,6 @@ public class GraphicalPlayer {
 
         return map;
     }
+
 
 }
