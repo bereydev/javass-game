@@ -5,23 +5,32 @@
 package ch.epfl.javass.gui;
 
 import java.util.Map;
+
 import java.util.concurrent.ArrayBlockingQueue;
 
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.Card.Color;
+import ch.epfl.javass.jass.CardSet;
+import ch.epfl.javass.jass.MctsPlayer;
+import ch.epfl.javass.jass.Player;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
+import ch.epfl.javass.jass.TurnState;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
@@ -31,9 +40,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.paint.Paint;
 
 public class GraphicalPlayer {
 
@@ -50,7 +61,8 @@ public class GraphicalPlayer {
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(createTrickPane(trick, player, map));
         borderPane.setTop(createScorePane(score, map));
-        borderPane.setBottom(createHandPane(hand, player, cardToPlay));
+        borderPane.setBottom(createHandPane(score, trick, hand, player,
+                cardToPlay));
         StackPane winningPane = new StackPane(createWinningPane(score, map),
                 borderPane);
         scene = new Scene(winningPane);
@@ -211,12 +223,13 @@ public class GraphicalPlayer {
         return winningPane;
     }
 
-    private HBox createHandPane(HandBean hand, PlayerId player,
-            ArrayBlockingQueue<Card> cardQueue) {
+    private HBox createHandPane(ScoreBean score, TrickBean trick, HandBean hand,
+            PlayerId player, ArrayBlockingQueue<Card> cardQueue) {
         HBox handBox = new HBox();
         StackPane cardImages[] = new StackPane[9];
         for (int i = 0; i < cardImages.length; i++) {
-            cardImages[i] = createHandCard(i, hand, cardQueue);
+            cardImages[i] = createHandCard(i, hand, cardQueue,
+                    player);
         }
         handBox.getChildren().addAll(cardImages);
         handBox.setStyle("-fx-background-color: lightgray;\r\n"
@@ -225,30 +238,37 @@ public class GraphicalPlayer {
     }
 
     private StackPane createHandCard(int i, HandBean hand,
-            ArrayBlockingQueue<Card> cardQueue) {
-        BooleanProperty b = new SimpleBooleanProperty(false); 
+            ArrayBlockingQueue<Card> cardQueue,
+            PlayerId player) {
+        ObjectBinding<Card> card = Bindings.valueAt(hand.hand(), i); 
+        BooleanProperty b = new SimpleBooleanProperty(false);
+        BooleanProperty f = new SimpleBooleanProperty(false);
         ImageView cardImage = new ImageView();
-        Rectangle blackR = new Rectangle(80,120); 
-        StackPane pair = new StackPane(cardImage,blackR); 
+        Rectangle blackR = new Rectangle(80, 120);
+        Circle circleG = new Circle(4, javafx.scene.paint.Color.MEDIUMSEAGREEN);
+        StackPane pair = new StackPane(cardImage, blackR, circleG);
+        StackPane.setAlignment(circleG, Pos.TOP_RIGHT);
         blackR.setStyle(
                 "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: black; -fx-stroke-width: 2; -fx-opacity: 0.7;");
         blackR.visibleProperty().bind(b);
         cardImage.imageProperty().bind(
-                Bindings.valueAt(cards, Bindings.valueAt(hand.hand(), i)));
+                Bindings.valueAt(cards, card));
         cardImage.setFitWidth(80);
         cardImage.setFitHeight(120);
         BooleanProperty isPlayable = new SimpleBooleanProperty();
         isPlayable.bind(Bindings.createBooleanBinding(
                 () -> hand.playableCards().contains(hand.hand().get(i)),
                 hand.playableCards(), hand.hand()));
+        //circleG.visibleProperty().bind(isPlayable); // You could MAYBE get rid
+                                                    // of this later
         pair.opacityProperty()
                 .bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
         pair.disableProperty()
                 .bind(Bindings.when(isPlayable).then(false).otherwise(true));
-        pair.setOnMouseEntered(e ->{
-            b.set(true); 
+        pair.setOnMouseEntered(e -> {
+            b.set(true);
         });
-        pair.setOnMouseExited(e ->{
+        pair.setOnMouseExited(e -> {
             b.set(false);
         });
         pair.setOnMouseClicked(e -> {

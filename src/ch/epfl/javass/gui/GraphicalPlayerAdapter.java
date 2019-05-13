@@ -21,6 +21,7 @@ public class GraphicalPlayerAdapter implements Player {
     private TrickBean trickBean;
     private GraphicalPlayer graphicalPlayer;
     private ArrayBlockingQueue<Card> cardQueue;
+    //bonus 
 
     public GraphicalPlayerAdapter() {
         handBean = new HandBean();

@@ -48,6 +48,10 @@ public final class RemotePlayerServer {
             //TODO : Figure what to do here 
             while(!s.isClosed()){
                 String[] message = r.readLine().trim().split(" ");
+                
+                for(String m : message)
+                    System.out.println(m);
+                
                 JassCommand command = JassCommand.valueOf(message[0]);
           
                 switch (command) {
