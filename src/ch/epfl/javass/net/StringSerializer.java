@@ -38,7 +38,7 @@ public final class StringSerializer {
    }
    
    public static String deserializeString(String param) {
-       return new String(param.getBytes(),StandardCharsets.UTF_8); 
+       return new String(Base64.getDecoder().decode(param),StandardCharsets.UTF_8); 
    }
    
    public static String combine(String...strings) {

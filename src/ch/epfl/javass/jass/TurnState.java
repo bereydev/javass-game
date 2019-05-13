@@ -1,7 +1,6 @@
 package ch.epfl.javass.jass;
 
 import ch.epfl.javass.Preconditions;
-import ch.epfl.javass.bits.Bits32;
 import ch.epfl.javass.jass.Card.Color;
 
 /**

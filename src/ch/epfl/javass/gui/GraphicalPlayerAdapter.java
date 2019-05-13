@@ -38,6 +38,10 @@ public class GraphicalPlayerAdapter implements Player {
         Card cardToPlay;
         try {
             cardToPlay = cardQueue.take();
+            Platform.runLater(() -> {
+                CardSet playableCards = CardSet.EMPTY;
+                handBean.setPlayableCards(playableCards);
+            });
             return cardToPlay;
         } catch (InterruptedException e) {
             throw new Error(e);
