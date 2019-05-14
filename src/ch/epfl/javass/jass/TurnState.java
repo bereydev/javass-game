@@ -119,8 +119,7 @@ public final class TurnState {
     public TurnState withNewCardPlayed(Card card) {
         if (PackedTrick.isFull(currentTrick))
             throw new IllegalStateException();
-        //TODO est-ce qu'il faut lancer une exception ou un assert suffit
-        assert (PackedCardSet.contains(unplayedCards, card.packed()));
+        Preconditions.checkArgument(PackedCardSet.contains(unplayedCards, card.packed()));
 
         int pkTrick = PackedTrick.withAddedCard(currentTrick, card.packed());
         long pkUnplayedCards = PackedCardSet.remove(unplayedCards,
