@@ -4,6 +4,8 @@
 */
 package ch.epfl.javass.gui;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -60,9 +62,11 @@ public class GraphicalPlayer {
         borderPane.setCenter(createTrickPane(trick, player, names));
         borderPane.setTop(createScorePane(score, names));
         borderPane.setBottom(createHandPane(hand, player, cardToPlay));
-        StackPane winningPane = new StackPane(createWinningPane(score, names),
-                borderPane);
-        scene = new Scene(winningPane);
+        StackPane mainPane = new StackPane();
+        mainPane.getChildren().add(borderPane);
+        mainPane.getChildren().addAll(createWinningPane(score, names));
+
+        scene = new Scene(mainPane);
     }
 
     public Stage createStage() {
@@ -199,35 +203,35 @@ public class GraphicalPlayer {
         });
     }
 
-    private StackPane createWinningPane(ScoreBean score,
+    private List<BorderPane> createWinningPane(ScoreBean score,
             Map<PlayerId, String> map) {
-        StackPane winningPane = new StackPane();
+        List<BorderPane> winningPane = new ArrayList<>();
         BorderPane[] teamPane = new BorderPane[TeamId.COUNT];
         Text[] teamText = new Text[TeamId.COUNT];
         teamText[0] = new Text();
         teamText[1] = new Text();
         teamText[0].textProperty()
-                .bind(Bindings.format(
-                        "-fx-font: 16 Optima;-fx-background-color: white;",
-                        map.get(PlayerId.PLAYER_1) + " et "
-                                + map.get(PlayerId.PLAYER_3) + "ont gagné avec "
-                                + score.gamePointsProperty(TeamId.TEAM_1)
-                                + " points contre "
-                                + score.gamePointsProperty(TeamId.TEAM_2)));
+                .bind(Bindings.format(map.get(PlayerId.PLAYER_1) + " et "
+                        + map.get(PlayerId.PLAYER_3) + " ont gagné avec "
+                        + score.gamePointsProperty(TeamId.TEAM_1)
+                        + " points contre "
+                        + score.gamePointsProperty(TeamId.TEAM_2)));
         teamText[1].textProperty()
-                .bind(Bindings.format(
-                        "-fx-font: 16 Optima;-fx-background-color: white;",
-                        map.get(PlayerId.PLAYER_2) + " et "
-                                + map.get(PlayerId.PLAYER_4) + "ont gagné avec "
-                                + score.gamePointsProperty(TeamId.TEAM_2)
-                                + " points contre "
-                                + score.gamePointsProperty(TeamId.TEAM_1)));
+                .bind(Bindings.format(map.get(PlayerId.PLAYER_2) + " et "
+                        + map.get(PlayerId.PLAYER_4) + " ont gagné avec "
+                        + score.gamePointsProperty(TeamId.TEAM_2)
+                        + " points contre "
+                        + score.gamePointsProperty(TeamId.TEAM_1)));
         for (int i = 0; i < TeamId.COUNT; i++) {
+            teamText[i].setStyle(
+                    "-fx-font: 16 Optima;-fx-background-color: lightgray;-fx-padding: 5px; -fx-alignment: center;");
             teamPane[i] = new BorderPane();
-            teamText[i].visibleProperty().bind(
+            teamPane[i].setStyle(
+                    "-fx-font: 16 Optima; -fx-background-color: white;");
+            teamPane[i].visibleProperty().bind(
                     score.winningTeamProperty().isEqualTo(TeamId.values()[i]));
             teamPane[i].setCenter(teamText[i]);
-            winningPane.getChildren().add(teamPane[i]);
+            winningPane.add(teamPane[i]);
         }
 
         return winningPane;
@@ -248,73 +252,68 @@ public class GraphicalPlayer {
 
     private StackPane createHandCard(int i, HandBean hand,
             ArrayBlockingQueue<Card> cardQueue) {
-        BooleanProperty b = new SimpleBooleanProperty(false);
         ImageView cardImage = new ImageView();
-        Rectangle blackR = new Rectangle(HANDCARD_WIDTH, HANDCARD_HEIGHT);
-        StackPane pair = new StackPane(cardImage, blackR);
-        blackR.setStyle(
-                "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: black; -fx-stroke-width: 2; -fx-opacity: 0.7;");
-        blackR.visibleProperty().bind(b);
+        StackPane card = new StackPane(cardImage);
         cardImage.imageProperty().bind(
                 Bindings.valueAt(cards, Bindings.valueAt(hand.hand(), i)));
         cardImage.setFitWidth(HANDCARD_WIDTH);
         cardImage.setFitHeight(HANDCARD_HEIGHT);
         BooleanProperty isPlayable = new SimpleBooleanProperty(true);
         cardImage.imageProperty().addListener((o, oV, nV) -> {
-            cardImage.setTranslateY(-HANDCARD_HEIGHT * 3);
-            cardImage.setScaleX(0);
-            cardImage.setScaleY(0);
-            cardImage.setRotate(360);
+            card.setTranslateY(-HANDCARD_HEIGHT * 3);
+            card.setScaleX(0);
+            card.setScaleY(0);
+            card.setRotate(360);
             Timeline timeline = new Timeline();
             timeline.getKeyFrames().addAll(
                     new KeyFrame(
                             Duration.millis(
                                     1000 / Math.log(Jass.HAND_SIZE - i + 1)),
                             "Translation",
-                            new KeyValue(cardImage.translateYProperty(), 0)),
+                            new KeyValue(card.translateYProperty(), 0)),
 
                     new KeyFrame(Duration.millis(1500 / (Jass.HAND_SIZE - i)),
                             "Bigger",
-                            new KeyValue(cardImage.scaleXProperty(), 1),
-                            new KeyValue(cardImage.scaleYProperty(), 1),
-                            new KeyValue(cardImage.rotateProperty(), 0)));
+                            new KeyValue(card.scaleXProperty(), 1),
+                            new KeyValue(card.scaleYProperty(), 1),
+                            new KeyValue(card.rotateProperty(), 0)));
             timeline.play();
             timeline.setOnFinished(event -> {
                 isPlayable.bind(Bindings.createBooleanBinding(
                         () -> hand.playableCards().contains(hand.hand().get(i)),
                         hand.playableCards(), hand.hand()));
-                cardImage.opacityProperty()
+                card.opacityProperty()
                         .bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
-                cardImage.disableProperty().bind(
+                card.disableProperty().bind(
                         Bindings.when(isPlayable).then(false).otherwise(true));
-                cardImage.setOnMouseEntered(e -> {
+                card.setOnMouseEntered(e -> {
                     Timeline tl = new Timeline();
                     tl.getKeyFrames().addAll(
                             new KeyFrame(Duration.millis(300), "Translation",
-                                    new KeyValue(cardImage.translateYProperty(),
+                                    new KeyValue(card.translateYProperty(),
                                             -HANDCARD_HEIGHT / 1.25)),
 
                             new KeyFrame(Duration.millis(300), "Bigger",
-                                    new KeyValue(cardImage.scaleXProperty(),
+                                    new KeyValue(card.scaleXProperty(),
                                             1.5),
-                                    new KeyValue(cardImage.scaleYProperty(),
+                                    new KeyValue(card.scaleYProperty(),
                                             1.5)));
                     tl.play();
                 });
-                cardImage.setOnMouseExited(e -> {
+                card.setOnMouseExited(e -> {
                     Timeline tl = new Timeline();
                     tl.getKeyFrames().addAll(
                             new KeyFrame(Duration.millis(200), "Translation",
-                                    new KeyValue(cardImage.translateYProperty(),
+                                    new KeyValue(card.translateYProperty(),
                                             0)),
 
                             new KeyFrame(Duration.millis(200), "Bigger",
-                                    new KeyValue(cardImage.scaleXProperty(), 1),
-                                    new KeyValue(cardImage.scaleYProperty(),
+                                    new KeyValue(card.scaleXProperty(), 1),
+                                    new KeyValue(card.scaleYProperty(),
                                             1)));
                     tl.play();
                 });
-                cardImage.setOnMouseClicked(e -> {
+                card.setOnMouseClicked(e -> {
                     try {
                         cardQueue.put(hand.hand().get(i));
                     } catch (InterruptedException e1) {
@@ -324,7 +323,7 @@ public class GraphicalPlayer {
             });
 
         });
-        return pair;
+        return card;
     }
 
     private static final ObservableMap<Card, Image> mapCreator(int quality) {

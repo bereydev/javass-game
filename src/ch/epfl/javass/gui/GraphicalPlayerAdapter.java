@@ -6,6 +6,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.CardSet;
+import ch.epfl.javass.jass.MctsPlayer;
 import ch.epfl.javass.jass.Player;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.Score;
@@ -22,6 +23,7 @@ public class GraphicalPlayerAdapter implements Player {
     private GraphicalPlayer graphicalPlayer;
     private ArrayBlockingQueue<Card> cardQueue;
     //bonus 
+    private MctsPlayer helper; 
 
     public GraphicalPlayerAdapter() {
         handBean = new HandBean();
