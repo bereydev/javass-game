@@ -28,6 +28,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
@@ -37,6 +38,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -56,12 +58,12 @@ public class GraphicalPlayer {
 
     public GraphicalPlayer(PlayerId player, Map<PlayerId, String> names,
             TrickBean trick, ScoreBean score, HandBean hand,
-            ArrayBlockingQueue<Card> cardToPlay) {
+            ArrayBlockingQueue<Card> cardToPlay,CardBean cardBean) {
         this.player = names.get(player);
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(createTrickPane(trick, player, names));
         borderPane.setTop(createScorePane(score, names));
-        borderPane.setBottom(createHandPane(hand, player, cardToPlay));
+        borderPane.setBottom(createHandPane(hand, player, cardToPlay,cardBean));
         StackPane mainPane = new StackPane();
         mainPane.getChildren().add(borderPane);
         mainPane.getChildren().addAll(createWinningPane(score, names));
@@ -252,11 +254,11 @@ public class GraphicalPlayer {
     }
 
     private HBox createHandPane(HandBean hand, PlayerId player,
-            ArrayBlockingQueue<Card> cardQueue) {
+            ArrayBlockingQueue<Card> cardQueue,CardBean cardBean) {
         HBox handBox = new HBox();
         StackPane cardImages[] = new StackPane[9];
         for (int i = 0; i < cardImages.length; i++) {
-            cardImages[i] = createHandCard(i, hand, cardQueue);
+            cardImages[i] = createHandCard(i, hand, cardQueue,cardBean);
         }
         handBox.getChildren().addAll(cardImages);
         handBox.setStyle("-fx-background-color: lightgray;\r\n"
@@ -265,9 +267,11 @@ public class GraphicalPlayer {
     }
 
     private StackPane createHandCard(int i, HandBean hand,
-            ArrayBlockingQueue<Card> cardQueue) {
+            ArrayBlockingQueue<Card> cardQueue,CardBean cardBean) {
         ImageView cardImage = new ImageView();
-        StackPane card = new StackPane(cardImage);
+        Circle greenCircle = new Circle(4,javafx.scene.paint.Color.ALICEBLUE); 
+        StackPane card = new StackPane(cardImage,greenCircle);
+        StackPane.setAlignment(greenCircle, Pos.TOP_RIGHT);
         cardImage.imageProperty().bind(
                 Bindings.valueAt(cards, Bindings.valueAt(hand.hand(), i)));
         cardImage.setFitWidth(HANDCARD_WIDTH);
