@@ -70,7 +70,6 @@ public final class JassGame {
 
     public void advanceToEndOfNextTrick() {
         if (isGameOver()) {
-            finalPlayerUpdate();
             return;
         }
         if (newGame) {
@@ -97,6 +96,10 @@ public final class JassGame {
                 }
             }
         }
+        for (PlayerId p : PlayerId.ALL) {
+            players.get(p).updateTrick(turnState.trick());
+            players.get(p).updateScore(turnState.score());
+        }
         if (isGameOver()) {
             finalPlayerUpdate();
             return;
@@ -104,19 +107,17 @@ public final class JassGame {
         for (int i = 0; i < PlayerId.COUNT; i++ ) {
             playTrick(turnState.nextPlayer());
         }
-        for (PlayerId p : PlayerId.ALL)
-            players.get(p).updateTrick(turnState.trick());
     }
     
     private void playTrick(PlayerId player) {
         players.get(player).updateScore(turnState.score());
-        for (PlayerId p : PlayerId.ALL)
-            players.get(p).updateTrick(turnState.trick());
         Card cardToPlay = players.get(player).cardToPlay(turnState,
                 hands.get(player));
         hands.replace(player, hands.get(player).remove(cardToPlay));
         players.get(player).updateHand(hands.get(player));
         turnState = turnState.withNewCardPlayed(cardToPlay);
+        for (PlayerId p : PlayerId.ALL)
+            players.get(p).updateTrick(turnState.trick());
     }
 
     /**

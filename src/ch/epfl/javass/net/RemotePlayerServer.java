@@ -47,6 +47,10 @@ public final class RemotePlayerServer {
                         s.getOutputStream(), US_ASCII))) {
             while(!s.isClosed()){
                 String[] message = r.readLine().trim().split(" ");
+                
+                for(String m : message)
+                    System.out.println(m);
+                
                 JassCommand command = JassCommand.valueOf(message[0]);
                 switch (command) {
                 case PLRS:

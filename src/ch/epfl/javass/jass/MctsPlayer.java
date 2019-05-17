@@ -105,13 +105,6 @@ public final class MctsPlayer implements Player {
     private void updateNodes(List<Node> nodes) {
         long score = randomPlay(nodes.get(0));
         for (Node node : nodes) {
-//            try {
-//                TeamId team = node.currentState.nextPlayer().team();
-//                 node.totalPoints += PackedScore
-//                         .totalPoints(score,team);
-//            } catch (IllegalStateException e) {
-//                //nothing
-//            }
             TeamId team = node.team();
             if (team != null)
                 node.totalPoints += PackedScore.totalPoints(score,

@@ -117,46 +117,32 @@ public final class Card {
             return symbol;
         }
     }
-
+//ajouter des attribut au constructeurs des ranks
     public enum Rank {
-        SIX("6"), SEVEN("7"), EIGHT("8"), NINE("9"), TEN("10"), JACK(
-                "J"), QUEEN("Q"), KING("K"), ACE("A");
+        SIX("6",0), SEVEN("7",1), EIGHT("8",2), NINE("9",7), TEN("10",3), JACK(
+                "J",8), QUEEN("Q",4), KING("K",5), ACE("A",6);
 
         public static final List<Rank> ALL = Collections
                 .unmodifiableList(Arrays.asList(values()));
         public static final int COUNT = 9;
 
         private String symbol;
+        private int trumpOrdinal;
 
         /**
          * @return The ordinal of a card whose color is the same as the trump
          */
         public int trumpOrdinal() {
-            switch (this) {
-            case NINE:
-                return 7;
-            case TEN:
-                return 3;
-            case JACK:
-                return 8;
-            case QUEEN:
-                return 4;
-            case KING:
-                return 5;
-            case ACE:
-                return 6;
-            // the 3 first cards don't change of value when trump
-            default:
-                return this.ordinal();
-            }
+                return trumpOrdinal;
         }
 
         /**
          * @param symbol
          *            The symbol to print.
          */
-        private Rank(String symbol) {
+        private Rank(String symbol, int trumpOrdinal) {
             this.symbol = symbol;
+            this.trumpOrdinal = trumpOrdinal;
         }
 
         @Override
