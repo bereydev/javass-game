@@ -53,11 +53,11 @@ public class GraphicalPlayer {
     private static final int CARD_HEIGHT = 180;
     private static final int HANDCARD_WIDTH = 80;
     private static final int HANDCARD_HEIGHT = 120;
-    private static final String TEXT_STYLE = "-fx-font: 16 Optima; -fx-background-color: lightgray;-fx-padding: 5px; -fx-alignment: center;"; 
+    private static final String TEXT_STYLE = "-fx-font: 16 Optima; -fx-background-color: lightgray;-fx-padding: 5px; -fx-alignment: center;";
     private static final String RECT_STYLE = "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: lightpink; -fx-stroke-width: 5; -fx-opacity: 0.5;";
     private static final String TRICK_STYLE = "-fx-background-color: whitesmoke; -fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center; ";
-    private static final String HANDBOX_STYLE = "-fx-background-color: lightgray;\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;"; 
-    
+    private static final String HANDBOX_STYLE = "-fx-background-color: lightgray;\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;";
+
     private final Scene scene;
     private final String player;
 
@@ -69,8 +69,8 @@ public class GraphicalPlayer {
         Button b = new Button("Help me !");
         borderPane.setCenter(createTrickPane(trick, player, names));
         borderPane.setTop(createScorePane(score, names));
-        borderPane
-                .setBottom(createHandPane(hand, player, cardToPlay, cardBean,b));
+        borderPane.setBottom(
+                createHandPane(hand, player, cardToPlay, cardBean, b));
         StackPane mainPane = new StackPane();
         mainPane.getChildren().add(borderPane);
         mainPane.getChildren().add(b);
@@ -90,58 +90,39 @@ public class GraphicalPlayer {
     private GridPane createScorePane(ScoreBean score,
             Map<PlayerId, String> map) {
         GridPane scorePane = new GridPane();
-        StringProperty diff1 = new SimpleStringProperty();
-        StringProperty diff2 = new SimpleStringProperty();
+        Text[] teamTexts = new Text[8];
+        for(int i=0; i<8; i++) 
+            teamTexts[i]= new Text(); 
+        StringProperty differences[] = new StringProperty[2];
+        for (TeamId t : TeamId.ALL) {
+            differences[t.ordinal()] = new SimpleStringProperty();
+            score.turnPointsProperty(t).addListener((o, oV, nV) -> {
+                
+                int diffInt = nV.intValue() - oV.intValue();
+                IntegerProperty diff = new SimpleIntegerProperty(
+                        diffInt < 0 ? 0 : diffInt);
+                differences[t.ordinal()].bind(
+                        Bindings.concat("(+", Bindings.convert(diff), ")"));
+            });
+            teamTexts[2+t.ordinal()].textProperty().bind(
+                    Bindings.convert(score.turnPointsProperty(t)));
+            
+            teamTexts[4+t.ordinal()].textProperty().bind(differences[t.ordinal()]);
+            
+            teamTexts[6+t.ordinal()].textProperty().bind(
+                    Bindings.convert(score.gamePointsProperty(t)));
+        }
 
-        score.turnPointsProperty(TeamId.TEAM_1).addListener((o, oV, nV) -> {
-            int diffInt = nV.intValue() - oV.intValue();
-            IntegerProperty diff = new SimpleIntegerProperty(
-                    diffInt < 0 ? 0 : diffInt);
-            diff1.bind(Bindings.concat("(+", Bindings.convert(diff), ")"));
-        });
-        score.turnPointsProperty(TeamId.TEAM_2).addListener((o, oV, nV) -> {
-            int diffInt = nV.intValue() - oV.intValue();
-            IntegerProperty diff = new SimpleIntegerProperty(
-                    diffInt < 0 ? 0 : diffInt);
-            diff2.bind(Bindings.concat("(+", Bindings.convert(diff), ")"));
-        });
-
-        Text names1 = new Text(map.get(PlayerId.PLAYER_1) + " et "
+        teamTexts[0] = new Text(map.get(PlayerId.PLAYER_1) + " et "
                 + map.get(PlayerId.PLAYER_3) + " : ");
-        Text names2 = new Text(map.get(PlayerId.PLAYER_2) + " et "
+        teamTexts[1]= new Text(map.get(PlayerId.PLAYER_2) + " et "
                 + map.get(PlayerId.PLAYER_4) + " : ");
-
-        Text turnPoints1 = new Text();
-        turnPoints1.textProperty().bind(
-                Bindings.convert(score.turnPointsProperty(TeamId.TEAM_1)));
-        Text turnPoints2 = new Text();
-        turnPoints2.textProperty().bind(
-                Bindings.convert(score.turnPointsProperty(TeamId.TEAM_2)));
-
-        Text difference1 = new Text();
-        difference1.textProperty().bind(diff1);
-        Text difference2 = new Text();
-        difference2.textProperty().bind(diff2);
-        
-        Text gamePoints1 = new Text();
-        gamePoints1.textProperty().bind(
-                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_1)));
-        Text gamePoints2 = new Text();
-        gamePoints2.textProperty().bind(
-                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_2)));
-
-        scorePane.addRow(0, names1);
-        scorePane.addRow(0, turnPoints1);
-        scorePane.addRow(0, difference1);
-        scorePane.addRow(0, new Text("/Total : "));
-        scorePane.addRow(0, gamePoints1);
-
-        scorePane.addRow(1, names2);
-        scorePane.addRow(1, turnPoints2);
-        scorePane.addRow(1, difference2);
-        scorePane.addRow(1, new Text("/Total : "));
-        scorePane.addRow(1, gamePoints2);
-        
+        for(int j = 0; j<TeamId.COUNT; j++)
+            for(int i=0; i<4; i++) {
+                if(i==3)
+                    scorePane.addRow(j, new Text("/Total : "));
+                scorePane.addRow(j, teamTexts[2*i + j]);
+            }
 
         scorePane.setStyle(TEXT_STYLE);
         return scorePane;
@@ -157,24 +138,24 @@ public class GraphicalPlayer {
         trumpImage.setFitHeight(101);
         trumpImage.setFitWidth(101);
 
-
         for (int i = 0; i < PlayerId.COUNT; i++) {
-            pairs[i] = trickCard(trick,player,i,map); 
+            pairs[i] = trickCard(trick, player, i, map);
         }
-
         trickPane.add(pairs[0], 1, 2, 1, 1);
         trickPane.add(pairs[1], 2, 0, 1, 3);
         trickPane.add(pairs[2], 1, 0, 1, 1);
         trickPane.add(pairs[3], 0, 0, 1, 3);
         trickPane.add(trumpImage, 1, 1, 1, 1);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
-        trickPane.setStyle(TRICK_STYLE); 
-                
+        trickPane.setStyle(TRICK_STYLE);
+
         return trickPane;
     }
-    private VBox trickCard(TrickBean trick, PlayerId player, int i,Map<PlayerId, String> map) {
+
+    private VBox trickCard(TrickBean trick, PlayerId player, int i,
+            Map<PlayerId, String> map) {
         Rectangle rect = new Rectangle(CARD_WIDTH, CARD_HEIGHT);
-        rect.setStyle(RECT_STYLE); 
+        rect.setStyle(RECT_STYLE);
         rect.setEffect(new GaussianBlur(4));
         ObjectBinding<Card> card = Bindings.valueAt(trick.trick(),
                 PlayerId.values()[(player.ordinal() + i) % 4]);
@@ -185,20 +166,21 @@ public class GraphicalPlayer {
         cardImage.setFitHeight(CARD_HEIGHT);
         StackPane pane = new StackPane(rect, cardImage);
         rect.visibleProperty()
-                .bind(trick.winningPlayerProperty().isEqualTo(
-                        PlayerId.values()[(player.ordinal() + i) % 4])
+                .bind(trick.winningPlayerProperty()
+                        .isEqualTo(
+                                PlayerId.values()[(player.ordinal() + i) % 4])
                         .and(cardImage.imageProperty().isNotNull()));
-        Text name= new Text(
+        Text name = new Text(
                 map.get(PlayerId.values()[(player.ordinal() + i) % 4]));
         name.setStyle("-fx-font: 14 Optima;");
-        VBox pair; 
+        VBox pair;
         if (i != 0)
             pair = new VBox(name, pane);
         else
-            pair= new VBox(pane, name);
+            pair = new VBox(pane, name);
         pair.setStyle("-fx-padding: 5px; -fx-alignment: center;");
-        
-        return pair; 
+
+        return pair;
     }
 
     private void imageThrowAnimation(ImageView cardImage, int index) {
@@ -246,7 +228,7 @@ public class GraphicalPlayer {
                         + " points contre "
                         + score.gamePointsProperty(TeamId.TEAM_1)));
         for (int i = 0; i < TeamId.COUNT; i++) {
-            teamText[i].setStyle(TEXT_STYLE); 
+            teamText[i].setStyle(TEXT_STYLE);
             teamPane[i] = new BorderPane();
             teamPane[i].setStyle(
                     "-fx-font: 16 Optima; -fx-background-color: white;");
@@ -264,7 +246,7 @@ public class GraphicalPlayer {
         HBox handBox = new HBox();
         StackPane cardImages[] = new StackPane[9];
         for (int i = 0; i < cardImages.length; i++) {
-            cardImages[i] = createHandCard(i, hand, cardQueue, cardBean,b);
+            cardImages[i] = createHandCard(i, hand, cardQueue, cardBean, b);
         }
         handBox.getChildren().addAll(cardImages);
         handBox.setStyle(HANDBOX_STYLE);
@@ -272,7 +254,7 @@ public class GraphicalPlayer {
     }
 
     private StackPane createHandCard(int i, HandBean hand,
-            ArrayBlockingQueue<Card> cardQueue, CardBean cardBean,Button b) {
+            ArrayBlockingQueue<Card> cardQueue, CardBean cardBean, Button b) {
         ImageView cardImage = new ImageView();
         Circle greenCircle = new Circle(4, javafx.scene.paint.Color.LIMEGREEN);
         StackPane card = new StackPane(cardImage, greenCircle);
@@ -283,8 +265,8 @@ public class GraphicalPlayer {
         cardImage.setFitHeight(HANDCARD_HEIGHT);
         cardImage.setTranslateX(0);
         cardImage.setTranslateY(0);
-        greenCircle.visibleProperty().bind(
-                Bindings.valueAt(hand.hand(), i).isEqualTo(cardBean.card()).and(b.armedProperty()));
+        greenCircle.visibleProperty().bind(Bindings.valueAt(hand.hand(), i)
+                .isEqualTo(cardBean.card()).and(b.armedProperty()));
         BooleanProperty isPlayable = new SimpleBooleanProperty(true);
         cardImage.imageProperty().addListener((o, oV, nV) -> {
             card.setTranslateY(-HANDCARD_HEIGHT * 3);
