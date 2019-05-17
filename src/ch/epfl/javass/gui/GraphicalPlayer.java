@@ -9,12 +9,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.Card.Color;
-import ch.epfl.javass.jass.Jass;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
@@ -38,7 +34,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 public class GraphicalPlayer {
 
@@ -158,7 +153,6 @@ public class GraphicalPlayer {
             ObjectBinding<Card> card = Bindings.valueAt(trick.trick(),
                     PlayerId.values()[(player.ordinal() + i) % 4]);
             cardImages[i] = new ImageView();
-            imageThrowAnimation(cardImages[i], i);
             cardImages[i].imageProperty().bind(Bindings.valueAt(cards, card));
             cardImages[i].setFitWidth(CARD_WIDTH);
             cardImages[i].setFitHeight(CARD_HEIGHT);
@@ -187,30 +181,6 @@ public class GraphicalPlayer {
                 "-fx-background-color: whitesmoke; -fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center;");
 
         return trickPane;
-    }
-
-    private void imageThrowAnimation(ImageView cardImage, int index) {
-        cardImage.imageProperty().addListener((o, oV, nV) -> {
-            Timeline timeline = new Timeline();
-            if ( index == 0) {
-                cardImage.setRotate(360);
-                cardImage.setTranslateY(400);
-            }else if (index == 1) {
-                cardImage.setRotate(-360);
-                cardImage.setTranslateX(400);
-            }else if (index == 2) {
-                cardImage.setRotate(360);
-                cardImage.setTranslateY(-400);
-            }else {
-                cardImage.setRotate(360);
-                cardImage.setTranslateX(-400);
-            }
-            timeline.getKeyFrames().addAll(new KeyFrame(Duration.millis(500),
-                    "Throw", new KeyValue(cardImage.rotateProperty(), 0),
-                            new KeyValue(cardImage.translateXProperty(),0),
-                            new KeyValue(cardImage.translateYProperty(),0)));
-            timeline.play();
-        });
     }
 
     private StackPane createWinningPane(ScoreBean score,
@@ -276,69 +246,19 @@ public class GraphicalPlayer {
         cardImage.setTranslateX(0);
         cardImage.setTranslateY(0);
         BooleanProperty isPlayable = new SimpleBooleanProperty(true);
-        cardImage.imageProperty().addListener((o, oV, nV) -> {
-            cardImage.setTranslateY(-HANDCARD_HEIGHT * 3);
-            cardImage.setScaleX(0);
-            cardImage.setScaleY(0);
-            cardImage.setRotate(360);
-            Timeline timeline = new Timeline();
-            timeline.getKeyFrames().addAll(
-                    new KeyFrame(
-                            Duration.millis(
-                                    1000 / Math.log(Jass.HAND_SIZE - i + 1)),
-                            "Translation",
-                            new KeyValue(cardImage.translateYProperty(), 0)),
-
-                    new KeyFrame(Duration.millis(1500 / (Jass.HAND_SIZE - i)),
-                            "Bigger",
-                            new KeyValue(cardImage.scaleXProperty(), 1),
-                            new KeyValue(cardImage.scaleYProperty(), 1),
-                            new KeyValue(cardImage.rotateProperty(), 0)));
-            timeline.play();
-            timeline.setOnFinished(event -> {
-                isPlayable.bind(Bindings.createBooleanBinding(
-                        () -> hand.playableCards().contains(hand.hand().get(i)),
-                        hand.playableCards(), hand.hand()));
-                cardImage.opacityProperty()
-                        .bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
-                cardImage.disableProperty().bind(
-                        Bindings.when(isPlayable).then(false).otherwise(true));
-                cardImage.setOnMouseEntered(e -> {
-                    Timeline tl = new Timeline();
-                    tl.getKeyFrames().addAll(
-                            new KeyFrame(Duration.millis(300), "Translation",
-                                    new KeyValue(cardImage.translateYProperty(),
-                                            -HANDCARD_HEIGHT / 1.25)),
-
-                            new KeyFrame(Duration.millis(300), "Bigger",
-                                    new KeyValue(cardImage.scaleXProperty(),
-                                            1.5),
-                                    new KeyValue(cardImage.scaleYProperty(),
-                                            1.5)));
-                    tl.play();
-                });
-                cardImage.setOnMouseExited(e -> {
-                    Timeline tl = new Timeline();
-                    tl.getKeyFrames().addAll(
-                            new KeyFrame(Duration.millis(200), "Translation",
-                                    new KeyValue(cardImage.translateYProperty(),
-                                            0)),
-
-                            new KeyFrame(Duration.millis(200), "Bigger",
-                                    new KeyValue(cardImage.scaleXProperty(), 1),
-                                    new KeyValue(cardImage.scaleYProperty(),
-                                            1)));
-                    tl.play();
-                });
-                cardImage.setOnMouseClicked(e -> {
-                    try {
-                        cardQueue.put(hand.hand().get(i));
-                    } catch (InterruptedException e1) {
-                        throw new Error(e1);
-                    }
-                });
-            });
-
+        isPlayable.bind(Bindings.createBooleanBinding(
+                () -> hand.playableCards().contains(hand.hand().get(i)),
+                hand.playableCards(), hand.hand()));
+        cardImage.opacityProperty()
+                .bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
+        cardImage.disableProperty().bind(
+                Bindings.when(isPlayable).then(false).otherwise(true));
+        cardImage.setOnMouseClicked(e -> {
+            try {
+                cardQueue.put(hand.hand().get(i));
+            } catch (InterruptedException e1) {
+                throw new Error(e1);
+            }
         });
         return pair;
     }

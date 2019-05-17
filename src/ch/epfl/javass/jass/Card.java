@@ -117,7 +117,7 @@ public final class Card {
             return symbol;
         }
     }
-//ajouter des attribut au constructeurs des ranks
+
     public enum Rank {
         SIX("6",0), SEVEN("7",1), EIGHT("8",2), NINE("9",7), TEN("10",3), JACK(
                 "J",8), QUEEN("Q",4), KING("K",5), ACE("A",6);

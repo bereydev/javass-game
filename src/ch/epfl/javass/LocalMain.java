@@ -123,6 +123,7 @@ public class LocalMain extends Application {
                 g.advanceToEndOfNextTrick();
                 try {
                     Thread.sleep(1000);
+                    //to wait before collecting the trick
                 } catch (Exception e) {
                 }
             }
