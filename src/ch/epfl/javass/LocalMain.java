@@ -1,6 +1,6 @@
 package ch.epfl.javass;
 
-import java.io.IOError;
+import java.io.IOException;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +100,7 @@ public class LocalMain extends Application {
                     ns.put(player, NAME[player.ordinal()]);
                 try {
                     ps.put(player, new RemotePlayerClient(host));
-                } catch (IOError e) {
+                } catch (IOException e) {
                     System.err.println(
                             "Erreur : Connexion au serveur impossible ou refusée "
                                     + "veuillez vérifier les paramètre d'hôte passé "
