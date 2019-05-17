@@ -29,7 +29,7 @@ public final class PacedPlayer implements Player {
         assert (minTime >= 0);
         this.underlyingPlayer = underlyingPlayer;
         //in miliseconds
-        this.minTime = (long)minTime * 1000;
+        this.minTime = (long)minTime * MILLI_SECONDS;
     }
 
     @Override
@@ -49,19 +49,16 @@ public final class PacedPlayer implements Player {
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         underlyingPlayer.setPlayers(ownId, playerNames);
-
     }
 
     @Override
     public void updateHand(CardSet newHand) {
         underlyingPlayer.updateHand(newHand);
-
     }
 
     @Override
     public void setTrump(Color trump) {
         underlyingPlayer.setTrump(trump);
-
     }
 
     @Override
