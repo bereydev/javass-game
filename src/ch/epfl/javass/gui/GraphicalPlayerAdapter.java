@@ -60,7 +60,7 @@ public class GraphicalPlayerAdapter implements Player {
         graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trickBean,
                 scoreBean, handBean, cardQueue,cardBean);
         //BONUS
-        helper = new MctsPlayer(ownId,0,10000); 
+        helper = new MctsPlayer(ownId,0,10_000); 
         Platform.runLater(() -> {
             graphicalPlayer.createStage().show();
         });
