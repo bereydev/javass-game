@@ -6,6 +6,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.CardSet;
+import ch.epfl.javass.jass.MctsPlayer;
 import ch.epfl.javass.jass.Player;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.Score;
@@ -19,15 +20,18 @@ public class GraphicalPlayerAdapter implements Player {
     private HandBean handBean;
     private ScoreBean scoreBean;
     private TrickBean trickBean;
+    private CardBean cardBean; 
     private GraphicalPlayer graphicalPlayer;
     private ArrayBlockingQueue<Card> cardQueue;
-    //bonus 
+    //BONUS
+    private MctsPlayer helper; 
 
     public GraphicalPlayerAdapter() {
         handBean = new HandBean();
         scoreBean = new ScoreBean();
         trickBean = new TrickBean();
         cardQueue = new ArrayBlockingQueue<>(1);
+        cardBean = new CardBean(); 
     }
 
     @Override
@@ -35,6 +39,8 @@ public class GraphicalPlayerAdapter implements Player {
         Platform.runLater(() -> {
             CardSet playableCards = state.trick().playableCards(hand);
             handBean.setPlayableCards(playableCards);
+            //BONUS
+            cardBean.setCard(helper.cardToPlay(state, hand));
         });
         Card cardToPlay;
         try {
@@ -52,7 +58,9 @@ public class GraphicalPlayerAdapter implements Player {
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trickBean,
-                scoreBean, handBean, cardQueue);
+                scoreBean, handBean, cardQueue,cardBean);
+        //BONUS
+        helper = new MctsPlayer(ownId,0,10_000); 
         Platform.runLater(() -> {
             graphicalPlayer.createStage().show();
         });
