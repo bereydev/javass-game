@@ -218,9 +218,9 @@ public class GraphicalPlayer {
         teamText[0].textProperty()
                 .bind(Bindings.format(map.get(PlayerId.PLAYER_1) + " et "
                         + map.get(PlayerId.PLAYER_3) + " ont gagné avec "
-                        + score.gamePointsProperty(TeamId.TEAM_1)
+                        + score.gamePointsProperty(TeamId.TEAM_1).intValue()
                         + " points contre "
-                        + score.gamePointsProperty(TeamId.TEAM_2)));
+                        + score.gamePointsProperty(TeamId.TEAM_2).intValue()));
         teamText[1].textProperty()
                 .bind(Bindings.format(map.get(PlayerId.PLAYER_2) + " et "
                         + map.get(PlayerId.PLAYER_4) + " ont gagné avec "
@@ -299,7 +299,7 @@ public class GraphicalPlayer {
                     tl.getKeyFrames().addAll(
                             new KeyFrame(Duration.millis(300), "Translation",
                                     new KeyValue(card.translateYProperty(),
-                                            -HANDCARD_HEIGHT / 1.25)),
+                                            -HANDCARD_HEIGHT /3)),
 
                             new KeyFrame(Duration.millis(300), "Bigger",
                                     new KeyValue(card.scaleXProperty(), 1.5),

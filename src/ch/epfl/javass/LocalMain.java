@@ -105,6 +105,7 @@ public class LocalMain extends Application {
                             "Erreur : Connexion au serveur impossible ou refusée "
                                     + "veuillez vérifier les paramètre d'hôte passé "
                                     + "en paramètre ou désactiver votre anti-virus");
+                    System.exit(1);
                 }
 
                 System.out.println("Joueur distant nommé " + ns.get(player));
@@ -122,7 +123,7 @@ public class LocalMain extends Application {
             while (!g.isGameOver()) {
                 g.advanceToEndOfNextTrick();
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(3000);
                 } catch (Exception e) {
                 }
             }

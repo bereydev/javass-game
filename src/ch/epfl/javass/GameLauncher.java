@@ -218,6 +218,7 @@ public class GameLauncher extends Application {
                     String type = parameters[player.ordinal()][0];
                     String name = parameters[player.ordinal()][1];
                     String specific = parameters[player.ordinal()][2];
+                    System.out.println(specific);
                     switch (type) {
                     case "h":
                         ps.put(player, new GraphicalPlayerAdapter());
@@ -253,7 +254,7 @@ public class GameLauncher extends Application {
                     while (!g.isGameOver()) {
                         g.advanceToEndOfNextTrick();
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(4000);
                         } catch (Exception e) {
                         }
                     }
