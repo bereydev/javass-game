@@ -8,6 +8,10 @@ import javafx.stage.Stage;
 
 public class RemoteMain extends Application {
 
+    /**
+     * Program to launch on the remote player machine to emulate a JassGame
+     * while communicating with the main JassGame
+     */
     public static void main(String[] args) {
         launch(args);
     }
@@ -17,7 +21,8 @@ public class RemoteMain extends Application {
         Player player = new GraphicalPlayerAdapter();
         Thread serverThread = new Thread(() -> {
             RemotePlayerServer server = new RemotePlayerServer(player);
-            System.out.println("La partie commencera à la connexion du client...");
+            System.out.println(
+                    "La partie commencera à la connexion du client...");
             server.run();
         });
         serverThread.setDaemon(true);

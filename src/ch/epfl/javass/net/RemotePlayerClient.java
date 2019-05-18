@@ -39,6 +39,15 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
     private final BufferedWriter w;
     private final Socket s;
 
+    /**
+     * Constructor of the RemotePlayerClient, handle the opening of the
+     * different IOStream and the opening of the Socket
+     * 
+     * @param hostName
+     *            - IP address of the distant player if you want to play local
+     *            its "localhost"
+     * @throws IOException
+     */
     public RemotePlayerClient(String hostName) throws IOException {
         s = new Socket(hostName, 5108);
         r = new BufferedReader(
@@ -51,46 +60,57 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         String players[] = new String[4];
         for (int i = 0; i < players.length; i++) {
-            players[i] = StringSerializer.serializeString(playerNames.get(PlayerId.values()[i]));
+            players[i] = StringSerializer
+                    .serializeString(playerNames.get(PlayerId.values()[i]));
         }
         String serializedPlayers = StringSerializer.combine(players);
-        IOWriteAndCheck(JassCommand.PLRS.name(),StringSerializer.serializeInt(ownId.ordinal()),serializedPlayers);
+        IOWriteAndCheck(JassCommand.PLRS.name(),
+                StringSerializer.serializeInt(ownId.ordinal()),
+                serializedPlayers);
     }
 
     @Override
     public void updateHand(CardSet newHand) {
-        IOWriteAndCheck(JassCommand.HAND.name(),StringSerializer.serializeLong(newHand.packed()));
+        IOWriteAndCheck(JassCommand.HAND.name(),
+                StringSerializer.serializeLong(newHand.packed()));
     }
 
     @Override
     public void setTrump(Color trump) {
-        IOWriteAndCheck(JassCommand.TRMP.name(),StringSerializer.serializeInt(trump.ordinal()));
+        IOWriteAndCheck(JassCommand.TRMP.name(),
+                StringSerializer.serializeInt(trump.ordinal()));
     }
 
     @Override
     public void updateTrick(Trick newTrick) {
-        IOWriteAndCheck(JassCommand.TRCK.name(),StringSerializer.serializeInt(newTrick.packed()));
+        IOWriteAndCheck(JassCommand.TRCK.name(),
+                StringSerializer.serializeInt(newTrick.packed()));
     }
 
     @Override
     public void updateScore(Score score) {
-        IOWriteAndCheck(JassCommand.SCOR.name(),StringSerializer.serializeLong(score.packed()));
+        IOWriteAndCheck(JassCommand.SCOR.name(),
+                StringSerializer.serializeLong(score.packed()));
     }
 
     @Override
     public void setWinningTeam(TeamId winningTeam) {
-        IOWriteAndCheck(JassCommand.WINR.name(),StringSerializer.serializeInt(winningTeam.ordinal()));
+        IOWriteAndCheck(JassCommand.WINR.name(),
+                StringSerializer.serializeInt(winningTeam.ordinal()));
     }
-    
+
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
         Card card = null;
         String score = StringSerializer.serializeLong(state.packedScore());
-        String unplayedCards = StringSerializer.serializeLong(state.packedUnplayedCards());
+        String unplayedCards = StringSerializer
+                .serializeLong(state.packedUnplayedCards());
         String trick = StringSerializer.serializeInt(state.packedTrick());
-        IOWriteAndCheck(JassCommand.CARD.name(),StringSerializer.combine(score,unplayedCards,trick),StringSerializer.serializeLong(hand.packed()));
+        IOWriteAndCheck(JassCommand.CARD.name(),
+                StringSerializer.combine(score, unplayedCards, trick),
+                StringSerializer.serializeLong(hand.packed()));
         try {
-            //wait for the response
+            // wait for the response
             int pkCard = StringSerializer.deserializeInt(r.readLine());
             card = Card.ofPacked(pkCard);
         } catch (IOException e) {
@@ -98,7 +118,11 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
         }
         return card;
     }
-    private void IOWriteAndCheck(String...string) {
+
+    /**
+     * write on the OutputStream the passed strings and check the IOExceptions
+     */
+    private void IOWriteAndCheck(String... string) {
         try {
             for (String s : string) {
                 w.write(s + SPACE);
@@ -117,6 +141,5 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
         r.close();
         s.close();
     }
-
 
 }

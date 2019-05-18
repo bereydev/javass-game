@@ -1,5 +1,5 @@
 /*
- *	Author : Alexandre Santangelo 
+ *	Author : Alexandre Santangelo & Jonathan Bereyziat
  *	Date   : Apr 15, 2019	
 */
 
@@ -32,10 +32,19 @@ public final class RemotePlayerServer {
 
     private final Player player;
 
+    /**
+     * The constructor of the RemotePlyerServer take an underlying Player as
+     * parameter
+     */
     public RemotePlayerServer(Player player) {
         this.player = player;
     }
 
+    /**
+     * Lauch a "Serveur" which is communicating with the main game and is
+     * passing informations to the underlying Player mainly a human player who
+     * plays on an other machine
+     */
     public void run() {
 
         try (ServerSocket s0 = new ServerSocket(5108);
@@ -45,12 +54,12 @@ public final class RemotePlayerServer {
                         new InputStreamReader(s.getInputStream(), US_ASCII));
                 BufferedWriter w = new BufferedWriter(new OutputStreamWriter(
                         s.getOutputStream(), US_ASCII))) {
-            while(!s.isClosed()){
+            while (!s.isClosed()) {
                 String[] message = r.readLine().trim().split(" ");
-                
-                for(String m : message)
+
+                for (String m : message)
                     System.out.println(m);
-                
+
                 JassCommand command = JassCommand.valueOf(message[0]);
                 switch (command) {
                 case PLRS:
@@ -62,61 +71,66 @@ public final class RemotePlayerServer {
                         map.put(PlayerId.values()[i],
                                 StringSerializer.deserializeString(names[i]));
                     }
-        
+
                     player.setPlayers(ownId, map);
                     break;
                 case CARD:
                     String[] stateTab = StringSerializer.split(message[1]);
                     TurnState state = TurnState.ofPackedComponents(
-                            StringSerializer.deserializeLong(stateTab[0]),  //Score
-                            StringSerializer.deserializeLong(stateTab[1]),  //CardSet not played
-                            StringSerializer.deserializeInt(stateTab[2]));  //Trick
-                    CardSet hand = CardSet.ofPacked(StringSerializer.deserializeLong(message[2])); 
-                    
-                    Card card = player.cardToPlay(state, hand); 
-                    
-                    //Answering 
+                            StringSerializer.deserializeLong(stateTab[0]), // Score
+                            StringSerializer.deserializeLong(stateTab[1]), // CardSet
+                                                                           // not
+                                                                           // played
+                            StringSerializer.deserializeInt(stateTab[2])); // Trick
+                    CardSet hand = CardSet.ofPacked(
+                            StringSerializer.deserializeLong(message[2]));
+
+                    Card card = player.cardToPlay(state, hand);
+
+                    // Answering
                     w.write(StringSerializer.serializeInt(card.packed()));
                     w.write("\n");
                     w.flush();
                     break;
                 case HAND:
-                    CardSet set = CardSet
-                            .ofPacked(StringSerializer.deserializeLong(message[1]));
+                    CardSet set = CardSet.ofPacked(
+                            StringSerializer.deserializeLong(message[1]));
                     player.updateHand(set);
-        
+
                     break;
                 case SCOR:
-                    Score score = Score
-                            .ofPacked(StringSerializer.deserializeLong(message[1]));
+                    Score score = Score.ofPacked(
+                            StringSerializer.deserializeLong(message[1]));
                     player.updateScore(score);
-        
+
                     break;
                 case TRCK:
-                    Trick trick = Trick
-                            .ofPacked(StringSerializer.deserializeInt(message[1]));
+                    Trick trick = Trick.ofPacked(
+                            StringSerializer.deserializeInt(message[1]));
                     player.updateTrick(trick);
-        
+
                     break;
                 case TRMP:
-                    player.setTrump(Card.Color.values()[Integer.parseInt(message[1])]);
-        
+                    player.setTrump(
+                            Card.Color.values()[Integer.parseInt(message[1])]);
+
                     break;
                 case WINR:
-                    player.setWinningTeam(TeamId.values()[Integer.parseInt(message[1])]);
+                    player.setWinningTeam(
+                            TeamId.values()[Integer.parseInt(message[1])]);
                     System.out.println("server closed");
                     w.close();
                     r.close();
                     s.close();
                     s0.close();
-                    return; 
+                    return;
                 default:
                     System.out.println("Huston we have a problem");
                     break;
                 }
             }
         } catch (IOException e) {
-            throw new UncheckedIOException(e); 
+            throw new UncheckedIOException(e);
         }
     }
 
