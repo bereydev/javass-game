@@ -68,8 +68,8 @@ public class GraphicalPlayer {
         borderPane.setTop(createScorePane(score, names));
         borderPane.setBottom(createHandPane(hand, player, cardToPlay));
         StackPane mainPane = new StackPane();
-        mainPane.getChildren().add(borderPane); 
-        mainPane.getChildren().addAll(createWinningPane(score,names)); 
+        mainPane.getChildren().add(borderPane);
+        mainPane.getChildren().addAll(createWinningPane(score, names));
         scene = new Scene(mainPane);
     }
 
@@ -87,48 +87,48 @@ public class GraphicalPlayer {
      * Creates the Pane in which the score is displayed
      */
 
-
-
-private GridPane createScorePane(ScoreBean score,
+    private GridPane createScorePane(ScoreBean score,
             Map<PlayerId, String> map) {
         GridPane scorePane = new GridPane();
         Text[] teamTexts = new Text[8];
-        for(int i=0; i<8; i++) 
-            teamTexts[i]= new Text(); 
+        for (int i = 0; i < 8; i++)
+            teamTexts[i] = new Text();
         StringProperty differences[] = new StringProperty[2];
         for (TeamId t : TeamId.ALL) {
             differences[t.ordinal()] = new SimpleStringProperty();
             score.turnPointsProperty(t).addListener((o, oV, nV) -> {
-                
+
                 int diffInt = nV.intValue() - oV.intValue();
                 IntegerProperty diff = new SimpleIntegerProperty(
                         diffInt < 0 ? 0 : diffInt);
                 differences[t.ordinal()].bind(
                         Bindings.concat("(+", Bindings.convert(diff), ")"));
             });
-            teamTexts[2+t.ordinal()].textProperty().bind(
-                    Bindings.convert(score.turnPointsProperty(t)));
-            
-            teamTexts[4+t.ordinal()].textProperty().bind(differences[t.ordinal()]);
-            
-            teamTexts[6+t.ordinal()].textProperty().bind(
-                    Bindings.convert(score.gamePointsProperty(t)));
+            teamTexts[2 + t.ordinal()].textProperty()
+                    .bind(Bindings.convert(score.turnPointsProperty(t)));
+
+            teamTexts[4 + t.ordinal()].textProperty()
+                    .bind(differences[t.ordinal()]);
+
+            teamTexts[6 + t.ordinal()].textProperty()
+                    .bind(Bindings.convert(score.gamePointsProperty(t)));
         }
 
         teamTexts[0] = new Text(map.get(PlayerId.PLAYER_1) + " et "
                 + map.get(PlayerId.PLAYER_3) + " : ");
-        teamTexts[1]= new Text(map.get(PlayerId.PLAYER_2) + " et "
+        teamTexts[1] = new Text(map.get(PlayerId.PLAYER_2) + " et "
                 + map.get(PlayerId.PLAYER_4) + " : ");
-        for(int j = 0; j<TeamId.COUNT; j++)
-            for(int i=0; i<4; i++) {
-                if(i==3)
+        for (int j = 0; j < TeamId.COUNT; j++)
+            for (int i = 0; i < 4; i++) {
+                if (i == 3)
                     scorePane.addRow(j, new Text("/Total : "));
-                scorePane.addRow(j, teamTexts[2*i + j]);
+                scorePane.addRow(j, teamTexts[2 * i + j]);
             }
 
         scorePane.setStyle(TEXT_STYLE);
         return scorePane;
     }
+
     /**
      * Creates the pane in which the Trick is displayed
      */
@@ -186,10 +186,6 @@ private GridPane createScorePane(ScoreBean score,
         return pair;
     }
 
-
-
-
-
     /**
      * Creates the Pane that will be displayed at the end of the game
      */
@@ -200,18 +196,19 @@ private GridPane createScorePane(ScoreBean score,
         Text[] teamText = new Text[TeamId.COUNT];
         teamText[0] = new Text();
         teamText[1] = new Text();
-        teamText[0].textProperty()
-                .bind(Bindings.format(map.get(PlayerId.PLAYER_1) + " et "
-                        + map.get(PlayerId.PLAYER_3) + " ont gagné avec "
-                        + score.gamePointsProperty(TeamId.TEAM_1)
-                        + " points contre "
-                        + score.gamePointsProperty(TeamId.TEAM_2)));
-        teamText[1].textProperty()
-                .bind(Bindings.format(map.get(PlayerId.PLAYER_2) + " et "
-                        + map.get(PlayerId.PLAYER_4) + " ont gagné avec "
-                        + score.gamePointsProperty(TeamId.TEAM_2)
-                        + " points contre "
-                        + score.gamePointsProperty(TeamId.TEAM_1)));
+        teamText[0].textProperty().bind(Bindings.concat(
+                map.get(PlayerId.PLAYER_1), " et ", map.get(PlayerId.PLAYER_3),
+                " ont gagné avec ",
+                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_1)),
+                " points contre ",
+                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_2))));
+        teamText[1].textProperty().bind(Bindings.concat(
+                map.get(PlayerId.PLAYER_2), " et ", map.get(PlayerId.PLAYER_4),
+                " ont gagné avec ",
+                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_2)),
+                " points contre ",
+                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_1))));
+
         for (int i = 0; i < TeamId.COUNT; i++) {
             teamText[i].setStyle(TEXT_STYLE);
             teamPane[i] = new BorderPane();
