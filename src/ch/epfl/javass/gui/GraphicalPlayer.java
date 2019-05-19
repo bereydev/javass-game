@@ -48,6 +48,10 @@ public class GraphicalPlayer {
     private static final int CARD_HEIGHT = 180;
     private static final int HANDCARD_WIDTH = 80;
     private static final int HANDCARD_HEIGHT = 120;
+    private static final String TEXT_STYLE = "-fx-font: 16 Optima; -fx-background-color: lightgray;-fx-padding: 5px; -fx-alignment: center;";
+    private static final String RECT_STYLE = "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: lightpink; -fx-stroke-width: 5; -fx-opacity: 0.5;";
+    private static final String TRICK_STYLE = "-fx-background-color: whitesmoke; -fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center; ";
+    private static final String HANDBOX_STYLE = "-fx-background-color: lightgray;\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;";
 
     private final Scene scene;
     private final String player;
@@ -82,68 +86,49 @@ public class GraphicalPlayer {
     /**
      * Creates the Pane in which the score is displayed
      */
-    private GridPane createScorePane(ScoreBean score,
+
+
+
+private GridPane createScorePane(ScoreBean score,
             Map<PlayerId, String> map) {
         GridPane scorePane = new GridPane();
-        StringProperty diff1 = new SimpleStringProperty();
-        StringProperty diff2 = new SimpleStringProperty();
+        Text[] teamTexts = new Text[8];
+        for(int i=0; i<8; i++) 
+            teamTexts[i]= new Text(); 
+        StringProperty differences[] = new StringProperty[2];
+        for (TeamId t : TeamId.ALL) {
+            differences[t.ordinal()] = new SimpleStringProperty();
+            score.turnPointsProperty(t).addListener((o, oV, nV) -> {
+                
+                int diffInt = nV.intValue() - oV.intValue();
+                IntegerProperty diff = new SimpleIntegerProperty(
+                        diffInt < 0 ? 0 : diffInt);
+                differences[t.ordinal()].bind(
+                        Bindings.concat("(+", Bindings.convert(diff), ")"));
+            });
+            teamTexts[2+t.ordinal()].textProperty().bind(
+                    Bindings.convert(score.turnPointsProperty(t)));
+            
+            teamTexts[4+t.ordinal()].textProperty().bind(differences[t.ordinal()]);
+            
+            teamTexts[6+t.ordinal()].textProperty().bind(
+                    Bindings.convert(score.gamePointsProperty(t)));
+        }
 
-        score.turnPointsProperty(TeamId.TEAM_1).addListener((o, oV, nV) -> {
-            int diffInt = nV.intValue() - oV.intValue();
-            IntegerProperty diff = new SimpleIntegerProperty(
-                    diffInt < 0 ? 0 : diffInt);
-            diff1.bind(Bindings.concat("(+", Bindings.convert(diff), ")"));
-        });
-        score.turnPointsProperty(TeamId.TEAM_2).addListener((o, oV, nV) -> {
-            int diffInt = nV.intValue() - oV.intValue();
-            IntegerProperty diff = new SimpleIntegerProperty(
-                    diffInt < 0 ? 0 : diffInt);
-            diff2.bind(Bindings.concat("(+", Bindings.convert(diff), ")"));
-        });
-
-        Text names1 = new Text(map.get(PlayerId.PLAYER_1) + " et "
+        teamTexts[0] = new Text(map.get(PlayerId.PLAYER_1) + " et "
                 + map.get(PlayerId.PLAYER_3) + " : ");
-        Text names2 = new Text(map.get(PlayerId.PLAYER_2) + " et "
+        teamTexts[1]= new Text(map.get(PlayerId.PLAYER_2) + " et "
                 + map.get(PlayerId.PLAYER_4) + " : ");
+        for(int j = 0; j<TeamId.COUNT; j++)
+            for(int i=0; i<4; i++) {
+                if(i==3)
+                    scorePane.addRow(j, new Text("/Total : "));
+                scorePane.addRow(j, teamTexts[2*i + j]);
+            }
 
-        Text turnPoints1 = new Text();
-        turnPoints1.textProperty().bind(
-                Bindings.convert(score.turnPointsProperty(TeamId.TEAM_1)));
-        Text turnPoints2 = new Text();
-        turnPoints2.textProperty().bind(
-                Bindings.convert(score.turnPointsProperty(TeamId.TEAM_2)));
-
-        Text difference1 = new Text();
-        difference1.textProperty().bind(diff1);
-        Text difference2 = new Text();
-        difference2.textProperty().bind(diff2);
-
-        Text total1 = new Text("/Total : ");
-        Text total2 = new Text("/Total : ");
-        Text gamePoints1 = new Text();
-        gamePoints1.textProperty().bind(
-                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_1)));
-        Text gamePoints2 = new Text();
-        gamePoints2.textProperty().bind(
-                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_2)));
-
-        scorePane.addRow(0, names1);
-        scorePane.addRow(0, turnPoints1);
-        scorePane.addRow(0, difference1);
-        scorePane.addRow(0, total1);
-        scorePane.addRow(0, gamePoints1);
-
-        scorePane.addRow(1, names2);
-        scorePane.addRow(1, turnPoints2);
-        scorePane.addRow(1, difference2);
-        scorePane.addRow(1, total2);
-        scorePane.addRow(1, gamePoints2);
-
-        scorePane.setStyle(
-                "-fx-font: 16 Optima; -fx-background-color: lightgray;-fx-padding: 5px; -fx-alignment: center;");
+        scorePane.setStyle(TEXT_STYLE);
         return scorePane;
     }
-
     /**
      * Creates the pane in which the Trick is displayed
      */
