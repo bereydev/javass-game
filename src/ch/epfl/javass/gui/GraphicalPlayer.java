@@ -215,18 +215,19 @@ public class GraphicalPlayer {
         Text[] teamText = new Text[TeamId.COUNT];
         teamText[0] = new Text();
         teamText[1] = new Text();
-        teamText[0].textProperty()
-                .bind(Bindings.format(map.get(PlayerId.PLAYER_1) + " et "
-                        + map.get(PlayerId.PLAYER_3) + " ont gagné avec "
-                        + score.gamePointsProperty(TeamId.TEAM_1)
-                        + " points contre "
-                        + score.gamePointsProperty(TeamId.TEAM_2)));
-        teamText[1].textProperty()
-                .bind(Bindings.format(map.get(PlayerId.PLAYER_2) + " et "
-                        + map.get(PlayerId.PLAYER_4) + " ont gagné avec "
-                        + score.gamePointsProperty(TeamId.TEAM_2)
-                        + " points contre "
-                        + score.gamePointsProperty(TeamId.TEAM_1)));
+        teamText[0].textProperty().bind(Bindings.concat(
+                map.get(PlayerId.PLAYER_1), " et ", map.get(PlayerId.PLAYER_3),
+                " ont gagné avec ",
+                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_1)),
+                " points contre ",
+                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_2))));
+        teamText[1].textProperty().bind(Bindings.concat(
+                map.get(PlayerId.PLAYER_2), " et ", map.get(PlayerId.PLAYER_4),
+                " ont gagné avec ",
+                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_2)),
+                " points contre ",
+                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_1))));
+
         for (int i = 0; i < TeamId.COUNT; i++) {
             teamText[i].setStyle(TEXT_STYLE);
             teamPane[i] = new BorderPane();
@@ -240,7 +241,7 @@ public class GraphicalPlayer {
 
         return winningPane;
     }
-
+    
     private HBox createHandPane(HandBean hand, PlayerId player,
             ArrayBlockingQueue<Card> cardQueue, CardBean cardBean, Button b) {
         HBox handBox = new HBox();
