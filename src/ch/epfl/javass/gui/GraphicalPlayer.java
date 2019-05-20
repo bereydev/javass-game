@@ -234,8 +234,7 @@ public class GraphicalPlayer {
             cardImages[i] = createHandCard(i, hand, cardQueue);
         }
         handBox.getChildren().addAll(cardImages);
-        handBox.setStyle("-fx-background-color: lightgray;\r\n"
-                + "-fx-spacing: 5px;\r\n" + "-fx-padding: 5px;");
+        handBox.setStyle(HANDBOX_STYLE);
         return handBox;
     }
 
