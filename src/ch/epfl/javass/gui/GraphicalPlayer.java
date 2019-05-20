@@ -227,7 +227,7 @@ public class GraphicalPlayer {
                 Bindings.convert(score.gamePointsProperty(TeamId.TEAM_2)),
                 " points contre ",
                 Bindings.convert(score.gamePointsProperty(TeamId.TEAM_1))));
-
+        
         for (int i = 0; i < TeamId.COUNT; i++) {
             teamText[i].setStyle(TEXT_STYLE);
             teamPane[i] = new BorderPane();
@@ -300,7 +300,7 @@ public class GraphicalPlayer {
                     tl.getKeyFrames().addAll(
                             new KeyFrame(Duration.millis(300), "Translation",
                                     new KeyValue(card.translateYProperty(),
-                                            -HANDCARD_HEIGHT / 1.25)),
+                                            -HANDCARD_HEIGHT /3)),
 
                             new KeyFrame(Duration.millis(300), "Bigger",
                                     new KeyValue(card.scaleXProperty(), 1.5),
