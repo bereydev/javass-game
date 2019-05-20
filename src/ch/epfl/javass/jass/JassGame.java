@@ -25,7 +25,8 @@ public final class JassGame {
     private PlayerId turnStarter;
     private final Random shuffleRng;
     private final Random trumpRng;
-    private static final int SEVEN_DIAMOND = PackedCard.pack(Color.DIAMOND, Rank.SEVEN);
+    private static final int SEVEN_DIAMOND = PackedCard.pack(Color.DIAMOND,
+            Rank.SEVEN);
     private Boolean newGame = true;
     private TurnState turnState;
 
@@ -52,7 +53,7 @@ public final class JassGame {
                 || turnState.score()
                         .totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS;
     }
-    
+
     private void finalPlayerUpdate() {
         TeamId winningTeam = turnState.score()
                 .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
@@ -68,15 +69,15 @@ public final class JassGame {
      * Advances to the end of the next trick, doing everything.
      */
 
-    public void advanceToEndOfNextTrick() {
+    public void advanceToEndOfNextTrick(Color trump) {
         if (isGameOver()) {
             return;
         }
+        if (trump == null)
+            trump = Color.values()[trumpRng.nextInt(Color.COUNT)];
         if (newGame) {
             deal();
-            turnState = TurnState.initial(
-                    Color.values()[trumpRng.nextInt(Color.COUNT)],
-                    Score.INITIAL, turnStarter());
+            turnState = TurnState.initial(trump, Score.INITIAL, turnStarter());
             for (PlayerId p : PlayerId.ALL) {
                 players.get(p).setPlayers(p, playerNames);
                 players.get(p).updateHand(hands.get(p));
@@ -87,8 +88,7 @@ public final class JassGame {
             turnState = turnState.withTrickCollected();
             if (turnState.isTerminal()) {
                 deal();
-                turnState = TurnState.initial(
-                        Color.values()[trumpRng.nextInt(Color.COUNT)],
+                turnState = TurnState.initial(trump,
                         turnState.score().nextTurn(), turnStarter());
                 for (PlayerId p : PlayerId.ALL) {
                     players.get(p).updateHand(hands.get(p));
@@ -103,12 +103,16 @@ public final class JassGame {
         if (isGameOver()) {
             finalPlayerUpdate();
             return;
-        } 
-        for (int i = 0; i < PlayerId.COUNT; i++ ) {
+        }
+        for (int i = 0; i < PlayerId.COUNT; i++) {
             playTrick(turnState.nextPlayer());
         }
     }
     
+    public void advanceToEndOfNextTrick() {
+        advanceToEndOfNextTrick(null); 
+    }
+
     private void playTrick(PlayerId player) {
         players.get(player).updateScore(turnState.score());
         Card cardToPlay = players.get(player).cardToPlay(turnState,
@@ -134,7 +138,8 @@ public final class JassGame {
         hands.clear();
         for (PlayerId p : PlayerId.ALL) {
             CardSet hand = CardSet.EMPTY;
-            hand = CardSet.of(cards.subList(p.ordinal()*9, (p.ordinal()+1)*9));
+            hand = CardSet
+                    .of(cards.subList(p.ordinal() * 9, (p.ordinal() + 1) * 9));
             hands.put(p, hand);
         }
     }
