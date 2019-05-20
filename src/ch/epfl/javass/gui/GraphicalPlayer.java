@@ -27,6 +27,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
+import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -60,6 +61,8 @@ public class GraphicalPlayer {
 
     private final Scene scene;
     private final String player;
+    private double xCardPos;
+    private double yCardPos;
 
     public GraphicalPlayer(PlayerId player, Map<PlayerId, String> names,
             TrickBean trick, ScoreBean score, HandBean hand,
@@ -91,37 +94,38 @@ public class GraphicalPlayer {
             Map<PlayerId, String> map) {
         GridPane scorePane = new GridPane();
         Text[] teamTexts = new Text[8];
-        for(int i=0; i<8; i++) 
-            teamTexts[i]= new Text(); 
+        for (int i = 0; i < 8; i++)
+            teamTexts[i] = new Text();
         StringProperty differences[] = new StringProperty[2];
         for (TeamId t : TeamId.ALL) {
             differences[t.ordinal()] = new SimpleStringProperty();
             score.turnPointsProperty(t).addListener((o, oV, nV) -> {
-                
+
                 int diffInt = nV.intValue() - oV.intValue();
                 IntegerProperty diff = new SimpleIntegerProperty(
                         diffInt < 0 ? 0 : diffInt);
                 differences[t.ordinal()].bind(
                         Bindings.concat("(+", Bindings.convert(diff), ")"));
             });
-            teamTexts[2+t.ordinal()].textProperty().bind(
-                    Bindings.convert(score.turnPointsProperty(t)));
-            
-            teamTexts[4+t.ordinal()].textProperty().bind(differences[t.ordinal()]);
-            
-            teamTexts[6+t.ordinal()].textProperty().bind(
-                    Bindings.convert(score.gamePointsProperty(t)));
+            teamTexts[2 + t.ordinal()].textProperty()
+                    .bind(Bindings.convert(score.turnPointsProperty(t)));
+
+            teamTexts[4 + t.ordinal()].textProperty()
+                    .bind(differences[t.ordinal()]);
+
+            teamTexts[6 + t.ordinal()].textProperty()
+                    .bind(Bindings.convert(score.gamePointsProperty(t)));
         }
 
         teamTexts[0] = new Text(map.get(PlayerId.PLAYER_1) + " et "
                 + map.get(PlayerId.PLAYER_3) + " : ");
-        teamTexts[1]= new Text(map.get(PlayerId.PLAYER_2) + " et "
+        teamTexts[1] = new Text(map.get(PlayerId.PLAYER_2) + " et "
                 + map.get(PlayerId.PLAYER_4) + " : ");
-        for(int j = 0; j<TeamId.COUNT; j++)
-            for(int i=0; i<4; i++) {
-                if(i==3)
+        for (int j = 0; j < TeamId.COUNT; j++)
+            for (int i = 0; i < 4; i++) {
+                if (i == 3)
                     scorePane.addRow(j, new Text("/Total : "));
-                scorePane.addRow(j, teamTexts[2*i + j]);
+                scorePane.addRow(j, teamTexts[2 * i + j]);
             }
 
         scorePane.setStyle(TEXT_STYLE);
@@ -160,7 +164,9 @@ public class GraphicalPlayer {
         ObjectBinding<Card> card = Bindings.valueAt(trick.trick(),
                 PlayerId.values()[(player.ordinal() + i) % 4]);
         ImageView cardImage = new ImageView();
-        imageThrowAnimation(cardImage, i);
+        card.addListener((o, oV, nV) -> {
+            imageThrowAnimation(cardImage, i);
+        });
         cardImage.imageProperty().bind(Bindings.valueAt(cards, card));
         cardImage.setFitWidth(CARD_WIDTH);
         cardImage.setFitHeight(CARD_HEIGHT);
@@ -174,38 +180,46 @@ public class GraphicalPlayer {
                 map.get(PlayerId.values()[(player.ordinal() + i) % 4]));
         name.setStyle("-fx-font: 14 Optima;");
         VBox pair;
+        
         if (i != 0)
             pair = new VBox(name, pane);
         else
             pair = new VBox(pane, name);
         pair.setStyle("-fx-padding: 5px; -fx-alignment: center;");
-
         return pair;
     }
 
-    private void imageThrowAnimation(ImageView cardImage, int index) {
-        cardImage.imageProperty().addListener((o, oV, nV) -> {
-            Timeline timeline = new Timeline();
-            if (index == 0) {
-                cardImage.setRotate(360);
-                cardImage.setTranslateY(400);
-            } else if (index == 1) {
-                cardImage.setRotate(-360);
-                cardImage.setTranslateX(400);
-            } else if (index == 2) {
-                cardImage.setRotate(360);
-                cardImage.setTranslateY(-400);
-            } else {
-                cardImage.setRotate(360);
-                cardImage.setTranslateX(-400);
-            }
-            timeline.getKeyFrames()
-                    .addAll(new KeyFrame(Duration.millis(500), "Throw",
-                            new KeyValue(cardImage.rotateProperty(), 0),
-                            new KeyValue(cardImage.translateXProperty(), 0),
-                            new KeyValue(cardImage.translateYProperty(), 0)));
-            timeline.play();
-        });
+    private void imageThrowAnimation(ImageView cardImage, int index ) {
+        Timeline timeline = new Timeline();
+        double travelH = scene.getWidth()/2;
+        double travelV = scene.getHeight()/2;
+        if (index == 0) {
+            cardImage.setRotate(-100);
+            Bounds newCardPos = cardImage.localToScene(cardImage.getBoundsInLocal());
+            double xTrans = xCardPos-newCardPos.getMinX();
+            double yTrans = yCardPos-newCardPos.getMinY();
+            cardImage.setScaleX(HANDCARD_HEIGHT/CARD_HEIGHT);
+            cardImage.setScaleY(HANDCARD_WIDTH/CARD_WIDTH);
+            cardImage.setTranslateX(xTrans);
+            cardImage.setTranslateY(yTrans);
+        } else if (index == 1) {
+            cardImage.setRotate(-100*travelH/385);
+            cardImage.setTranslateX(travelH);
+        } else if (index == 2) {
+            cardImage.setTranslateY(-travelV);
+        } else {
+            cardImage.setRotate(100*travelH/385);
+            cardImage.setTranslateX(-travelH);
+        }
+        timeline.getKeyFrames()
+                .addAll(new KeyFrame(Duration.millis(500), "Throw",
+                        new KeyValue(cardImage.rotateProperty(), 0),
+                        new KeyValue(cardImage.scaleXProperty(), 1),
+                        new KeyValue(cardImage.scaleYProperty(), 1),
+                        new KeyValue(cardImage.translateXProperty(), 0),
+                        new KeyValue(cardImage.translateYProperty(), 0)));
+        timeline.play();
+
     }
 
     private List<BorderPane> createWinningPane(ScoreBean score,
@@ -256,8 +270,10 @@ public class GraphicalPlayer {
     private StackPane createHandCard(int i, HandBean hand,
             ArrayBlockingQueue<Card> cardQueue, CardBean cardBean, Button b) {
         ImageView cardImage = new ImageView();
+        Rectangle selectZone = new Rectangle(HANDCARD_WIDTH, HANDCARD_HEIGHT);
+        selectZone.setFill(javafx.scene.paint.Color.TRANSPARENT);
         Circle greenCircle = new Circle(4, javafx.scene.paint.Color.LIMEGREEN);
-        StackPane card = new StackPane(cardImage, greenCircle);
+        StackPane card = new StackPane(cardImage, greenCircle,selectZone);
         StackPane.setAlignment(greenCircle, Pos.TOP_RIGHT);
         cardImage.imageProperty().bind(
                 Bindings.valueAt(cards, Bindings.valueAt(hand.hand(), i)));
@@ -294,30 +310,25 @@ public class GraphicalPlayer {
                         .bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
                 card.disableProperty().bind(
                         Bindings.when(isPlayable).then(false).otherwise(true));
-                card.setOnMouseEntered(e -> {
+                selectZone.setOnMouseEntered(e -> {
                     Timeline tl = new Timeline();
                     tl.getKeyFrames().addAll(
-                            new KeyFrame(Duration.millis(300), "Translation",
-                                    new KeyValue(card.translateYProperty(),
-                                            -HANDCARD_HEIGHT /3)),
-
-                            new KeyFrame(Duration.millis(300), "Bigger",
-                                    new KeyValue(card.scaleXProperty(), 1.5),
-                                    new KeyValue(card.scaleYProperty(), 1.5)));
+                            new KeyFrame(Duration.millis(50), "Translation",
+                                    new KeyValue(cardImage.translateYProperty(),
+                                            -HANDCARD_HEIGHT / 7)));
                     tl.play();
                 });
-                card.setOnMouseExited(e -> {
+                selectZone.setOnMouseExited(e -> {
                     Timeline tl = new Timeline();
                     tl.getKeyFrames().addAll(
-                            new KeyFrame(Duration.millis(200), "Translation",
-                                    new KeyValue(card.translateYProperty(), 0)),
-
-                            new KeyFrame(Duration.millis(200), "Bigger",
-                                    new KeyValue(card.scaleXProperty(), 1),
-                                    new KeyValue(card.scaleYProperty(), 1)));
+                            new KeyFrame(Duration.millis(50), "Translation",
+                                    new KeyValue(cardImage.translateYProperty(), 0)));
                     tl.play();
                 });
                 card.setOnMouseClicked(e -> {
+                    Bounds cardPosition = cardImage.localToScene(cardImage.getBoundsInLocal());
+                    xCardPos = cardPosition.getMinX();
+                    yCardPos = cardPosition.getMinY();
                     try {
                         cardQueue.put(hand.hand().get(i));
                     } catch (InterruptedException e1) {

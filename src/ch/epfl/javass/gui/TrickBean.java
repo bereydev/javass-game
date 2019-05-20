@@ -41,11 +41,13 @@ public final class TrickBean {
     }
     
     public void setTrick(Trick trick) {
-        if(!trick.isEmpty())
+        if(trick.isEmpty())
+            this.trick.clear();
+        else {
             winningPlayer.setValue(trick.winningPlayer()); 
-        this.trick.clear();
-        for(int i=0; i<trick.size(); i++) 
-            this.trick.put(trick.player(i), trick.card(i)); 
+            for(int i=0; i<trick.size(); i++) 
+                this.trick.putIfAbsent(trick.player(i), trick.card(i)); 
+        }
         
     }
     
