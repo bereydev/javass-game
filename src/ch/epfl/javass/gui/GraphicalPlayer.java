@@ -116,6 +116,7 @@ public class GraphicalPlayer {
             teamTexts[6 + t.ordinal()].textProperty()
                     .bind(Bindings.convert(score.gamePointsProperty(t)));
         }
+        //TODO peut mieux faire
 
         teamTexts[0] = new Text(map.get(PlayerId.PLAYER_1) + " et "
                 + map.get(PlayerId.PLAYER_3) + " : ");
@@ -144,11 +145,12 @@ public class GraphicalPlayer {
 
         for (int i = 0; i < PlayerId.COUNT; i++) {
             pairs[i] = trickCard(trick, player, i, map);
+            if( i % 2 == 0)
+                trickPane.add(pairs[i], 1, 2 - i);
+            else 
+                trickPane.add(pairs[i], 3 - i, 0, 1, 3);
         }
-        trickPane.add(pairs[0], 1, 2, 1, 1);
-        trickPane.add(pairs[1], 2, 0, 1, 3);
-        trickPane.add(pairs[2], 1, 0, 1, 1);
-        trickPane.add(pairs[3], 0, 0, 1, 3);
+
         trickPane.add(trumpImage, 1, 1, 1, 1);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
         trickPane.setStyle(TRICK_STYLE);
