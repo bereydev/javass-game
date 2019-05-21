@@ -41,8 +41,11 @@ public final class TrickBean {
     }
     
     public void setTrick(Trick trick) {
-        if(trick.isEmpty())
+        if(trick.isEmpty()) {
             this.trick.clear();
+            //TODO besoin de faire ça ou pas ?
+            winningPlayer.setValue(null);
+        }  
         else {
             winningPlayer.setValue(trick.winningPlayer()); 
             for(int i=0; i<trick.size(); i++) 
