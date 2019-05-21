@@ -6,8 +6,11 @@
 
 package ch.epfl.javass.gui;
 
+import java.util.Collections;
+
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.CardSet;
+import ch.epfl.javass.jass.Jass;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -18,14 +21,8 @@ import javafx.collections.ObservableSet;
  */
 public final class HandBean {
 
-    private ObservableList<Card> hand = FXCollections.observableArrayList();
+    private ObservableList<Card> hand = FXCollections.observableArrayList(Collections.nCopies(Jass.HAND_SIZE, null));
     private ObservableSet<Card> playableCards = FXCollections.observableSet();
-
-    public HandBean() {
-        for (int i = 0; i < 9; i++) {
-            hand.add(null);
-        }
-    }
 
     /**
      * Sets the new value of the hand for the bean
@@ -34,15 +31,13 @@ public final class HandBean {
      *            - the new CardSet of the hand
      */
     public void setHand(CardSet newHand) {
-        if (newHand.size() == 9)
-            for (int i = 0; i < 9; i++) {
+        if (newHand.size() == Jass.HAND_SIZE)
+            for (int i = 0; i < Jass.HAND_SIZE; i++) {
                 hand.set(i, newHand.get(i));
             }
         else
-            for (int i = 0; i < 9; i++) {
-                if (hand.get(i) == null)
-                    continue;
-                if (!newHand.contains(hand.get(i)))
+            for (int i = 0; i < Jass.HAND_SIZE; i++) {
+                if (hand.get(i) != null && !newHand.contains(hand.get(i)))
                     hand.set(i, null);
             }
 
