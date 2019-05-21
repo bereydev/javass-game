@@ -54,6 +54,7 @@ public class GraphicalPlayer {
     private static final String HANDBOX_STYLE = "-fx-background-color: lightgray;\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;";
 
     private final Scene scene;
+    //TODO En attribu ou pas ?
     private final String player;
 
     /**
@@ -65,6 +66,7 @@ public class GraphicalPlayer {
         this.player = names.get(player);
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(createTrickPane(trick, player, names));
+        //TODO : Attribus de classe ou argument ?
         borderPane.setTop(createScorePane(score, names));
         borderPane.setBottom(createHandPane(hand, player, cardToPlay));
         StackPane mainPane = new StackPane();
