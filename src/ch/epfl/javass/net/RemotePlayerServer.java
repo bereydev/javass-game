@@ -96,11 +96,10 @@ public final class RemotePlayerServer {
         
                     break;
                 case TRMP:
-                    player.setTrump(Card.Color.values()[Integer.parseInt(message[1])]);
-        
+                    player.setTrump(Card.Color.values()[StringSerializer.deserializeInt(message[1])]);
                     break;
                 case WINR:
-                    player.setWinningTeam(TeamId.values()[Integer.parseInt(message[1])]);
+                    player.setWinningTeam(TeamId.values()[StringSerializer.deserializeInt(message[1])]);
                     System.out.println("server closed");
                     w.close();
                     r.close();
