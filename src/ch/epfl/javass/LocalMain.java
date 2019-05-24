@@ -31,6 +31,7 @@ public class LocalMain extends Application {
     private static final int MAX_GLOBAL_ARGS = 5;
     private static final int MIN_GLOBAL_ARGS = 4;
     private static final long THREAD_SLEEP_TIME = 1000;
+    private final Map<PlayerId,Long> rngSimulatePlayer= new EnumMap<>(PlayerId.class);
     private Random rng = new Random(0);
     private final Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);
     private final Map<PlayerId, String> ns = new EnumMap<>(PlayerId.class);
@@ -67,6 +68,10 @@ public class LocalMain extends Application {
                         "Erreur : la graine passée en argument doit être de type long");
                 System.exit(1);
             }
+        int rngJassGame = rng.nextInt();
+        for (PlayerId player : PlayerId.ALL) {
+            rngSimulatePlayer.put(player, rng.nextLong());
+        }
         for (PlayerId player : PlayerId.ALL) {
             String sets[] = parameters.get(player.ordinal()).split(":");
             if (sets.length > 3) {
@@ -76,7 +81,8 @@ public class LocalMain extends Application {
                 System.exit(1);
             }
             switch (sets[TYPE_INDEX]) {
-            //TODO enum 
+//            Can do enum or array but since it is used just once and it's pretty understandable like that 
+//            we choose to let it like that 
             case "h":
                 createHumanPlayer(player, sets);
                 break;
@@ -98,7 +104,7 @@ public class LocalMain extends Application {
         }
 
         Thread gameThread = new Thread(() -> {
-            JassGame g = new JassGame(rng.nextInt(), ps, ns);
+            JassGame g = new JassGame(rngJassGame, ps, ns);
             while (!g.isGameOver()) {
                 g.advanceToEndOfNextTrick();
                 try {
@@ -148,7 +154,7 @@ public class LocalMain extends Application {
         try {
             ps.put(player,
                     new PacedPlayer(
-                            new MctsPlayer(player, rng.nextInt(), itterations),
+                            new MctsPlayer(player, rngSimulatePlayer.get(player), itterations),
                             PLAY_TIME));
         } catch (IllegalArgumentException e) {
             System.err.println(
