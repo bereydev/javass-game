@@ -118,6 +118,7 @@ public final class JassGame {
         turnState = turnState.withNewCardPlayed(cardToPlay);
         for (PlayerId p : PlayerId.ALL)
             players.get(p).updateTrick(turnState.trick());
+        players.get(player).updateScore(turnState.score());
     }
 
     /**

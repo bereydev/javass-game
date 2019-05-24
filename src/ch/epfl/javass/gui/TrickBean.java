@@ -25,9 +25,9 @@ import javafx.collections.FXCollections;
  */
 public final class TrickBean {
 
-    private ObjectProperty<Color> trump;
-    private ObservableMap<PlayerId, Card> trick;
-    private ObjectProperty<PlayerId> winningPlayer;
+    private final ObjectProperty<Color> trump;
+    private final ObservableMap<PlayerId, Card> trick;
+    private final ObjectProperty<PlayerId> winningPlayer;
 
     public TrickBean() {
         trump = new SimpleObjectProperty<>();
@@ -42,7 +42,7 @@ public final class TrickBean {
      *            - new Color value
      */
     public void setTrump(Color trump) {
-        this.trump.setValue(trump);
+        this.trump.set(trump);
     }
 
     /**
@@ -52,7 +52,7 @@ public final class TrickBean {
      *            - new PlayerId value
      */
     public void setWinningPlayer(PlayerId player) {
-        winningPlayer.setValue(player);
+        winningPlayer.set(player);
     }
 
     /**
@@ -64,11 +64,10 @@ public final class TrickBean {
     public void setTrick(Trick trick) {
         if(trick.isEmpty()) {
             this.trick.clear();
-            //TODO besoin de faire ça ou pas ?
-            winningPlayer.setValue(null);
+            winningPlayer.set(null);
         }  
         else {
-            winningPlayer.setValue(trick.winningPlayer()); 
+            winningPlayer.set(trick.winningPlayer()); 
             for(int i=0; i<trick.size(); i++) 
                 this.trick.putIfAbsent(trick.player(i), trick.card(i)); 
         }

@@ -35,7 +35,6 @@ import java.util.Map;
 
 public final class RemotePlayerClient implements Player, AutoCloseable {
     private static final String SPACE = " ";
-    //TODO final ou pas ?
     private final BufferedReader r;
     private final BufferedWriter w;
     private final Socket s;

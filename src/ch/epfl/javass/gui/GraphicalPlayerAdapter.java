@@ -19,11 +19,11 @@ import javafx.application.Platform;
  */
 public class GraphicalPlayerAdapter implements Player {
 
-    private HandBean handBean;
-    private ScoreBean scoreBean;
-    private TrickBean trickBean;
+    private final HandBean handBean;
+    private final ScoreBean scoreBean;
+    private final TrickBean trickBean;
     private GraphicalPlayer graphicalPlayer;
-    private ArrayBlockingQueue<Card> cardQueue;
+    private final ArrayBlockingQueue<Card> cardQueue;
 
     public GraphicalPlayerAdapter() {
         handBean = new HandBean();

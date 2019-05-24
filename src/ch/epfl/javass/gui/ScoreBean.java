@@ -1,5 +1,8 @@
 package ch.epfl.javass.gui;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 import ch.epfl.javass.jass.TeamId;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -13,19 +16,17 @@ import javafx.beans.property.SimpleObjectProperty;
  *
  */
 public final class ScoreBean {
-    //MAP ou pas map tel est la question
-    private IntegerProperty turnPoints1, turnPoints2;
-    private IntegerProperty gamePoints1, gamePoints2;
-    private IntegerProperty totalPoints1, totalPoints2;
-    private ObjectProperty<TeamId> winningTeam;
+    private final Map<TeamId, IntegerProperty> turnPoints = new EnumMap<>(TeamId.class);
+    private final Map<TeamId, IntegerProperty> totalPoints = new EnumMap<>(TeamId.class);
+    private final Map<TeamId, IntegerProperty> gamePoints = new EnumMap<>(TeamId.class);
+    private final ObjectProperty<TeamId> winningTeam;
 
     public ScoreBean() {
-        turnPoints1 = new SimpleIntegerProperty();
-        turnPoints2 = new SimpleIntegerProperty();
-        gamePoints1 = new SimpleIntegerProperty();
-        gamePoints2 = new SimpleIntegerProperty();
-        totalPoints1 = new SimpleIntegerProperty();
-        totalPoints2 = new SimpleIntegerProperty();
+        for (TeamId team : TeamId.ALL) {
+            turnPoints.put(team,new SimpleIntegerProperty());
+            totalPoints.put(team,new SimpleIntegerProperty());
+            gamePoints.put(team,new SimpleIntegerProperty());
+        }
         winningTeam = new SimpleObjectProperty<>();
     }
 
@@ -38,7 +39,7 @@ public final class ScoreBean {
      *         ReadOnlyIntegerProperty
      */
     public ReadOnlyIntegerProperty turnPointsProperty(TeamId team) {
-        return team == TeamId.TEAM_1 ? turnPoints1 : turnPoints2;
+        return turnPoints.get(team);
     }
 
     /**
@@ -50,7 +51,7 @@ public final class ScoreBean {
      *         ReadOnlyIntegerProperty
      */
     public ReadOnlyIntegerProperty gamePointsProperty(TeamId team) {
-        return team == TeamId.TEAM_1 ? gamePoints1 : gamePoints2;
+        return gamePoints.get(team);
     }
 
     /**
@@ -62,7 +63,7 @@ public final class ScoreBean {
      *         ReadOnlyIntegerProperty
      */
     public ReadOnlyIntegerProperty totalPointsProperty(TeamId team) {
-        return team == TeamId.TEAM_1 ? totalPoints1 : totalPoints2;
+        return totalPoints.get(team);
     }
 
     /**
@@ -82,10 +83,7 @@ public final class ScoreBean {
      * @param newTurnPoints
      */
     public void setTurnPoints(TeamId team, int newTurnPoints) {
-        if (team == TeamId.TEAM_1)
-            turnPoints1.setValue(newTurnPoints);
-        else
-            turnPoints2.setValue(newTurnPoints);
+        turnPoints.get(team).set(newTurnPoints);
     }
 
     /**
@@ -96,11 +94,7 @@ public final class ScoreBean {
      * @param newTotalPoints
      */
     public void setTotalPoints(TeamId team, int newTotalPoints) {
-        //TODO set ou setValue
-        if (team.equals(TeamId.TEAM_1))
-            totalPoints1.setValue(newTotalPoints);
-        else
-            totalPoints2.setValue(newTotalPoints);
+      totalPoints.get(team).set(newTotalPoints);
     }
 
     /**
@@ -121,10 +115,7 @@ public final class ScoreBean {
      * @param newGamePoints
      */
     public void setGamePoints(TeamId team, int newGamePoints) {
-        if (team == TeamId.TEAM_1)
-            gamePoints1.setValue(newGamePoints);
-        else
-            gamePoints2.setValue(newGamePoints);
+        gamePoints.get(team).set(newGamePoints);
     }
 
 }

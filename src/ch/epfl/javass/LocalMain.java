@@ -24,9 +24,8 @@ public class LocalMain extends Application {
     private static final String DEFAULT_HOST = "localhost";
     private static final int PLAY_TIME = 2; // time expressed in second
     private Random rng = new Random(0);
-    // TODO final ou pas
-    private Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);
-    private Map<PlayerId, String> ns = new EnumMap<>(PlayerId.class);
+    private final Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);
+    private final Map<PlayerId, String> ns = new EnumMap<>(PlayerId.class);
 
     /**
      * Program that is launched on the main device (where the JassGame is really
@@ -59,15 +58,15 @@ public class LocalMain extends Application {
                 System.exit(1);
             }
             switch (sets[0]) {
-
+            //TODO enum 
             case "h":
                 createHumanPlayer(player, sets);
                 break;
             case "s":
-                createRemotePlayer(player, sets);
+                createSimulatePlayer(player, sets);
                 break;
             case "r":
-                createSimulatePlayer(player, sets);
+                createRemotePlayer(player, sets);
                 break;
             default:
                 System.err.println(
@@ -92,7 +91,6 @@ public class LocalMain extends Application {
 
     }
 
-    // TODO des if dans les cas ça passe ?
     private void createHumanPlayer(PlayerId player, String[] sets) {
         if (sets.length > 2) {
             System.err.println(
