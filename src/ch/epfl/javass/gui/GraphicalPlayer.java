@@ -52,9 +52,9 @@ public class GraphicalPlayer {
     private static final String RECT_STYLE = "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: lightpink; -fx-stroke-width: 5; -fx-opacity: 0.5;";
     private static final String TRICK_STYLE = "-fx-background-color: whitesmoke; -fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center; ";
     private static final String HANDBOX_STYLE = "-fx-background-color: lightgray;\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;";
-
     private final Scene scene;
-    //TODO En attribu ou pas ?
+  
+    //TODO En attribu ou pas ? (Bonne question) 
     private final String player;
 
     /**
@@ -144,19 +144,15 @@ public class GraphicalPlayer {
         trumpImage.setFitHeight(101);
         trumpImage.setFitWidth(101);
 
-        for (int i = 0; i < PlayerId.COUNT; i++) {
+        for (int i = 0; i < PlayerId.COUNT; i++)
             pairs[i] = trickCard(trick, player, i, map);
-            //TODO mieux de faire if ou de hardCoder ?
-            if (i % 2 == 0)
-                trickPane.add(pairs[i], 1, 2 - i);
-            else
-                trickPane.add(pairs[i], 3 - i, 0, 1, 3);
-        }
-//        trickPane.add(pairs[0], 1, 2);
-//        trickPane.add(pairs[1], 2, 0, 1, 3);
-//        trickPane.add(pairs[2], 1, 0);
-//        trickPane.add(pairs[3], 0, 0, 1, 3);
+        
+        trickPane.add(pairs[0], 1, 2);
+        trickPane.add(pairs[1], 2, 0, 1, 3);
+        trickPane.add(pairs[2], 1, 0);
+        trickPane.add(pairs[3], 0, 0, 1, 3);
         trickPane.add(trumpImage, 1, 1, 1, 1);
+        
         GridPane.setHalignment(trumpImage, HPos.CENTER);
         trickPane.setStyle(TRICK_STYLE);
 

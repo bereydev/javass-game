@@ -16,6 +16,7 @@ import javafx.beans.property.SimpleObjectProperty;
  *
  */
 public final class ScoreBean {
+    
     private final Map<TeamId, IntegerProperty> turnPoints = new EnumMap<>(TeamId.class);
     private final Map<TeamId, IntegerProperty> totalPoints = new EnumMap<>(TeamId.class);
     private final Map<TeamId, IntegerProperty> gamePoints = new EnumMap<>(TeamId.class);

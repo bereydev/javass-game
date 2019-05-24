@@ -22,9 +22,9 @@ public class GraphicalPlayerAdapter implements Player {
     private final HandBean handBean;
     private final ScoreBean scoreBean;
     private final TrickBean trickBean;
-    private GraphicalPlayer graphicalPlayer;
     private final ArrayBlockingQueue<Card> cardQueue;
-
+    private GraphicalPlayer graphicalPlayer;
+    
     public GraphicalPlayerAdapter() {
         handBean = new HandBean();
         scoreBean = new ScoreBean();
@@ -42,7 +42,6 @@ public class GraphicalPlayerAdapter implements Player {
         try {
             cardToPlay = cardQueue.take();
             Platform.runLater(() -> {
-                // to disable when the player turn is finished
                 handBean.setPlayableCards(CardSet.EMPTY);
             });
             return cardToPlay;

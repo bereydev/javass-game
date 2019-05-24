@@ -31,6 +31,7 @@ import java.util.Map;
 public final class RemotePlayerServer {
 
     private final Player player;
+    private final int COMMAND_INDEX = 0;
 
     /**
      * The constructor of the RemotePlyerServer take an underlying Player as
@@ -57,7 +58,7 @@ public final class RemotePlayerServer {
             while (!s.isClosed()) {
                 String[] message = r.readLine().trim().split(" ");
 
-                JassCommand command = JassCommand.valueOf(message[0]);
+                JassCommand command = JassCommand.valueOf(message[COMMAND_INDEX]);
                 switch (command) {
                 case PLRS:
                     PlayerId ownId = PlayerId.values()[Integer
@@ -74,6 +75,7 @@ public final class RemotePlayerServer {
                 case CARD:
                     String[] stateTab = StringSerializer.split(message[1]);
                     TurnState state = TurnState.ofPackedComponents(
+                            
                             StringSerializer.deserializeLong(stateTab[0]), // Score
                             StringSerializer.deserializeLong(stateTab[1]), // CardSet
                                                                            // not
