@@ -67,16 +67,18 @@ public class GraphicalPlayer {
             ArrayBlockingQueue<Color> trump) {
         this.player = names.get(player);
         BorderPane borderPane = new BorderPane();
-        Button b = new Button("Help me !");
-        borderPane.setCenter(createTrickPane(trick, player, names));
+        Button b = new Button("Help me !"); 
+        borderPane.setCenter(createTrickPane(trick, player, names,trump));
         borderPane.setTop(createScorePane(score, names));
         borderPane.setBottom(
-                createHandPane(hand, player, cardToPlay, cardBean, b, trump));
+                createHandPane(hand, player, cardToPlay, cardBean, b));
         StackPane mainPane = new StackPane();
+        
         mainPane.getChildren().add(borderPane);
         mainPane.getChildren().add(b);
         StackPane.setAlignment(b, Pos.CENTER_RIGHT);
         mainPane.getChildren().addAll(createWinningPane(score, names));
+        
 
         scene = new Scene(mainPane);
     }
@@ -125,13 +127,13 @@ public class GraphicalPlayer {
                     scorePane.addRow(j, new Text("/Total : "));
                 scorePane.addRow(j, teamTexts[2 * i + j]);
             }
-
         scorePane.setStyle(TEXT_STYLE);
         return scorePane;
     }
 
     private GridPane createTrickPane(TrickBean trick, PlayerId player,
-            Map<PlayerId, String> map) {
+            Map<PlayerId, String> map, ArrayBlockingQueue<Color> trumpQueue) {
+        StackPane s = trumpChoicePane(trumpQueue); 
         GridPane trickPane = new GridPane();
         VBox[] pairs = new VBox[4];
         ImageView trumpImage = new ImageView();
@@ -148,6 +150,7 @@ public class GraphicalPlayer {
         trickPane.add(pairs[2], 1, 0, 1, 1);
         trickPane.add(pairs[3], 0, 0, 1, 3);
         trickPane.add(trumpImage, 1, 1, 1, 1);
+        trickPane.add(s, 2,3,1,1);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
         trickPane.setStyle(TRICK_STYLE);
 
@@ -245,13 +248,11 @@ public class GraphicalPlayer {
     }
 
     private HBox createHandPane(HandBean hand, PlayerId player,
-            ArrayBlockingQueue<Card> cardQueue, CardBean cardBean, Button b,
-            ArrayBlockingQueue<Color> trump) {
+            ArrayBlockingQueue<Card> cardQueue, CardBean cardBean, Button b) {
         HBox handBox = new HBox();
         StackPane cardImages[] = new StackPane[9];
         for (int i = 0; i < cardImages.length; i++) {
-            cardImages[i] = createHandCard(i, hand, cardQueue, cardBean, b,
-                    trump);
+            cardImages[i] = createHandCard(i, hand, cardQueue, cardBean, b);
         }
         handBox.getChildren().addAll(cardImages);
         handBox.setStyle(HANDBOX_STYLE);
@@ -259,8 +260,7 @@ public class GraphicalPlayer {
     }
 
     private StackPane createHandCard(int i, HandBean hand,
-            ArrayBlockingQueue<Card> cardQueue, CardBean cardBean, Button b,
-            ArrayBlockingQueue<Color> trumpQueue) {
+            ArrayBlockingQueue<Card> cardQueue, CardBean cardBean, Button b) {
 
         ImageView cardImage = new ImageView();
         Circle greenCircle = new Circle(4, javafx.scene.paint.Color.LIMEGREEN);
@@ -331,19 +331,35 @@ public class GraphicalPlayer {
                     } catch (InterruptedException e1) {
                         throw new Error(e1);
                     }
-                    try {
-                        trumpQueue.put(Color.DIAMOND);
-                    } catch (InterruptedException e2) {
-                        System.err.println("WHAT");
-                        throw new Error(e2);
-                    }
-                   
                 });
          
             });
 
         });
         return card;
+    }
+    private StackPane trumpChoicePane(ArrayBlockingQueue<Color> trumpQueue) {
+        StackPane result = new StackPane(); 
+        HBox trumps = new HBox(); 
+        ImageView[] images = new ImageView[Color.COUNT]; 
+        for(Color c : Color.ALL) {
+            images[c.ordinal()]= new ImageView(GraphicalPlayer.trumps.get(c)); 
+            images[c.ordinal()].setFitHeight(CARD_HEIGHT/4);
+            images[c.ordinal()].setFitWidth(CARD_WIDTH/4);
+            images[c.ordinal()].setOnMouseClicked(event ->{
+              try {
+              trumpQueue.put(Color.DIAMOND);
+          } catch (InterruptedException e2) {
+              System.err.println("WHAT");
+              throw new Error(e2);
+          }
+            });
+        }
+        trumps.setStyle(HANDBOX_STYLE);
+        trumps.getChildren().addAll(images); 
+        result.getChildren().add(trumps); 
+        result.resize(100, 20);
+        return result; 
     }
 
     private static final ObservableMap<Card, Image> mapCreator(int quality) {
