@@ -35,6 +35,7 @@ import java.util.Map;
 
 public final class RemotePlayerClient implements Player, AutoCloseable {
     private static final String SPACE = " ";
+    //TODO final ou pas ?
     private final BufferedReader r;
     private final BufferedWriter w;
     private final Socket s;
@@ -58,8 +59,8 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        String players[] = new String[4];
-        for (int i = 0; i < players.length; i++) {
+        String players[] = new String[PlayerId.COUNT];
+        for (int i = 0; i < PlayerId.COUNT; i++) {
             players[i] = StringSerializer
                     .serializeString(playerNames.get(PlayerId.values()[i]));
         }

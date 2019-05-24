@@ -12,6 +12,8 @@ import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 
 public final class StringSerializer {
+    
+    private final static int BASE_16 = 16;
 
     private StringSerializer() {
         // Not instantiable.
@@ -25,7 +27,7 @@ public final class StringSerializer {
      * @return the serialize String value
      */
     public static String serializeInt(int param) {
-        return Integer.toUnsignedString(param);
+        return Integer.toUnsignedString(param,BASE_16);
     }
 
     /**
@@ -36,7 +38,7 @@ public final class StringSerializer {
      * @return the deserialized int value
      */
     public static int deserializeInt(String param) {
-        return Integer.parseUnsignedInt(param);
+        return Integer.parseUnsignedInt(param,BASE_16);
     }
 
     /**
@@ -47,7 +49,7 @@ public final class StringSerializer {
      * @return the serialized String value
      */
     public static String serializeLong(long param) {
-        return Long.toUnsignedString(param);
+        return Long.toUnsignedString(param,BASE_16);
     }
 
     /**
@@ -58,7 +60,7 @@ public final class StringSerializer {
      * @return the deserialized long value
      */
     public static long deserializeLong(String param) {
-        return Long.parseUnsignedLong(param);
+        return Long.parseUnsignedLong(param,BASE_16);
     }
 
     /**
@@ -104,6 +106,7 @@ public final class StringSerializer {
      * @return an array of String values
      */
     public static String[] split(String string) {
+        //TODO delimiter ou pas délimiteur
         return string.split(",");
     }
 

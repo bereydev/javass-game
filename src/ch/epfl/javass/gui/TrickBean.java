@@ -29,7 +29,7 @@ public final class TrickBean {
     private ObservableMap<PlayerId, Card> trick;
     private ObjectProperty<PlayerId> winningPlayer;
 
-    TrickBean() {
+    public TrickBean() {
         trump = new SimpleObjectProperty<>();
         winningPlayer = new SimpleObjectProperty<>();
         trick = FXCollections.observableHashMap();
@@ -62,11 +62,16 @@ public final class TrickBean {
      *            - new Trick value
      */
     public void setTrick(Trick trick) {
-        if (!trick.isEmpty())
-            winningPlayer.setValue(trick.winningPlayer());
-        this.trick.clear();
-        for (int i = 0; i < trick.size(); i++)
-            this.trick.put(trick.player(i), trick.card(i));
+        if(trick.isEmpty()) {
+            this.trick.clear();
+            //TODO besoin de faire ça ou pas ?
+            winningPlayer.setValue(null);
+        }  
+        else {
+            winningPlayer.setValue(trick.winningPlayer()); 
+            for(int i=0; i<trick.size(); i++) 
+                this.trick.putIfAbsent(trick.player(i), trick.card(i)); 
+        }
 
     }
 

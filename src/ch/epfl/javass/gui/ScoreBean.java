@@ -13,12 +13,13 @@ import javafx.beans.property.SimpleObjectProperty;
  *
  */
 public final class ScoreBean {
+    //MAP ou pas map tel est la question
     private IntegerProperty turnPoints1, turnPoints2;
     private IntegerProperty gamePoints1, gamePoints2;
     private IntegerProperty totalPoints1, totalPoints2;
     private ObjectProperty<TeamId> winningTeam;
 
-    ScoreBean() {
+    public ScoreBean() {
         turnPoints1 = new SimpleIntegerProperty();
         turnPoints2 = new SimpleIntegerProperty();
         gamePoints1 = new SimpleIntegerProperty();
@@ -95,6 +96,7 @@ public final class ScoreBean {
      * @param newTotalPoints
      */
     public void setTotalPoints(TeamId team, int newTotalPoints) {
+        //TODO set ou setValue
         if (team.equals(TeamId.TEAM_1))
             totalPoints1.setValue(newTotalPoints);
         else
@@ -109,7 +111,6 @@ public final class ScoreBean {
      */
     public void setWinningTeam(TeamId team) {
         winningTeam.setValue(team);
-        ;
     }
 
     /**

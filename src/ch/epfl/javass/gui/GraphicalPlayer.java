@@ -53,6 +53,7 @@ public class GraphicalPlayer {
     private static final String TRICK_STYLE = "-fx-background-color: whitesmoke; -fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center; ";
 
     private final Scene scene;
+    //TODO En attribu ou pas ?
     private final String player;
 
     /**
@@ -64,6 +65,7 @@ public class GraphicalPlayer {
         this.player = names.get(player);
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(createTrickPane(trick, player, names));
+        //TODO : Attribus de classe ou argument ?
         borderPane.setTop(createScorePane(score, names));
         borderPane.setBottom(createHandPane(hand, player, cardToPlay));
         StackPane mainPane = new StackPane();
@@ -143,11 +145,16 @@ public class GraphicalPlayer {
 
         for (int i = 0; i < PlayerId.COUNT; i++) {
             pairs[i] = trickCard(trick, player, i, map);
+            //TODO mieux de faire if ou de hardCoder ?
+            if (i % 2 == 0)
+                trickPane.add(pairs[i], 1, 2 - i);
+            else
+                trickPane.add(pairs[i], 3 - i, 0, 1, 3);
         }
-        trickPane.add(pairs[0], 1, 2, 1, 1);
-        trickPane.add(pairs[1], 2, 0, 1, 3);
-        trickPane.add(pairs[2], 1, 0, 1, 1);
-        trickPane.add(pairs[3], 0, 0, 1, 3);
+//        trickPane.add(pairs[0], 1, 2);
+//        trickPane.add(pairs[1], 2, 0, 1, 3);
+//        trickPane.add(pairs[2], 1, 0);
+//        trickPane.add(pairs[3], 0, 0, 1, 3);
         trickPane.add(trumpImage, 1, 1, 1, 1);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
         trickPane.setStyle(TRICK_STYLE);
@@ -157,11 +164,11 @@ public class GraphicalPlayer {
 
     private VBox trickCard(TrickBean trick, PlayerId player, int i,
             Map<PlayerId, String> map) {
+        PlayerId cardPlayer = PlayerId.ALL.get((player.ordinal() + i) % PlayerId.COUNT);
         Rectangle rect = new Rectangle(CARD_WIDTH, CARD_HEIGHT);
         rect.setStyle(RECT_STYLE);
         rect.setEffect(new GaussianBlur(4));
-        ObjectBinding<Card> card = Bindings.valueAt(trick.trick(),
-                PlayerId.values()[(player.ordinal() + i) % 4]);
+        ObjectBinding<Card> card = Bindings.valueAt(trick.trick(), cardPlayer);
         ImageView cardImage = new ImageView();
         cardImage.imageProperty().bind(Bindings.valueAt(cards, card));
         cardImage.setFitWidth(CARD_WIDTH);
@@ -169,11 +176,10 @@ public class GraphicalPlayer {
         StackPane pane = new StackPane(rect, cardImage);
         rect.visibleProperty()
                 .bind(trick.winningPlayerProperty()
-                        .isEqualTo(
-                                PlayerId.values()[(player.ordinal() + i) % 4])
+                        .isEqualTo(cardPlayer)
                         .and(cardImage.imageProperty().isNotNull()));
         Text name = new Text(
-                map.get(PlayerId.values()[(player.ordinal() + i) % 4]));
+                map.get(cardPlayer));
         name.setStyle("-fx-font: 14 Optima;");
         VBox pair;
         if (i != 0)
@@ -233,8 +239,7 @@ public class GraphicalPlayer {
             cardImages[i] = createHandCard(i, hand, cardQueue);
         }
         handBox.getChildren().addAll(cardImages);
-        handBox.setStyle("-fx-background-color: lightgray;\r\n"
-                + "-fx-spacing: 5px;\r\n" + "-fx-padding: 5px;");
+        handBox.setStyle(HANDBOX_STYLE);
         return handBox;
     }
 

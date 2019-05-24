@@ -57,9 +57,6 @@ public final class RemotePlayerServer {
             while (!s.isClosed()) {
                 String[] message = r.readLine().trim().split(" ");
 
-                for (String m : message)
-                    System.out.println(m);
-
                 JassCommand command = JassCommand.valueOf(message[0]);
                 switch (command) {
                 case PLRS:
@@ -112,12 +109,12 @@ public final class RemotePlayerServer {
                     break;
                 case TRMP:
                     player.setTrump(
-                            Card.Color.values()[Integer.parseInt(message[1])]);
+                            Card.Color.values()[StringSerializer.deserializeInt(message[1])]);
 
                     break;
                 case WINR:
                     player.setWinningTeam(
-                            TeamId.values()[Integer.parseInt(message[1])]);
+                            TeamId.values()[StringSerializer.deserializeInt(message[1])]);
                     System.out.println("server closed");
                     w.close();
                     r.close();
