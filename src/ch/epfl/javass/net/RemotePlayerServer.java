@@ -46,7 +46,7 @@ public final class RemotePlayerServer {
     /**
      * Lauch a "Serveur" which is communicating with the main game and is
      * passing informations to the underlying Player mainly a human player who
-     * plays on an other machine
+     * plays on another machine
      */
     public void run() {
 
