@@ -78,4 +78,12 @@ public final class PacedPlayer implements Player {
         underlyingPlayer.setWinningTeam(winningTeam);
     }
 
+    /* (non-Javadoc)
+     * @see ch.epfl.javass.jass.Player#trumpToPlay(ch.epfl.javass.jass.Card.Color, ch.epfl.javass.jass.CardSet)
+     */
+    @Override
+    public Color trumpToPlay(CardSet hand) {
+        return underlyingPlayer.trumpToPlay(hand);
+    }
+
 }

@@ -29,6 +29,7 @@ public final class JassGame {
             Rank.SEVEN);
     private Boolean newGame = true;
     private TurnState turnState;
+    private Color trump; 
 
     public JassGame(long rngSeed, Map<PlayerId, Player> players,
             Map<PlayerId, String> playerNames) {
@@ -69,17 +70,20 @@ public final class JassGame {
      * Advances to the end of the next trick, doing everything.
      */
 
-    public void advanceToEndOfNextTrick(Color trump) {
+    public void advanceToEndOfNextTrick() {
         if (isGameOver()) {
             return;
         }
-        if (trump == null)
-            trump = Color.values()[trumpRng.nextInt(Color.COUNT)];
         if (newGame) {
             deal();
-            turnState = TurnState.initial(trump, Score.INITIAL, turnStarter());
-            for (PlayerId p : PlayerId.ALL) {
+            for (PlayerId p : PlayerId.ALL)
                 players.get(p).setPlayers(p, playerNames);
+            
+            PlayerId temp = turnStarter(); 
+            trump = players.get(temp).trumpToPlay(hands.get(temp));            
+            turnState = TurnState.initial(trump, Score.INITIAL, temp);
+            for (PlayerId p : PlayerId.ALL) {
+                
                 players.get(p).updateHand(hands.get(p));
                 players.get(p).setTrump(turnState.trick().trump());
             }
@@ -88,6 +92,8 @@ public final class JassGame {
             turnState = turnState.withTrickCollected();
             if (turnState.isTerminal()) {
                 deal();
+                PlayerId temp = turnStarter(); 
+                trump = players.get(temp).trumpToPlay(hands.get(temp)); 
                 turnState = TurnState.initial(trump,
                         turnState.score().nextTurn(), turnStarter());
                 for (PlayerId p : PlayerId.ALL) {
@@ -109,9 +115,6 @@ public final class JassGame {
         }
     }
     
-    public void advanceToEndOfNextTrick() {
-        advanceToEndOfNextTrick(null); 
-    }
 
     private void playTrick(PlayerId player) {
         players.get(player).updateScore(turnState.score());

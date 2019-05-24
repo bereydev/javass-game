@@ -5,11 +5,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import ch.epfl.javass.gui.GraphicalPlayerAdapter;
-import ch.epfl.javass.jass.Card;
-import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.JassGame;
 import ch.epfl.javass.jass.MctsPlayer;
 import ch.epfl.javass.jass.PacedPlayer;
@@ -27,7 +24,6 @@ public class LocalMain extends Application {
     private static final String DEFAULT_HOST = "localhost";
     private static final int PLAY_TIME = 2; // time expressed in second
     private Random rng = new Random(0);
-    private ArrayBlockingQueue<Color> trumpQueue = new ArrayBlockingQueue<>(1);
 
     public static void main(String[] args) {
         launch(args);
@@ -109,7 +105,6 @@ public class LocalMain extends Application {
                             "Erreur : Connexion au serveur impossible ou refusée "
                                     + "veuillez vérifier les paramètre d'hôte passé "
                                     + "en paramètre ou désactiver votre anti-virus");
-                    System.exit(1);
                 }
 
                 System.out.println("Joueur distant nommé " + ns.get(player));
@@ -125,13 +120,9 @@ public class LocalMain extends Application {
         Thread gameThread = new Thread(() -> {
             JassGame g = new JassGame(rng.nextInt(), ps, ns);
             while (!g.isGameOver()) {
+                g.advanceToEndOfNextTrick();
                 try {
-                    g.advanceToEndOfNextTrick(trumpQueue.take());
-                } catch (InterruptedException e) {
-                    throw new Error(e);
-                }
-                try {
-                    Thread.sleep(3000);
+                    Thread.sleep(1000);
                 } catch (Exception e) {
                 }
             }

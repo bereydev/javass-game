@@ -63,14 +63,15 @@ public class GraphicalPlayer {
 
     public GraphicalPlayer(PlayerId player, Map<PlayerId, String> names,
             TrickBean trick, ScoreBean score, HandBean hand,
-            ArrayBlockingQueue<Card> cardToPlay, CardBean cardBean) {
+            ArrayBlockingQueue<Card> cardToPlay, CardBean cardBean,
+            ArrayBlockingQueue<Color> trump) {
         this.player = names.get(player);
         BorderPane borderPane = new BorderPane();
         Button b = new Button("Help me !");
         borderPane.setCenter(createTrickPane(trick, player, names));
         borderPane.setTop(createScorePane(score, names));
         borderPane.setBottom(
-                createHandPane(hand, player, cardToPlay, cardBean, b));
+                createHandPane(hand, player, cardToPlay, cardBean, b, trump));
         StackPane mainPane = new StackPane();
         mainPane.getChildren().add(borderPane);
         mainPane.getChildren().add(b);
@@ -91,37 +92,38 @@ public class GraphicalPlayer {
             Map<PlayerId, String> map) {
         GridPane scorePane = new GridPane();
         Text[] teamTexts = new Text[8];
-        for(int i=0; i<8; i++) 
-            teamTexts[i]= new Text(); 
+        for (int i = 0; i < 8; i++)
+            teamTexts[i] = new Text();
         StringProperty differences[] = new StringProperty[2];
         for (TeamId t : TeamId.ALL) {
             differences[t.ordinal()] = new SimpleStringProperty();
             score.turnPointsProperty(t).addListener((o, oV, nV) -> {
-                
+
                 int diffInt = nV.intValue() - oV.intValue();
                 IntegerProperty diff = new SimpleIntegerProperty(
                         diffInt < 0 ? 0 : diffInt);
                 differences[t.ordinal()].bind(
                         Bindings.concat("(+", Bindings.convert(diff), ")"));
             });
-            teamTexts[2+t.ordinal()].textProperty().bind(
-                    Bindings.convert(score.turnPointsProperty(t)));
-            
-            teamTexts[4+t.ordinal()].textProperty().bind(differences[t.ordinal()]);
-            
-            teamTexts[6+t.ordinal()].textProperty().bind(
-                    Bindings.convert(score.gamePointsProperty(t)));
+            teamTexts[2 + t.ordinal()].textProperty()
+                    .bind(Bindings.convert(score.turnPointsProperty(t)));
+
+            teamTexts[4 + t.ordinal()].textProperty()
+                    .bind(differences[t.ordinal()]);
+
+            teamTexts[6 + t.ordinal()].textProperty()
+                    .bind(Bindings.convert(score.gamePointsProperty(t)));
         }
 
         teamTexts[0] = new Text(map.get(PlayerId.PLAYER_1) + " et "
                 + map.get(PlayerId.PLAYER_3) + " : ");
-        teamTexts[1]= new Text(map.get(PlayerId.PLAYER_2) + " et "
+        teamTexts[1] = new Text(map.get(PlayerId.PLAYER_2) + " et "
                 + map.get(PlayerId.PLAYER_4) + " : ");
-        for(int j = 0; j<TeamId.COUNT; j++)
-            for(int i=0; i<4; i++) {
-                if(i==3)
+        for (int j = 0; j < TeamId.COUNT; j++)
+            for (int i = 0; i < 4; i++) {
+                if (i == 3)
                     scorePane.addRow(j, new Text("/Total : "));
-                scorePane.addRow(j, teamTexts[2*i + j]);
+                scorePane.addRow(j, teamTexts[2 * i + j]);
             }
 
         scorePane.setStyle(TEXT_STYLE);
@@ -227,7 +229,7 @@ public class GraphicalPlayer {
                 Bindings.convert(score.gamePointsProperty(TeamId.TEAM_2)),
                 " points contre ",
                 Bindings.convert(score.gamePointsProperty(TeamId.TEAM_1))));
-        
+
         for (int i = 0; i < TeamId.COUNT; i++) {
             teamText[i].setStyle(TEXT_STYLE);
             teamPane[i] = new BorderPane();
@@ -241,13 +243,15 @@ public class GraphicalPlayer {
 
         return winningPane;
     }
-    
+
     private HBox createHandPane(HandBean hand, PlayerId player,
-            ArrayBlockingQueue<Card> cardQueue, CardBean cardBean, Button b) {
+            ArrayBlockingQueue<Card> cardQueue, CardBean cardBean, Button b,
+            ArrayBlockingQueue<Color> trump) {
         HBox handBox = new HBox();
         StackPane cardImages[] = new StackPane[9];
         for (int i = 0; i < cardImages.length; i++) {
-            cardImages[i] = createHandCard(i, hand, cardQueue, cardBean, b);
+            cardImages[i] = createHandCard(i, hand, cardQueue, cardBean, b,
+                    trump);
         }
         handBox.getChildren().addAll(cardImages);
         handBox.setStyle(HANDBOX_STYLE);
@@ -255,13 +259,16 @@ public class GraphicalPlayer {
     }
 
     private StackPane createHandCard(int i, HandBean hand,
-            ArrayBlockingQueue<Card> cardQueue, CardBean cardBean, Button b) {
+            ArrayBlockingQueue<Card> cardQueue, CardBean cardBean, Button b,
+            ArrayBlockingQueue<Color> trumpQueue) {
+
         ImageView cardImage = new ImageView();
         Circle greenCircle = new Circle(4, javafx.scene.paint.Color.LIMEGREEN);
         StackPane card = new StackPane(cardImage, greenCircle);
         StackPane.setAlignment(greenCircle, Pos.TOP_RIGHT);
         cardImage.imageProperty().bind(
                 Bindings.valueAt(cards, Bindings.valueAt(hand.hand(), i)));
+        
         cardImage.setFitWidth(HANDCARD_WIDTH);
         cardImage.setFitHeight(HANDCARD_HEIGHT);
         cardImage.setTranslateX(0);
@@ -300,7 +307,7 @@ public class GraphicalPlayer {
                     tl.getKeyFrames().addAll(
                             new KeyFrame(Duration.millis(300), "Translation",
                                     new KeyValue(card.translateYProperty(),
-                                            -HANDCARD_HEIGHT /3)),
+                                            -HANDCARD_HEIGHT / 3)),
 
                             new KeyFrame(Duration.millis(300), "Bigger",
                                     new KeyValue(card.scaleXProperty(), 1.5),
@@ -324,7 +331,15 @@ public class GraphicalPlayer {
                     } catch (InterruptedException e1) {
                         throw new Error(e1);
                     }
+                    try {
+                        trumpQueue.put(Color.DIAMOND);
+                    } catch (InterruptedException e2) {
+                        System.err.println("WHAT");
+                        throw new Error(e2);
+                    }
+                   
                 });
+         
             });
 
         });

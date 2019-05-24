@@ -17,6 +17,8 @@ public interface Player {
      *         cards hand in the hand
      */
     abstract Card cardToPlay(TurnState state, CardSet hand);
+    
+    abstract Color trumpToPlay(CardSet hand); 
 
     default public void setPlayers(PlayerId ownId,
             Map<PlayerId, String> playerNames) {

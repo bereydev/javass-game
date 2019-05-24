@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.SplittableRandom;
 import ch.epfl.javass.Preconditions;
+import ch.epfl.javass.jass.Card.Color;
 
 /**
  * Class representing a simulated player using the MCTS algorithm
@@ -234,5 +235,14 @@ public final class MctsPlayer implements Player {
             }
             return indexOfTheBestChild;
         }
+    }
+
+    /* (non-Javadoc)
+     * @see ch.epfl.javass.jass.Player#trumpToPlay(ch.epfl.javass.jass.Card.Color, ch.epfl.javass.jass.CardSet)
+     */
+    @Override
+    public Color trumpToPlay(CardSet hand) {
+        // TODO Make it smort 
+        return Color.HEART;
     }
 }
