@@ -1,5 +1,5 @@
 /*
- *  Author : Alexandre Santangelo 
+ *  Author : Alexandre Santangelo & Jonathan Bereyziat
  *  Date   : Apr 29, 2019   
 */
 package ch.epfl.javass.gui;
@@ -46,6 +46,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+/**
+ * Class that define the graphical interface for a Jass human player
+ */
 public class GraphicalPlayer {
 
     private static final ObservableMap<Card, Image> cards = mapCreator(240);
@@ -60,10 +63,14 @@ public class GraphicalPlayer {
     private static final String HANDBOX_STYLE = "-fx-background-color: lightgray;\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;";
 
     private final Scene scene;
+    //TODO En attribu ou pas ?
     private final String player;
     private double xCardPos;
     private double yCardPos;
 
+    /**
+     * Create the different panes and place it into the scene
+     */
     public GraphicalPlayer(PlayerId player, Map<PlayerId, String> names,
             TrickBean trick, ScoreBean score, HandBean hand,
             ArrayBlockingQueue<Card> cardToPlay, CardBean cardBean) {
@@ -71,24 +78,31 @@ public class GraphicalPlayer {
         BorderPane borderPane = new BorderPane();
         Button b = new Button("Help me !");
         borderPane.setCenter(createTrickPane(trick, player, names));
-        borderPane.setTop(createScorePane(score, names));
+        //TODO : Attribus de classe ou argument ?
         borderPane.setBottom(
                 createHandPane(hand, player, cardToPlay, cardBean, b));
+        borderPane.setTop(createScorePane(score, names));
         StackPane mainPane = new StackPane();
         mainPane.getChildren().add(borderPane);
         mainPane.getChildren().add(b);
         StackPane.setAlignment(b, Pos.CENTER_RIGHT);
         mainPane.getChildren().addAll(createWinningPane(score, names));
-
         scene = new Scene(mainPane);
     }
 
+    /**
+     * Creates the Stage in which the scene takes place
+     */
     public Stage createStage() {
         Stage stage = new Stage();
         stage.setTitle("Javass - " + player);
         stage.setScene(scene);
         return stage;
     }
+
+    /**
+     * Creates the Pane in which the score is displayed
+     */
 
     private GridPane createScorePane(ScoreBean score,
             Map<PlayerId, String> map) {
@@ -117,7 +131,6 @@ public class GraphicalPlayer {
                     .bind(Bindings.convert(score.gamePointsProperty(t)));
         }
         //TODO peut mieux faire
-
         teamTexts[0] = new Text(map.get(PlayerId.PLAYER_1) + " et "
                 + map.get(PlayerId.PLAYER_3) + " : ");
         teamTexts[1] = new Text(map.get(PlayerId.PLAYER_2) + " et "
@@ -133,6 +146,9 @@ public class GraphicalPlayer {
         return scorePane;
     }
 
+    /**
+     * Creates the pane in which the Trick is displayed
+     */
     private GridPane createTrickPane(TrickBean trick, PlayerId player,
             Map<PlayerId, String> map) {
         GridPane trickPane = new GridPane();
@@ -145,12 +161,16 @@ public class GraphicalPlayer {
 
         for (int i = 0; i < PlayerId.COUNT; i++) {
             pairs[i] = trickCard(trick, player, i, map);
-            if( i % 2 == 0)
+            //TODO mieux de faire if ou de hardCoder ?
+            if (i % 2 == 0)
                 trickPane.add(pairs[i], 1, 2 - i);
-            else 
+            else
                 trickPane.add(pairs[i], 3 - i, 0, 1, 3);
         }
-
+//        trickPane.add(pairs[0], 1, 2);
+//        trickPane.add(pairs[1], 2, 0, 1, 3);
+//        trickPane.add(pairs[2], 1, 0);
+//        trickPane.add(pairs[3], 0, 0, 1, 3);
         trickPane.add(trumpImage, 1, 1, 1, 1);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
         trickPane.setStyle(TRICK_STYLE);
@@ -160,26 +180,27 @@ public class GraphicalPlayer {
 
     private VBox trickCard(TrickBean trick, PlayerId player, int i,
             Map<PlayerId, String> map) {
+        
+        PlayerId cardPlayer = PlayerId.ALL.get((player.ordinal() + i) % PlayerId.COUNT);
         Rectangle rect = new Rectangle(CARD_WIDTH, CARD_HEIGHT);
         rect.setStyle(RECT_STYLE);
         rect.setEffect(new GaussianBlur(4));
-        ObjectBinding<Card> card = Bindings.valueAt(trick.trick(),
-                PlayerId.values()[(player.ordinal() + i) % 4]);
+        ObjectBinding<Card> card = Bindings.valueAt(trick.trick(), cardPlayer);
         ImageView cardImage = new ImageView();
         card.addListener((o, oV, nV) -> {
             imageThrowAnimation(cardImage, i);
         });
+
         cardImage.imageProperty().bind(Bindings.valueAt(cards, card));
         cardImage.setFitWidth(CARD_WIDTH);
         cardImage.setFitHeight(CARD_HEIGHT);
         StackPane pane = new StackPane(rect, cardImage);
         rect.visibleProperty()
                 .bind(trick.winningPlayerProperty()
-                        .isEqualTo(
-                                PlayerId.values()[(player.ordinal() + i) % 4])
+                        .isEqualTo(cardPlayer)
                         .and(cardImage.imageProperty().isNotNull()));
         Text name = new Text(
-                map.get(PlayerId.values()[(player.ordinal() + i) % 4]));
+                map.get(cardPlayer));
         name.setStyle("-fx-font: 14 Optima;");
         VBox pair;
         
@@ -231,18 +252,20 @@ public class GraphicalPlayer {
         Text[] teamText = new Text[TeamId.COUNT];
         teamText[0] = new Text();
         teamText[1] = new Text();
-        teamText[0].textProperty()
-                .bind(Bindings.format(map.get(PlayerId.PLAYER_1) + " et "
-                        + map.get(PlayerId.PLAYER_3) + " ont gagné avec "
-                        + score.gamePointsProperty(TeamId.TEAM_1).intValue()
-                        + " points contre "
-                        + score.gamePointsProperty(TeamId.TEAM_2).intValue()));
-        teamText[1].textProperty()
-                .bind(Bindings.format(map.get(PlayerId.PLAYER_2) + " et "
-                        + map.get(PlayerId.PLAYER_4) + " ont gagné avec "
-                        + score.gamePointsProperty(TeamId.TEAM_2)
-                        + " points contre "
-                        + score.gamePointsProperty(TeamId.TEAM_1)));
+
+        teamText[0].textProperty().bind(Bindings.concat(
+                map.get(PlayerId.PLAYER_1), " et ", map.get(PlayerId.PLAYER_3),
+                " ont gagné avec ",
+                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_1)),
+                " points contre ",
+                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_2))));
+        teamText[1].textProperty().bind(Bindings.concat(
+                map.get(PlayerId.PLAYER_2), " et ", map.get(PlayerId.PLAYER_4),
+                " ont gagné avec ",
+                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_2)),
+                " points contre ",
+                Bindings.convert(score.gamePointsProperty(TeamId.TEAM_1))));
+
         for (int i = 0; i < TeamId.COUNT; i++) {
             teamText[i].setStyle(TEXT_STYLE);
             teamPane[i] = new BorderPane();
@@ -257,6 +280,9 @@ public class GraphicalPlayer {
         return winningPane;
     }
 
+    /**
+     * Creates the pane in which the Hand of the Player will be displayed
+     */
     private HBox createHandPane(HandBean hand, PlayerId player,
             ArrayBlockingQueue<Card> cardQueue, CardBean cardBean, Button b) {
         HBox handBox = new HBox();
@@ -343,6 +369,9 @@ public class GraphicalPlayer {
         return card;
     }
 
+    /**
+     * Creates the map of card images
+     */
     private static final ObservableMap<Card, Image> mapCreator(int quality) {
         assert (quality == 240 || quality == 160);
 
@@ -356,6 +385,9 @@ public class GraphicalPlayer {
         return map;
     }
 
+    /**
+     * Creates the map of trump images
+     */
     private static final ObservableMap<Color, Image> trumps() {
         ObservableMap<Color, Image> map = FXCollections.observableHashMap();
 

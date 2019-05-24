@@ -15,6 +15,9 @@ import ch.epfl.javass.jass.Trick;
 import ch.epfl.javass.jass.TurnState;
 import javafx.application.Platform;
 
+/**
+ * Class that create the stage and acts as a "Human" player
+ */
 public class GraphicalPlayerAdapter implements Player {
 
     private HandBean handBean;
@@ -25,6 +28,7 @@ public class GraphicalPlayerAdapter implements Player {
     private ArrayBlockingQueue<Card> cardQueue;
     //BONUS
     private MctsPlayer helper; 
+
 
     public GraphicalPlayerAdapter() {
         handBean = new HandBean();
@@ -46,8 +50,8 @@ public class GraphicalPlayerAdapter implements Player {
         try {
             cardToPlay = cardQueue.take();
             Platform.runLater(() -> {
-                CardSet playableCards = CardSet.EMPTY;
-                handBean.setPlayableCards(playableCards);
+                // to disable when the player turn is finished
+                handBean.setPlayableCards(CardSet.EMPTY);
             });
             return cardToPlay;
         } catch (InterruptedException e) {
