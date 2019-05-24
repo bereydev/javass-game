@@ -14,8 +14,10 @@ import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.Trick;
 import javafx.collections.ObservableMap;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections; 
 
@@ -24,11 +26,13 @@ public final class TrickBean {
     private ObjectProperty<Color> trump; 
     private ObservableMap<PlayerId,Card> trick; 
     private ObjectProperty<PlayerId> winningPlayer; 
+    private BooleanProperty newTurn; 
     
     TrickBean(){
         trump = new SimpleObjectProperty<>(); 
         winningPlayer = new SimpleObjectProperty<>();  
         trick = FXCollections.observableHashMap(); 
+        newTurn = new SimpleBooleanProperty(); 
     }
     
     
@@ -59,5 +63,12 @@ public final class TrickBean {
     public ReadOnlyObjectProperty<PlayerId> winningPlayerProperty(){
         return winningPlayer; 
     }
+    public BooleanProperty newTurn() {
+        return newTurn; 
+    }
+    public void setNewTurn(boolean b) {
+        newTurn.setValue(b);
+    }
+    
 
 }

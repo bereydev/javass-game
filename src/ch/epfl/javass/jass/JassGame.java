@@ -24,7 +24,6 @@ public final class JassGame {
     private Map<PlayerId, CardSet> hands = new HashMap<PlayerId, CardSet>();
     private PlayerId turnStarter;
     private final Random shuffleRng;
-    private final Random trumpRng;
     private static final int SEVEN_DIAMOND = PackedCard.pack(Color.DIAMOND,
             Rank.SEVEN);
     private Boolean newGame = true;
@@ -35,7 +34,6 @@ public final class JassGame {
             Map<PlayerId, String> playerNames) {
         Random rng = new Random(rngSeed);
         shuffleRng = new Random(rng.nextLong());
-        trumpRng = new Random(rng.nextLong());
         this.players = Collections.unmodifiableMap(new EnumMap<>(players));
         this.playerNames = Collections
                 .unmodifiableMap(new EnumMap<>(playerNames));
@@ -97,7 +95,7 @@ public final class JassGame {
                 trump = players.get(temp).trumpToPlay(hands.get(temp)); 
                 System.out.println(trump);
                 turnState = TurnState.initial(trump,
-                        turnState.score().nextTurn(), turnStarter());
+                        turnState.score().nextTurn(), temp);
                 for (PlayerId p : PlayerId.ALL) {
                     players.get(p).updateHand(hands.get(p));
                     players.get(p).setTrump(turnState.trick().trump());

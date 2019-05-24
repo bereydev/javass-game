@@ -134,6 +134,7 @@ public class GraphicalPlayer {
     private GridPane createTrickPane(TrickBean trick, PlayerId player,
             Map<PlayerId, String> map, ArrayBlockingQueue<Color> trumpQueue) {
         StackPane s = trumpChoicePane(trumpQueue); 
+        s.visibleProperty().bind(trick.newTurn());
         GridPane trickPane = new GridPane();
         VBox[] pairs = new VBox[4];
         ImageView trumpImage = new ImageView();
@@ -348,7 +349,7 @@ public class GraphicalPlayer {
             images[c.ordinal()].setFitWidth(CARD_WIDTH/4);
             images[c.ordinal()].setOnMouseClicked(event ->{
               try {
-              trumpQueue.put(Color.DIAMOND);
+              trumpQueue.put(c);
           } catch (InterruptedException e2) {
               System.err.println("WHAT");
               throw new Error(e2);
