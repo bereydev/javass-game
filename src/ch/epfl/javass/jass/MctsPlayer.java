@@ -243,6 +243,7 @@ public final class MctsPlayer implements Player {
     @Override
     public Color trumpToPlay(CardSet hand) {
         // TODO Make it smort 
-        return Color.HEART;
+        System.out.println("Im smort and setting a trump");
+        return Color.values()[rng.nextInt(Color.COUNT)];
     }
 }

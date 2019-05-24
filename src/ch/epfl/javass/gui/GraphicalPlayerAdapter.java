@@ -113,13 +113,6 @@ public class GraphicalPlayerAdapter implements Player {
      */
     @Override
     public Color trumpToPlay(CardSet hand) {
-        Color trump = null; 
-        
-        try {
-            trump = trumpQueue.take();
-        } catch (InterruptedException e) {
-            throw new Error(e);
-        } 
-        return trump;
+        return Color.values()[2];
     }
 }

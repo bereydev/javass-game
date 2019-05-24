@@ -80,7 +80,8 @@ public final class JassGame {
                 players.get(p).setPlayers(p, playerNames);
             
             PlayerId temp = turnStarter(); 
-            trump = players.get(temp).trumpToPlay(hands.get(temp));            
+            trump = players.get(temp).trumpToPlay(hands.get(temp)); 
+            System.out.println(trump);
             turnState = TurnState.initial(trump, Score.INITIAL, temp);
             for (PlayerId p : PlayerId.ALL) {
                 
@@ -94,6 +95,7 @@ public final class JassGame {
                 deal();
                 PlayerId temp = turnStarter(); 
                 trump = players.get(temp).trumpToPlay(hands.get(temp)); 
+                System.out.println(trump);
                 turnState = TurnState.initial(trump,
                         turnState.score().nextTurn(), turnStarter());
                 for (PlayerId p : PlayerId.ALL) {
