@@ -27,6 +27,14 @@ public class LocalMain extends Application {
     // TODO final ou pas
     private Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);
     private Map<PlayerId, String> ns = new EnumMap<>(PlayerId.class);
+    private static final String explications = "Utilisation: java ch.epfl.javass.LocalMain <j1>…<j4> [<graine>]\n"
+            + "où :\n" + "<jn> spécifie le joueur n, ainsi:\n"
+            + "   h:<nom>  un joueur humain nommé <nom>\n"
+            + "   r:<nom>:<IP>  un joueur à distance nommé <nom> et"
+            + " son adresse IP <IP>\n"
+            + "   s:<nom>:<iterations>  un joueur simulé nommé <nom> et"
+            + " son nombre d'iterations <iterations>\n"
+            + "Vous pouvez ommettre le nom et/ou le nombre de simulations";
 
     /**
      * Program that is launched on the main device (where the JassGame is really
@@ -40,7 +48,8 @@ public class LocalMain extends Application {
     public void start(Stage arg0) throws Exception {
         List<String> parameters = getParameters().getRaw();
         if (parameters.size() > 5 || parameters.size() < 4) {
-            System.err.println("Erreur : Nombre d'arguments invalide");
+            System.err.println(
+                    "Erreur : Nombre d'arguments invalide\n" + explications);
             System.exit(1);
         }
         if (parameters.size() == 5)
@@ -55,7 +64,8 @@ public class LocalMain extends Application {
             String sets[] = parameters.get(player.ordinal()).split(":");
             if (sets.length > 3) {
                 System.err.println(
-                        "Erreur : Les spécification d'un joueur comportent trop de composantes");
+                        "Erreur : Les spécification d'un joueur comportent trop de composantes\n"
+                                + explications);
                 System.exit(1);
             }
             switch (sets[0]) {
@@ -64,14 +74,18 @@ public class LocalMain extends Application {
                 createHumanPlayer(player, sets);
                 break;
             case "s":
-                createRemotePlayer(player, sets);
+                createSimulatePlayer(player, sets);
                 break;
             case "r":
-                createSimulatePlayer(player, sets);
+                createRemotePlayer(player, sets);
                 break;
             default:
                 System.err.println(
-                        "Erreur : l'argument pour le type de joueur est invalide");
+                        "Erreur : l'argument pour le type de joueur est invalide\n"
+                        + "Vous pouvez ajouter un joueur ainsi:\n"
+                        + "h pour un joueur humain\n"
+                        + "s pour un joueur simulé\n+"
+                        + "r pour un joueur distant");
                 System.exit(1);
             }
         }
@@ -96,7 +110,10 @@ public class LocalMain extends Application {
     private void createHumanPlayer(PlayerId player, String[] sets) {
         if (sets.length > 2) {
             System.err.println(
-                    "Erreur : Les spécification du joueur humain comportent trop de composantes");
+                    "Erreur : Les spécification du joueur humain comportent trop de composantes\n"
+                    + "le joueur humain doit être spécifié ainsi\n"
+                    + "h[:<nom>] où <nom> correspond au nom du joeur\n"
+                    + "les parametres entre [] sont optionnels");
             System.exit(1);
         }
         ps.put(player, new GraphicalPlayerAdapter());
@@ -123,14 +140,16 @@ public class LocalMain extends Application {
             ns.put(player, NAME[player.ordinal()]);
         }
         try {
-            ps.put(player, new PacedPlayer(
-                    new MctsPlayer(player, rng.nextInt(), itterations), PLAY_TIME));
+            ps.put(player,
+                    new PacedPlayer(
+                            new MctsPlayer(player, rng.nextInt(), itterations),
+                            PLAY_TIME));
         } catch (IllegalArgumentException e) {
             System.err.println(
                     "Erreur : Le nombre d'ittération doit être supérieur à 9");
             System.exit(1);
         }
-        
+
     }
 
     private void createRemotePlayer(PlayerId player, String[] sets) {
