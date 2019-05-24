@@ -27,6 +27,7 @@ public class LocalMain extends Application {
     private static final int NAME_INDEX = 1;
     private static final int SPEC_ARGS_LENGTH = 3;
     private static final int SPEC_INDEX = 2;
+    private static final int TYPE_INDEX = 0;
     private static final int MAX_GLOBAL_ARGS = 5;
     private static final int MIN_GLOBAL_ARGS = 4;
     private static final long THREAD_SLEEP_TIME = 1000;
@@ -74,7 +75,7 @@ public class LocalMain extends Application {
                                 + EXPLICATIONS);
                 System.exit(1);
             }
-            switch (sets[0]) {
+            switch (sets[TYPE_INDEX]) {
             //TODO enum 
             case "h":
                 createHumanPlayer(player, sets);
@@ -113,7 +114,7 @@ public class LocalMain extends Application {
     }
 
     private void createHumanPlayer(PlayerId player, String[] sets) {
-        if (sets.length > HUMAN_PLAYER_ARGS) {
+        if (sets.length > NAME_ARGS_LENGTH) {
             System.err.println(
                     "Erreur : Les spécification du joueur humain comportent trop de composantes\n"
                     + "le joueur humain doit être spécifié ainsi\n"
@@ -123,24 +124,24 @@ public class LocalMain extends Application {
         }
         ps.put(player, new GraphicalPlayerAdapter());
         if (sets.length == NAME_ARGS_LENGTH)
-            ns.put(player, sets[1]);
+            ns.put(player, sets[NAME_INDEX]);
         else
             ns.put(player, NAME[player.ordinal()]);
     }
 
     private void createSimulatePlayer(PlayerId player, String[] sets) {
         int itterations = ITTERATIONS;
-        if (sets.length == SPEC_ARGS)
+        if (sets.length == SPEC_ARGS_LENGTH)
             try {
-                itterations = Integer.parseInt(sets[2]);
+                itterations = Integer.parseInt(sets[SPEC_INDEX]);
 
             } catch (NumberFormatException e) {
                 System.err.println(
                         "Erreur : Le nombre d'ittération doit être un nombre entier valide");
                 System.exit(1);
             }
-        if (sets.length >= NAME_ARGS && !sets[1].trim().isEmpty()) {
-            ns.put(player, sets[1]);
+        if (sets.length >= NAME_ARGS_LENGTH && !sets[NAME_INDEX].trim().isEmpty()) {
+            ns.put(player, sets[NAME_INDEX]);
         } else {
             ns.put(player, NAME[player.ordinal()]);
         }
@@ -159,10 +160,10 @@ public class LocalMain extends Application {
 
     private void createRemotePlayer(PlayerId player, String[] sets) {
         String host = DEFAULT_HOST;
-        if (sets.length == SPEC_ARGS)
-            host = sets[2];
-        if (sets.length >= 2 && !sets[1].trim().isEmpty())
-            ns.put(player, sets[1]);
+        if (sets.length == SPEC_ARGS_LENGTH)
+            host = sets[SPEC_INDEX];
+        if (sets.length >= NAME_ARGS_LENGTH && !sets[NAME_INDEX].trim().isEmpty())
+            ns.put(player, sets[NAME_INDEX]);
         else
             ns.put(player, NAME[player.ordinal()]);
         try {

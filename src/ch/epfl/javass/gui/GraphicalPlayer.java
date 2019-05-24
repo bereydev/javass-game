@@ -44,6 +44,7 @@ public class GraphicalPlayer {
 
     private static final ObservableMap<Card, Image> cards = mapCreator(240);
     private static final ObservableMap<Color, Image> trumps = trumps();
+    private static final int TRUMP_SIZE = 101;
     private static final int CARD_WIDTH = 120;
     private static final int CARD_HEIGHT = 180;
     private static final int HANDCARD_WIDTH = 80;
@@ -52,10 +53,11 @@ public class GraphicalPlayer {
     private static final String RECT_STYLE = "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: lightpink; -fx-stroke-width: 5; -fx-opacity: 0.5;";
     private static final String TRICK_STYLE = "-fx-background-color: whitesmoke; -fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center; ";
     private static final String HANDBOX_STYLE = "-fx-background-color: lightgray;\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;";
+    private static final String TRICK_NAME_STYLE = "-fx-font: 14 Optima;";
+    private static final String NAME_CARD_STYLE = "-fx-padding: 5px; -fx-alignment: center;";
+    private static final String TEAM_STYLE = "-fx-font: 16 Optima; -fx-background-color: white;";
     private final Scene scene;
-  
-    //TODO En attribu ou pas ? (Bonne question) 
-    private final String player;
+    private final String title;
 
     /**
      * Create the different panes and place it into the scene
@@ -63,10 +65,9 @@ public class GraphicalPlayer {
     public GraphicalPlayer(PlayerId player, Map<PlayerId, String> names,
             TrickBean trick, ScoreBean score, HandBean hand,
             ArrayBlockingQueue<Card> cardToPlay) {
-        this.player = names.get(player);
+        title = "Javass - " + names.get(player);
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(createTrickPane(trick, player, names));
-        //TODO : Attribus de classe ou argument ?
         borderPane.setTop(createScorePane(score, names));
         borderPane.setBottom(createHandPane(hand, player, cardToPlay));
         StackPane mainPane = new StackPane();
@@ -80,7 +81,7 @@ public class GraphicalPlayer {
      */
     public Stage createStage() {
         Stage stage = new Stage();
-        stage.setTitle("Javass - " + player);
+        stage.setTitle(title);
         stage.setScene(scene);
         return stage;
     }
@@ -141,8 +142,8 @@ public class GraphicalPlayer {
         ImageView trumpImage = new ImageView();
         trumpImage.imageProperty()
                 .bind(Bindings.valueAt(trumps, trick.ColorProperty()));
-        trumpImage.setFitHeight(101);
-        trumpImage.setFitWidth(101);
+        trumpImage.setFitHeight(TRUMP_SIZE);
+        trumpImage.setFitWidth(TRUMP_SIZE);
 
         for (int i = 0; i < PlayerId.COUNT; i++)
             pairs[i] = trickCard(trick, player, i, map);
@@ -177,13 +178,13 @@ public class GraphicalPlayer {
                         .and(cardImage.imageProperty().isNotNull()));
         Text name = new Text(
                 map.get(cardPlayer));
-        name.setStyle("-fx-font: 14 Optima;");
+        name.setStyle(TRICK_NAME_STYLE);
         VBox pair;
         if (i != 0)
             pair = new VBox(name, pane);
         else
             pair = new VBox(pane, name);
-        pair.setStyle("-fx-padding: 5px; -fx-alignment: center;");
+        pair.setStyle(NAME_CARD_STYLE);
 
         return pair;
     }
@@ -214,8 +215,7 @@ public class GraphicalPlayer {
         for (int i = 0; i < TeamId.COUNT; i++) {
             teamText[i].setStyle(TEXT_STYLE);
             teamPane[i] = new BorderPane();
-            teamPane[i].setStyle(
-                    "-fx-font: 16 Optima; -fx-background-color: white;");
+            teamPane[i].setStyle(TEAM_STYLE);
             teamPane[i].visibleProperty().bind(
                     score.winningTeamProperty().isEqualTo(TeamId.values()[i]));
             teamPane[i].setCenter(teamText[i]);
