@@ -14,10 +14,10 @@ import javafx.beans.property.SimpleObjectProperty;
  */
 public final class ScoreBean {
     //MAP ou pas map tel est la question
-    private IntegerProperty turnPoints1, turnPoints2;
-    private IntegerProperty gamePoints1, gamePoints2;
-    private IntegerProperty totalPoints1, totalPoints2;
-    private ObjectProperty<TeamId> winningTeam;
+    private final IntegerProperty turnPoints1, turnPoints2;
+    private final IntegerProperty gamePoints1, gamePoints2;
+    private final IntegerProperty totalPoints1, totalPoints2;
+    private final ObjectProperty<TeamId> winningTeam;
 
     public ScoreBean() {
         turnPoints1 = new SimpleIntegerProperty();

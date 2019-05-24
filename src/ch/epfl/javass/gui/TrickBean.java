@@ -25,9 +25,9 @@ import javafx.collections.FXCollections;
  */
 public final class TrickBean {
 
-    private ObjectProperty<Color> trump;
-    private ObservableMap<PlayerId, Card> trick;
-    private ObjectProperty<PlayerId> winningPlayer;
+    private final ObjectProperty<Color> trump;
+    private final ObservableMap<PlayerId, Card> trick;
+    private final ObjectProperty<PlayerId> winningPlayer;
 
     public TrickBean() {
         trump = new SimpleObjectProperty<>();

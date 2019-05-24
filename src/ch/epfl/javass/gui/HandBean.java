@@ -21,9 +21,15 @@ import javafx.collections.ObservableSet;
  */
 public final class HandBean {
 
-    private ObservableList<Card> hand = FXCollections.observableArrayList(Collections.nCopies(Jass.HAND_SIZE, null));
-    private ObservableSet<Card> playableCards = FXCollections.observableSet();
-
+    private final ObservableList<Card> hand;
+    private final ObservableSet<Card> playableCards;
+    
+    
+    public HandBean() {
+        hand = FXCollections.observableArrayList(Collections.nCopies(Jass.HAND_SIZE, null));
+        playableCards = FXCollections.observableSet();
+    }
+    
     /**
      * Sets the new value of the hand for the bean
      * 
