@@ -20,8 +20,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -79,6 +82,29 @@ public class GameLauncher extends Application {
             Button btnRemotePlayer = new Button();
             Button btnSimulatePlayer = new Button();
             
+            RadioButton btnHuman = new RadioButton("Local");
+            RadioButton btnRemote = new RadioButton("Distant");
+            RadioButton btnSimulate = new RadioButton("Simulé");
+            
+            ToggleGroup typeGroup = new ToggleGroup();
+            
+            btnHuman.setToggleGroup(typeGroup);
+            btnRemote.setToggleGroup(typeGroup);
+            btnSimulate.setToggleGroup(typeGroup);
+            
+            HBox typeBox = new HBox(btnHuman,btnRemote,btnSimulate);
+            
+//            RadioButton btnEasy = new RadioButton("Facile");
+//            RadioButton btnMedium = new RadioButton("Moyenne");
+//            RadioButton btnHard = new RadioButton("Difficile");
+            
+//            ToggleGroup hardnessGroup = new ToggleGroup();
+//            
+//            btnEasy.setToggleGroup(hardnessGroup);
+//            btnMedium.setToggleGroup(hardnessGroup);
+//            btnHard.setToggleGroup(hardnessGroup);
+//            
+//            HBox hardnessBox = new HBox(btnEasy,btnMedium,btnHard);
            
             GridPane hardnessGrid = new GridPane();
             hardnessGrid.setHgap(10);
@@ -196,8 +222,9 @@ public class GameLauncher extends Application {
             playerGrid.add(playerName, 0, 1);
             playerGrid.add(playerTextField, 1, 1);
             playerGrid.add(hostGrid, 0, 2, 3,1);
-            playerGrid.add(hardnessGrid, 0, 3, 3, 2);
+            playerGrid.add(hardnessGrid, 0, 2, 3, 2);
             playerGrid.add(typeGrid, 0, 5, 3, 1);
+            playerGrid.add(typeBox, 0, 6, 2 ,1);
             
             int column = player.ordinal() % 2;
             int row = player.ordinal() == 0 || player.ordinal() == 1 ? 1 : 2;
