@@ -107,6 +107,16 @@ public final class RemotePlayerServer {
                     s.close();
                     s0.close();
                     return; 
+                case SETRMP: 
+                    CardSet myCards = CardSet
+                    .ofPacked(StringSerializer.deserializeLong(message[1]));
+                    
+                    int trump = player.trumpToPlay(myCards).ordinal(); 
+                    //Answers the trump to set 
+                    w.write(StringSerializer.serializeInt(trump));
+                    w.write("\n");
+                    w.flush();
+                    
                 default:
                     System.out.println("Huston we have a problem");
                     break;

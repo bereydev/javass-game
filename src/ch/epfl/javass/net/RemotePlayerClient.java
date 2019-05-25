@@ -123,8 +123,16 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
      */
     @Override
     public Color trumpToPlay(CardSet hand) {
-        // TODO Auto-generated method stub
-        return null;
+        IOWriteAndCheck(JassCommand.SETRMP.name(),StringSerializer.serializeLong(hand.packed()));
+        Color trump = null; 
+        try {
+            //wait for the response
+            int ord = StringSerializer.deserializeInt(r.readLine());
+            trump = Color.values()[ord]; 
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        return trump;
     }
 
 

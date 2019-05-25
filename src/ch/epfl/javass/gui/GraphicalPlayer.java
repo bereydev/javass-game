@@ -53,6 +53,7 @@ public class GraphicalPlayer {
     private static final int CARD_HEIGHT = 180;
     private static final int HANDCARD_WIDTH = 80;
     private static final int HANDCARD_HEIGHT = 120;
+    private static final int TRUMP_SIZE = 101; 
     private static final String TEXT_STYLE = "-fx-font: 16 Optima; -fx-background-color: lightgray;-fx-padding: 5px; -fx-alignment: center;";
     private static final String RECT_STYLE = "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: lightpink; -fx-stroke-width: 5; -fx-opacity: 0.5;";
     private static final String TRICK_STYLE = "-fx-background-color: whitesmoke; -fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center; ";
@@ -73,9 +74,8 @@ public class GraphicalPlayer {
         borderPane.setBottom(
                 createHandPane(hand, player, cardToPlay, cardBean, b));
         StackPane mainPane = new StackPane();
-        
         mainPane.getChildren().add(borderPane);
-        mainPane.getChildren().add(b);
+        mainPane.getChildren().add(b); 
         StackPane.setAlignment(b, Pos.CENTER_RIGHT);
         mainPane.getChildren().addAll(createWinningPane(score, names));
         
@@ -132,16 +132,15 @@ public class GraphicalPlayer {
     }
 
     private GridPane createTrickPane(TrickBean trick, PlayerId player,
-            Map<PlayerId, String> map, ArrayBlockingQueue<Color> trumpQueue) {
-        StackPane s = trumpChoicePane(trumpQueue); 
-        s.visibleProperty().bind(trick.newTurn());
+            Map<PlayerId, String> map, ArrayBlockingQueue<Color> trump) {
         GridPane trickPane = new GridPane();
         VBox[] pairs = new VBox[4];
         ImageView trumpImage = new ImageView();
+        StackPane trumpChoice = new StackPane(trumpChoicePane(trump,trick)); 
         trumpImage.imageProperty()
                 .bind(Bindings.valueAt(trumps, trick.ColorProperty()));
-        trumpImage.setFitHeight(101);
-        trumpImage.setFitWidth(101);
+        trumpImage.setFitHeight(TRUMP_SIZE);
+        trumpImage.setFitWidth(TRUMP_SIZE);
 
         for (int i = 0; i < PlayerId.COUNT; i++) {
             pairs[i] = trickCard(trick, player, i, map);
@@ -151,8 +150,9 @@ public class GraphicalPlayer {
         trickPane.add(pairs[2], 1, 0, 1, 1);
         trickPane.add(pairs[3], 0, 0, 1, 3);
         trickPane.add(trumpImage, 1, 1, 1, 1);
-        trickPane.add(s, 2,3,1,1);
+        trickPane.add(trumpChoice, 1,1);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
+        GridPane.setHalignment(trumpChoice, HPos.CENTER);
         trickPane.setStyle(TRICK_STYLE);
 
         return trickPane;
@@ -339,28 +339,27 @@ public class GraphicalPlayer {
         });
         return card;
     }
-    private StackPane trumpChoicePane(ArrayBlockingQueue<Color> trumpQueue) {
-        StackPane result = new StackPane(); 
-        HBox trumps = new HBox(); 
+    private GridPane trumpChoicePane(ArrayBlockingQueue<Color> trumpQueue, TrickBean trick) {
+        GridPane pane = new GridPane(); 
         ImageView[] images = new ImageView[Color.COUNT]; 
         for(Color c : Color.ALL) {
             images[c.ordinal()]= new ImageView(GraphicalPlayer.trumps.get(c)); 
-            images[c.ordinal()].setFitHeight(CARD_HEIGHT/4);
-            images[c.ordinal()].setFitWidth(CARD_WIDTH/4);
+            images[c.ordinal()].setFitHeight(TRUMP_SIZE);
+            images[c.ordinal()].setFitWidth(TRUMP_SIZE);
             images[c.ordinal()].setOnMouseClicked(event ->{
               try {
               trumpQueue.put(c);
           } catch (InterruptedException e2) {
-              System.err.println("WHAT");
               throw new Error(e2);
           }
             });
         }
-        trumps.setStyle(HANDBOX_STYLE);
-        trumps.getChildren().addAll(images); 
-        result.getChildren().add(trumps); 
-        result.resize(100, 20);
-        return result; 
+        pane.add(images[0], 0, 0);
+        pane.add(images[1], 0, 1);
+        pane.add(images[2], 1, 0);
+        pane.add(images[3], 1, 1);
+        pane.visibleProperty().bind(trick.newTurn());
+        return pane; 
     }
 
     private static final ObservableMap<Card, Image> mapCreator(int quality) {

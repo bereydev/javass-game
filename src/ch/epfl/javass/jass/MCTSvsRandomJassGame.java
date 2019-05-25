@@ -15,7 +15,7 @@ public final class MCTSvsRandomJassGame {
             players.put(pId, player);
             playerNames.put(pId, pId.name());
         }
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             JassGame g = new JassGame(0, players, playerNames);
             while (!g.isGameOver()) {
                 g.advanceToEndOfNextTrick();

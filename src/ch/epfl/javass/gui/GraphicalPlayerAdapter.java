@@ -58,10 +58,8 @@ public class GraphicalPlayerAdapter implements Player {
 
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        System.out.println("eee");
         graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trickBean,
                 scoreBean, handBean, cardQueue,cardBean, trumpQueue);
-        System.out.println("graph done");
         //BONUS
         helper = new MctsPlayer(ownId,0,10_000); 
         Platform.runLater(() -> {
@@ -118,7 +116,6 @@ public class GraphicalPlayerAdapter implements Player {
         try {
             trump = trumpQueue.take();
         } catch (InterruptedException e2) {
-            System.err.println("WHAT");
             throw new Error(e2);
         }
         trickBean.setNewTurn(false);

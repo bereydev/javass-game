@@ -47,10 +47,14 @@ public final class JassGame {
      */
 
     public boolean isGameOver() {
-        return turnState.score()
+        boolean b = turnState.score()
                 .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
                 || turnState.score()
                         .totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS;
+        if(b)
+            System.out.println(turnState.score()
+                .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS ? "////////////////////////////////////////": "Team2");
+        return b; 
     }
 
     private void finalPlayerUpdate() {
@@ -74,18 +78,16 @@ public final class JassGame {
         }
         if (newGame) {
             deal();
-            for (PlayerId p : PlayerId.ALL)
+            for (PlayerId p : PlayerId.ALL) {
                 players.get(p).setPlayers(p, playerNames);
-            
+                players.get(p).updateHand(hands.get(p));
+            }
             PlayerId temp = turnStarter(); 
             trump = players.get(temp).trumpToPlay(hands.get(temp)); 
-            System.out.println(trump);
             turnState = TurnState.initial(trump, Score.INITIAL, temp);
-            for (PlayerId p : PlayerId.ALL) {
-                
-                players.get(p).updateHand(hands.get(p));
+            for (PlayerId p : PlayerId.ALL) 
                 players.get(p).setTrump(turnState.trick().trump());
-            }
+            
             newGame = false;
         } else {
             turnState = turnState.withTrickCollected();
@@ -93,7 +95,6 @@ public final class JassGame {
                 deal();
                 PlayerId temp = turnStarter(); 
                 trump = players.get(temp).trumpToPlay(hands.get(temp)); 
-                System.out.println(trump);
                 turnState = TurnState.initial(trump,
                         turnState.score().nextTurn(), temp);
                 for (PlayerId p : PlayerId.ALL) {
