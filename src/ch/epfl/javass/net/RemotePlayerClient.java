@@ -35,7 +35,7 @@ import java.util.Map;
 
 public final class RemotePlayerClient implements Player, AutoCloseable {
     private static final String SPACE = " ";
-    //TODO final ou pas ?
+    private static final int PORT = 5108;
     private final BufferedReader r;
     private final BufferedWriter w;
     private final Socket s;
@@ -50,7 +50,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
      * @throws IOException
      */
     public RemotePlayerClient(String hostName) throws IOException {
-        s = new Socket(hostName, 5108);
+        s = new Socket(hostName, PORT);
         r = new BufferedReader(
                 new InputStreamReader(s.getInputStream(), US_ASCII));
         w = new BufferedWriter(

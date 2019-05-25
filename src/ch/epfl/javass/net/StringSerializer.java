@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 public final class StringSerializer {
     
     private final static int BASE_16 = 16;
+    private final static String DELIMITER = ",";
 
     private StringSerializer() {
         // Not instantiable.
@@ -95,7 +96,7 @@ public final class StringSerializer {
      * @return a unique String combination
      */
     public static String combine(String... strings) {
-        return String.join(",", strings);
+        return String.join(DELIMITER, strings);
     }
 
     /**
@@ -106,8 +107,7 @@ public final class StringSerializer {
      * @return an array of String values
      */
     public static String[] split(String string) {
-        //TODO delimiter ou pas délimiteur
-        return string.split(",");
+        return string.split(DELIMITER);
     }
 
 }

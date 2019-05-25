@@ -81,6 +81,7 @@ public final class JassGame {
                 players.get(p).setPlayers(p, playerNames);
                 players.get(p).updateHand(hands.get(p));
                 players.get(p).setTrump(turnState.trick().trump());
+                players.get(p).updateScore(turnState.score());
             }
             newGame = false;
         } else {
@@ -93,6 +94,7 @@ public final class JassGame {
                 for (PlayerId p : PlayerId.ALL) {
                     players.get(p).updateHand(hands.get(p));
                     players.get(p).setTrump(turnState.trick().trump());
+                    players.get(p).updateScore(turnState.score());
                 }
             }
         }
@@ -118,6 +120,7 @@ public final class JassGame {
         turnState = turnState.withNewCardPlayed(cardToPlay);
         for (PlayerId p : PlayerId.ALL)
             players.get(p).updateTrick(turnState.trick());
+        players.get(player).updateScore(turnState.score());
     }
 
     /**

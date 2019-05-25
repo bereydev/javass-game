@@ -20,16 +20,14 @@ import javafx.application.Platform;
  */
 public class GraphicalPlayerAdapter implements Player {
 
-    private HandBean handBean;
-    private ScoreBean scoreBean;
-    private TrickBean trickBean;
-    private CardBean cardBean; 
+    private final HandBean handBean;
+    private final ScoreBean scoreBean;
+    private final TrickBean trickBean;
+    private final ArrayBlockingQueue<Card> cardQueue;
     private GraphicalPlayer graphicalPlayer;
-    private ArrayBlockingQueue<Card> cardQueue;
-    //BONUS
+    private final CardBean cardBean; 
     private MctsPlayer helper; 
-
-
+    
     public GraphicalPlayerAdapter() {
         handBean = new HandBean();
         scoreBean = new ScoreBean();
@@ -50,7 +48,6 @@ public class GraphicalPlayerAdapter implements Player {
         try {
             cardToPlay = cardQueue.take();
             Platform.runLater(() -> {
-                // to disable when the player turn is finished
                 handBean.setPlayableCards(CardSet.EMPTY);
             });
             return cardToPlay;

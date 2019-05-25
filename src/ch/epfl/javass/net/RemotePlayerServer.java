@@ -31,6 +31,9 @@ import java.util.Map;
 public final class RemotePlayerServer {
 
     private final Player player;
+    private final static int COMMAND_INDEX = 0;
+    private final static int FIRST_PARAMETER = 1; 
+    private final static int SECOND_PARAMETER = 2; 
 
     /**
      * The constructor of the RemotePlyerServer take an underlying Player as
@@ -43,7 +46,7 @@ public final class RemotePlayerServer {
     /**
      * Lauch a "Serveur" which is communicating with the main game and is
      * passing informations to the underlying Player mainly a human player who
-     * plays on an other machine
+     * plays on another machine
      */
     public void run() {
 
@@ -56,11 +59,11 @@ public final class RemotePlayerServer {
                         s.getOutputStream(), US_ASCII))) {
             while (!s.isClosed()) {
                 String[] message = r.readLine().trim().split(" ");
-                JassCommand command = JassCommand.valueOf(message[0]);
+                JassCommand command = JassCommand.valueOf(message[COMMAND_INDEX]);
                 switch (command) {
                 case PLRS:
                     PlayerId ownId = PlayerId.values()[Integer
-                            .parseInt(message[1])];
+                            .parseInt(message[FIRST_PARAMETER])];
                     String[] names = StringSerializer.split(message[2]);
                     Map<PlayerId, String> map = new HashMap<>();
                     for (int i = 0; i < PlayerId.COUNT; i++) {
@@ -71,15 +74,16 @@ public final class RemotePlayerServer {
                     player.setPlayers(ownId, map);
                     break;
                 case CARD:
-                    String[] stateTab = StringSerializer.split(message[1]);
+                    String[] stateTab = StringSerializer.split(message[FIRST_PARAMETER]);
                     TurnState state = TurnState.ofPackedComponents(
+                            
                             StringSerializer.deserializeLong(stateTab[0]), // Score
                             StringSerializer.deserializeLong(stateTab[1]), // CardSet
                                                                            // not
                                                                            // played
                             StringSerializer.deserializeInt(stateTab[2])); // Trick
                     CardSet hand = CardSet.ofPacked(
-                            StringSerializer.deserializeLong(message[2]));
+                            StringSerializer.deserializeLong(message[SECOND_PARAMETER]));
 
                     Card card = player.cardToPlay(state, hand);
 
@@ -90,30 +94,30 @@ public final class RemotePlayerServer {
                     break;
                 case HAND:
                     CardSet set = CardSet.ofPacked(
-                            StringSerializer.deserializeLong(message[1]));
+                            StringSerializer.deserializeLong(message[FIRST_PARAMETER]));
                     player.updateHand(set);
 
                     break;
                 case SCOR:
                     Score score = Score.ofPacked(
-                            StringSerializer.deserializeLong(message[1]));
+                            StringSerializer.deserializeLong(message[FIRST_PARAMETER]));
                     player.updateScore(score);
 
                     break;
                 case TRCK:
                     Trick trick = Trick.ofPacked(
-                            StringSerializer.deserializeInt(message[1]));
+                            StringSerializer.deserializeInt(message[FIRST_PARAMETER]));
                     player.updateTrick(trick);
 
                     break;
                 case TRMP:
                     player.setTrump(
-                            Card.Color.values()[StringSerializer.deserializeInt(message[1])]);
+                            Card.Color.values()[StringSerializer.deserializeInt(message[FIRST_PARAMETER])]);
 
                     break;
                 case WINR:
                     player.setWinningTeam(
-                            TeamId.values()[StringSerializer.deserializeInt(message[1])]);
+                            TeamId.values()[StringSerializer.deserializeInt(message[FIRST_PARAMETER])]);
                     System.out.println("server closed");
                     w.close();
                     r.close();
@@ -121,7 +125,8 @@ public final class RemotePlayerServer {
                     s0.close();
                     return;
                 default:
-                    System.out.println("Huston we have a problem");
+                    System.err.println("Huston we have a problem");
+                    System.exit(1);
                     break;
                 }
             }
