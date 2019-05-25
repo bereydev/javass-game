@@ -143,4 +143,21 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
         s.close();
     }
 
+    /* (non-Javadoc)
+     * @see ch.epfl.javass.jass.Player#trumpToPlay(ch.epfl.javass.jass.CardSet)
+     */
+    @Override
+    public Color trumpToPlay(CardSet hand) {
+        IOWriteAndCheck(JassCommand.SETRMP.name(),StringSerializer.serializeLong(hand.packed()));
+        Color trump = null; 
+        try {
+            //wait for the response
+            int ord = StringSerializer.deserializeInt(r.readLine());
+            trump = Color.values()[ord]; 
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        return trump;
+    }
+
 }

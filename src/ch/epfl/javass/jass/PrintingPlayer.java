@@ -80,4 +80,13 @@ public final class PrintingPlayer implements Player {
 
     }
 
+    /* (non-Javadoc)
+     * @see ch.epfl.javass.jass.Player#trumpToPlay(ch.epfl.javass.jass.Card.Color, ch.epfl.javass.jass.CardSet)
+     */
+    @Override
+    public Color trumpToPlay(CardSet hand) {
+        // TODO Auto-generated method stub
+        return underlyingPlayer.trumpToPlay(hand);
+    }
+
 }

@@ -24,16 +24,16 @@ public final class JassGame {
     private Map<PlayerId, CardSet> hands = new HashMap<PlayerId, CardSet>();
     private PlayerId turnStarter;
     private final Random shuffleRng;
-    private final Random trumpRng;
-    private static final int SEVEN_DIAMOND = PackedCard.pack(Color.DIAMOND, Rank.SEVEN);
+    private static final int SEVEN_DIAMOND = PackedCard.pack(Color.DIAMOND,
+            Rank.SEVEN);
     private Boolean newGame = true;
     private TurnState turnState;
+    private Color trump; 
 
     public JassGame(long rngSeed, Map<PlayerId, Player> players,
             Map<PlayerId, String> playerNames) {
         Random rng = new Random(rngSeed);
         shuffleRng = new Random(rng.nextLong());
-        trumpRng = new Random(rng.nextLong());
         this.players = Collections.unmodifiableMap(new EnumMap<>(players));
         this.playerNames = Collections
                 .unmodifiableMap(new EnumMap<>(playerNames));
@@ -47,12 +47,16 @@ public final class JassGame {
      */
 
     public boolean isGameOver() {
-        return turnState.score()
+        boolean b = turnState.score()
                 .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
                 || turnState.score()
                         .totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS;
+        if(b)
+            System.out.println(turnState.score()
+                .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS ? "////////////////////////////////////////": "Team2");
+        return b; 
     }
-    
+
     private void finalPlayerUpdate() {
         TeamId winningTeam = turnState.score()
                 .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
@@ -74,23 +78,26 @@ public final class JassGame {
         }
         if (newGame) {
             deal();
-            turnState = TurnState.initial(
-                    Color.values()[trumpRng.nextInt(Color.COUNT)],
-                    Score.INITIAL, turnStarter());
             for (PlayerId p : PlayerId.ALL) {
                 players.get(p).setPlayers(p, playerNames);
                 players.get(p).updateHand(hands.get(p));
-                players.get(p).setTrump(turnState.trick().trump());
                 players.get(p).updateScore(turnState.score());
             }
+            PlayerId temp = turnStarter(); 
+            trump = players.get(temp).trumpToPlay(hands.get(temp)); 
+            turnState = TurnState.initial(trump, Score.INITIAL, temp);
+            for (PlayerId p : PlayerId.ALL) 
+                players.get(p).setTrump(turnState.trick().trump());
+            
             newGame = false;
         } else {
             turnState = turnState.withTrickCollected();
             if (turnState.isTerminal()) {
                 deal();
-                turnState = TurnState.initial(
-                        Color.values()[trumpRng.nextInt(Color.COUNT)],
-                        turnState.score().nextTurn(), turnStarter());
+                PlayerId temp = turnStarter(); 
+                trump = players.get(temp).trumpToPlay(hands.get(temp)); 
+                turnState = TurnState.initial(trump,
+                        turnState.score().nextTurn(), temp);
                 for (PlayerId p : PlayerId.ALL) {
                     players.get(p).updateHand(hands.get(p));
                     players.get(p).setTrump(turnState.trick().trump());
@@ -105,12 +112,13 @@ public final class JassGame {
         if (isGameOver()) {
             finalPlayerUpdate();
             return;
-        } 
-        for (int i = 0; i < PlayerId.COUNT; i++ ) {
+        }
+        for (int i = 0; i < PlayerId.COUNT; i++) {
             playTrick(turnState.nextPlayer());
         }
     }
     
+
     private void playTrick(PlayerId player) {
         players.get(player).updateScore(turnState.score());
         Card cardToPlay = players.get(player).cardToPlay(turnState,
@@ -137,7 +145,8 @@ public final class JassGame {
         hands.clear();
         for (PlayerId p : PlayerId.ALL) {
             CardSet hand = CardSet.EMPTY;
-            hand = CardSet.of(cards.subList(p.ordinal()*9, (p.ordinal()+1)*9));
+            hand = CardSet
+                    .of(cards.subList(p.ordinal() * 9, (p.ordinal() + 1) * 9));
             hands.put(p, hand);
         }
     }

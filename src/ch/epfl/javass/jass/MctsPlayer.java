@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.SplittableRandom;
 import ch.epfl.javass.Preconditions;
+import ch.epfl.javass.jass.Card.Color;
 
 /**
  * Class representing a simulated player using the MCTS algorithm
@@ -234,5 +235,31 @@ public final class MctsPlayer implements Player {
             }
             return indexOfTheBestChild;
         }
+    }
+
+    /* (non-Javadoc)
+     * @see ch.epfl.javass.jass.Player#trumpToPlay(ch.epfl.javass.jass.Card.Color, ch.epfl.javass.jass.CardSet)
+     */
+    @Override
+    public Color trumpToPlay(CardSet hand) {
+        // TODO Make it smort 
+        int points[][] = new int[Color.COUNT][2];  
+        int index=0; 
+        //Calculates total points of the hand according to each color
+        //And the number of cards of that color 
+        for(Color c : Color.ALL) 
+            for(int i=0; i<hand.size(); i++) {
+                Card card = hand.get(i); 
+                points[c.ordinal()][0]+=card.points(c); 
+                if(card.color().equals(c))
+                    points[c.ordinal()][1]++; 
+            }
+        for(int i=0; i<points.length; i++) {
+            if(points[i][0]>points[index][0]) 
+                index = i;
+            else if(points[i][0]==points[index][0]&&points[i][1]>points[index][1])
+                index = i; 
+        }
+        return Color.values()[index];
     }
 }

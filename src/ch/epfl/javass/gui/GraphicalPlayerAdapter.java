@@ -23,9 +23,11 @@ public class GraphicalPlayerAdapter implements Player {
     private final HandBean handBean;
     private final ScoreBean scoreBean;
     private final TrickBean trickBean;
+    private final MessageBean messageBean;
     private final ArrayBlockingQueue<Card> cardQueue;
     private GraphicalPlayer graphicalPlayer;
     private final CardBean cardBean; 
+    private final ArrayBlockingQueue<Color> trumpQueue;
     private MctsPlayer helper; 
     
     public GraphicalPlayerAdapter() {
@@ -33,7 +35,9 @@ public class GraphicalPlayerAdapter implements Player {
         scoreBean = new ScoreBean();
         trickBean = new TrickBean();
         cardQueue = new ArrayBlockingQueue<>(1);
+        trumpQueue = new ArrayBlockingQueue<>(1);
         cardBean = new CardBean(); 
+        messageBean = new MessageBean();
     }
 
     @Override
@@ -59,7 +63,7 @@ public class GraphicalPlayerAdapter implements Player {
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trickBean,
-                scoreBean, handBean, cardQueue,cardBean);
+                scoreBean, handBean, cardQueue,cardBean, trumpQueue, messageBean);
         //BONUS
         helper = new MctsPlayer(ownId,0,10_000); 
         Platform.runLater(() -> {
@@ -105,4 +109,21 @@ public class GraphicalPlayerAdapter implements Player {
             scoreBean.setWinningTeam(winningTeam);
         });
     }
+
+    /* (non-Javadoc)
+     * @see ch.epfl.javass.jass.Player#trumpToPlay(ch.epfl.javass.jass.Card.Color, ch.epfl.javass.jass.CardSet)
+     */
+    @Override
+    public Color trumpToPlay(CardSet hand) {
+        trickBean.setNewTurn(true);
+        Color trump = null; 
+        try {
+            trump = trumpQueue.take();
+        } catch (InterruptedException e2) {
+            throw new Error(e2);
+        }
+        trickBean.setNewTurn(false);
+        return trump;
+    }
+    
 }

@@ -184,6 +184,15 @@ public class PacedPlayerTest {
             setWinningTeamCallCount += 1;
             setWinningTeamWinningTeam = winningTeam;
         }
+
+        /* (non-Javadoc)
+         * @see ch.epfl.javass.jass.Player#trumpToPlay(ch.epfl.javass.jass.CardSet)
+         */
+        @Override
+        public Color trumpToPlay(CardSet hand) {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
 }
 
