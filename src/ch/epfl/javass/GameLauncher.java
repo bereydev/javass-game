@@ -104,9 +104,6 @@ public class GameLauncher extends Application {
             typeGrid.add(btnSimulatePlayer, 2, 0);
             
             
-
-            
-            
             playerTextField.textProperty().addListener((o,oV,nV) -> {
                 playerSet[1] = nV;
             });
