@@ -94,14 +94,16 @@ public final class JassGame {
             turnState = turnState.withTrickCollected();
             if (turnState.isTerminal()) {
                 deal();
+                for (PlayerId p : PlayerId.ALL) {
+                    players.get(p).updateHand(hands.get(p));
+                    players.get(p).updateScore(turnState.score());
+                }
                 PlayerId temp = turnStarter(); 
                 trump = players.get(temp).trumpToPlay(hands.get(temp)); 
                 turnState = TurnState.initial(trump,
                         turnState.score().nextTurn(), temp);
                 for (PlayerId p : PlayerId.ALL) {
-                    players.get(p).updateHand(hands.get(p));
                     players.get(p).setTrump(turnState.trick().trump());
-                    players.get(p).updateScore(turnState.score());
                 }
             }
         }
