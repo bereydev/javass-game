@@ -1,6 +1,7 @@
 package ch.epfl.javass.gui;
 
 import java.util.Map;
+
 import java.util.concurrent.ArrayBlockingQueue;
 
 import ch.epfl.javass.jass.Card;
@@ -13,26 +14,35 @@ import ch.epfl.javass.jass.Score;
 import ch.epfl.javass.jass.TeamId;
 import ch.epfl.javass.jass.Trick;
 import ch.epfl.javass.jass.TurnState;
+import ch.epfl.javass.net.ChatClient;
 import javafx.application.Platform;
 
+/**
+ * Class that create the stage and acts as a "Human" player
+ */
 public class GraphicalPlayerAdapter implements Player {
 
-    private HandBean handBean;
-    private ScoreBean scoreBean;
-    private TrickBean trickBean;
-    private CardBean cardBean; 
+    private final HandBean handBean;
+    private final ScoreBean scoreBean;
+    private final TrickBean trickBean;
+    private final MessageBean messageBean;
+    private final ArrayBlockingQueue<Card> cardQueue;
     private GraphicalPlayer graphicalPlayer;
-    private ArrayBlockingQueue<Card> cardQueue;
-    private ArrayBlockingQueue<Color> trumpQueue;
-    private MctsPlayer helper; 
+    private final CardBean cardBean;
+    private final ArrayBlockingQueue<Color> trumpQueue;
+    private MctsPlayer helper;
 
-    public GraphicalPlayerAdapter() {
+    public GraphicalPlayerAdapter(MessageBean messageBean) {
+        this.messageBean = messageBean;
         handBean = new HandBean();
         scoreBean = new ScoreBean();
         trickBean = new TrickBean();
         cardQueue = new ArrayBlockingQueue<>(1);
         trumpQueue = new ArrayBlockingQueue<>(1);
-        cardBean = new CardBean(); 
+        cardBean = new CardBean();  
+    }
+    public GraphicalPlayerAdapter() {
+        this(null); 
     }
 
     @Override
@@ -40,15 +50,14 @@ public class GraphicalPlayerAdapter implements Player {
         Platform.runLater(() -> {
             CardSet playableCards = state.trick().playableCards(hand);
             handBean.setPlayableCards(playableCards);
-            //BONUS
+            // BONUS
             cardBean.setCard(helper.cardToPlay(state, hand));
         });
         Card cardToPlay;
         try {
             cardToPlay = cardQueue.take();
             Platform.runLater(() -> {
-                CardSet playableCards = CardSet.EMPTY;
-                handBean.setPlayableCards(playableCards);
+                handBean.setPlayableCards(CardSet.EMPTY);
             });
             return cardToPlay;
         } catch (InterruptedException e) {
@@ -59,9 +68,10 @@ public class GraphicalPlayerAdapter implements Player {
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trickBean,
-                scoreBean, handBean, cardQueue,cardBean, trumpQueue);
-        //BONUS
-        helper = new MctsPlayer(ownId,0,10_000); 
+                scoreBean, handBean, cardQueue, cardBean, trumpQueue,
+                messageBean);
+        // BONUS
+        helper = new MctsPlayer(ownId, 0, 10_000);
         Platform.runLater(() -> {
             graphicalPlayer.createStage().show();
         });
@@ -106,13 +116,17 @@ public class GraphicalPlayerAdapter implements Player {
         });
     }
 
-    /* (non-Javadoc)
-     * @see ch.epfl.javass.jass.Player#trumpToPlay(ch.epfl.javass.jass.Card.Color, ch.epfl.javass.jass.CardSet)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ch.epfl.javass.jass.Player#trumpToPlay(ch.epfl.javass.jass.Card.Color,
+     * ch.epfl.javass.jass.CardSet)
      */
     @Override
     public Color trumpToPlay(CardSet hand) {
         trickBean.setNewTurn(true);
-        Color trump = null; 
+        Color trump = null;
         try {
             trump = trumpQueue.take();
         } catch (InterruptedException e2) {
@@ -121,4 +135,10 @@ public class GraphicalPlayerAdapter implements Player {
         trickBean.setNewTurn(false);
         return trump;
     }
+
+    @Override
+    public void catchMessage(PlayerId player, MessageId message) {
+        Platform.runLater(() -> messageBean.setMessage(player, message));
+    }
+
 }
