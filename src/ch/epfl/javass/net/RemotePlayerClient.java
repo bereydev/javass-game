@@ -8,6 +8,7 @@
  */
 package ch.epfl.javass.net;
 
+import ch.epfl.javass.gui.MessageId;
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.CardSet;
 import ch.epfl.javass.jass.Player;
@@ -84,7 +85,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 
     @Override
     public void updateTrick(Trick newTrick) {
-        IOWriteAndCheck(JassCommand.TRCK.name(),
+       IOWriteAndCheck(JassCommand.TRCK.name(),
                 StringSerializer.serializeInt(newTrick.packed()));
     }
 
@@ -118,6 +119,11 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
             throw new UncheckedIOException(e);
         }
         return card;
+    }
+    
+    @Override
+    public void catchMessage(PlayerId player,MessageId message) {
+        IOWriteAndCheck(JassCommand.MSG.name(),StringSerializer.serializeInt(player.ordinal()),StringSerializer.serializeInt((message.ordinal())));     
     }
 
     /**

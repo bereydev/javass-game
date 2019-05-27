@@ -13,6 +13,7 @@ import ch.epfl.javass.jass.Score;
 import ch.epfl.javass.jass.TeamId;
 import ch.epfl.javass.jass.Trick;
 import ch.epfl.javass.jass.TurnState;
+import ch.epfl.javass.net.ChatClient;
 import javafx.application.Platform;
 
 /**
@@ -26,18 +27,18 @@ public class GraphicalPlayerAdapter implements Player {
     private final MessageBean messageBean;
     private final ArrayBlockingQueue<Card> cardQueue;
     private GraphicalPlayer graphicalPlayer;
-    private final CardBean cardBean; 
+    private final CardBean cardBean;
     private final ArrayBlockingQueue<Color> trumpQueue;
-    private MctsPlayer helper; 
-    
-    public GraphicalPlayerAdapter() {
+    private MctsPlayer helper;
+
+    public GraphicalPlayerAdapter(MessageBean messageBean) {
+        this.messageBean = messageBean;
         handBean = new HandBean();
         scoreBean = new ScoreBean();
         trickBean = new TrickBean();
         cardQueue = new ArrayBlockingQueue<>(1);
         trumpQueue = new ArrayBlockingQueue<>(1);
-        cardBean = new CardBean(); 
-        messageBean = new MessageBean();
+        cardBean = new CardBean();  
     }
 
     @Override
@@ -45,7 +46,7 @@ public class GraphicalPlayerAdapter implements Player {
         Platform.runLater(() -> {
             CardSet playableCards = state.trick().playableCards(hand);
             handBean.setPlayableCards(playableCards);
-            //BONUS
+            // BONUS
             cardBean.setCard(helper.cardToPlay(state, hand));
         });
         Card cardToPlay;
@@ -63,9 +64,10 @@ public class GraphicalPlayerAdapter implements Player {
     @Override
     public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
         graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trickBean,
-                scoreBean, handBean, cardQueue,cardBean, trumpQueue, messageBean);
-        //BONUS
-        helper = new MctsPlayer(ownId,0,10_000); 
+                scoreBean, handBean, cardQueue, cardBean, trumpQueue,
+                messageBean);
+        // BONUS
+        helper = new MctsPlayer(ownId, 0, 10_000);
         Platform.runLater(() -> {
             graphicalPlayer.createStage().show();
         });
@@ -110,13 +112,17 @@ public class GraphicalPlayerAdapter implements Player {
         });
     }
 
-    /* (non-Javadoc)
-     * @see ch.epfl.javass.jass.Player#trumpToPlay(ch.epfl.javass.jass.Card.Color, ch.epfl.javass.jass.CardSet)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ch.epfl.javass.jass.Player#trumpToPlay(ch.epfl.javass.jass.Card.Color,
+     * ch.epfl.javass.jass.CardSet)
      */
     @Override
     public Color trumpToPlay(CardSet hand) {
         trickBean.setNewTurn(true);
-        Color trump = null; 
+        Color trump = null;
         try {
             trump = trumpQueue.take();
         } catch (InterruptedException e2) {
@@ -125,5 +131,10 @@ public class GraphicalPlayerAdapter implements Player {
         trickBean.setNewTurn(false);
         return trump;
     }
-    
+
+    @Override
+    public void catchMessage(PlayerId player, MessageId message) {
+        Platform.runLater(() -> messageBean.setMessage(player, message));
+    }
+
 }

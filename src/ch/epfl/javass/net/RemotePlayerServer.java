@@ -134,9 +134,12 @@ public final class RemotePlayerServer {
                     w.write(StringSerializer.serializeInt(trump));
                     w.write("\n");
                     w.flush();
+                    break;
+                case MSG:
+                    break;
                     
                 default:
-                    System.err.println("Huston we have a problem");
+                    System.err.println("Huston we have a problem ! \n I can't read that bro : "+ command);
                     System.exit(1);
                     break;
                 }

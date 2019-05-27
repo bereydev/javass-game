@@ -16,10 +16,10 @@ import java.util.List;
  */
 public enum JassCommand {
 
-    PLRS, TRMP, HAND, TRCK, CARD, SCOR, WINR, SETRMP;
+    PLRS, TRMP, HAND, TRCK, CARD, SCOR, WINR, SETRMP, MSG;
 
     public static final List<JassCommand> ALL = Collections
             .unmodifiableList(Arrays.asList(values()));
-    public static final int COUNT = 8;
+    public static final int COUNT = 9;
 
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Random;
 
 import ch.epfl.javass.gui.GraphicalPlayerAdapter;
+import ch.epfl.javass.gui.MessageBean;
 import ch.epfl.javass.jass.JassGame;
 import ch.epfl.javass.jass.MctsPlayer;
 import ch.epfl.javass.jass.PacedPlayer;
@@ -183,7 +184,8 @@ public class GameLauncher2 extends Application {
         primaryStage.setTitle("Javass - Créer votre partie !");
         primaryStage.setScene(scene);
         primaryStage.show();
-
+        MessageBean messageBean = new MessageBean();
+        
         Button btnConnect = new Button("Se connecter ");
         grid.add(btnConnect, 1, 3);
         btnConnect.setOnMouseClicked(e -> {
@@ -204,15 +206,15 @@ public class GameLauncher2 extends Application {
             ipInfo.setHeaderText("Adresse IP : " + ipAdress);
             btnConnect.setDisable(true);
             btnConnect.setOpacity(0.2);
-            launchRemote();
+            launchRemote(messageBean);
 
         });
         Button btnStart = new Button("Lancer le jeu");
         grid.add(btnStart, 0, 3);
-        btnStart.setOnMouseClicked(e -> launchGame());
+        btnStart.setOnMouseClicked(e -> launchGame(messageBean));
     }
 
-    private void launchGame() {
+    private void launchGame(MessageBean messageBean) {
         for (PlayerId player : PlayerId.ALL) {
             String type = typeOfPlayers.get(player).getValue();
             String name = nameOfPlayers.get(player).getValue();
@@ -220,7 +222,7 @@ public class GameLauncher2 extends Application {
             int itterations = itterationOfPlayers.get(player).getValue();
             switch (type) {
             case "h":
-                ps.put(player, new GraphicalPlayerAdapter());
+                ps.put(player, new GraphicalPlayerAdapter(messageBean));
                 ns.put(player, name);
                 break;
             case "s":
@@ -232,7 +234,9 @@ public class GameLauncher2 extends Application {
             case "r":
                 try {
                     ps.put(player, new RemotePlayerClient(host));
+                    
                 } catch (IOException e) {
+                    System.out.println(host);
                     System.err.println(
                             "Erreur : Connexion au serveur impossible ou refusée "
                                     + "veuillez vérifier les paramètre d'hôte passé "
@@ -262,8 +266,8 @@ public class GameLauncher2 extends Application {
         gameThread.start();
     }
 
-    private void launchRemote() {
-        Player player = new GraphicalPlayerAdapter();
+    private void launchRemote(MessageBean messageBean) {
+        Player player = new GraphicalPlayerAdapter(messageBean);
         Thread serverThread = new Thread(() -> {
             new RemotePlayerServer(player).run();
         });
