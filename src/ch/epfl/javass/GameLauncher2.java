@@ -1,7 +1,6 @@
 package ch.epfl.javass;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.InetAddress;
 import java.util.EnumMap;
 import java.util.Map;
@@ -25,8 +24,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -41,11 +38,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 public class GameLauncher2 extends Application {
@@ -56,9 +51,6 @@ public class GameLauncher2 extends Application {
     private static final int MEDIUM_ITTERATIONS = 5_000;
     private static final int HARD_ITTERATIONS = 100_000;
     private static final String DEFAULT_HOST = "localhost";
-    private static final String IP_STYLE = "-fx-background-color: white;-fx-text-alignment:center; -fx-padding: 10px; "
-            + "-fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: black;";
-    private static final String IP_LABEL_STYLE = "-fx-background-color: white;-fx-text-alignment:center; -fx-padding: 10px; ";
     Map<PlayerId, Player> ps = new EnumMap<>(PlayerId.class);
     Map<PlayerId, String> ns = new EnumMap<>(PlayerId.class);
     private final Map<PlayerId, StringProperty> typeOfPlayers = new EnumMap<>(
@@ -195,18 +187,23 @@ public class GameLauncher2 extends Application {
         Button btnConnect = new Button("Se connecter ");
         grid.add(btnConnect, 1, 3);
         btnConnect.setOnMouseClicked(e -> {
+            Alert ipInfo = new Alert(AlertType.INFORMATION);
+            ipInfo.setTitle("Information de connexion");
+            ipInfo.setContentText(
+                    "La partie commencera à la connexion du client. "
+                            + "\nVeuillez communiquer votre adresse IP à l'hôte de la partie : \n");
+            ButtonType btnDismiss = new ButtonType("C'est fait merci !");
+            ipInfo.getButtonTypes().setAll(btnDismiss);
+            ipInfo.show();
+            String ipAdress;
             try {
-                Alert ipInfo = new Alert(AlertType.INFORMATION);
-                ipInfo.setTitle("Information de connexion");
-                ipInfo.setHeaderText("Adresse IP : " + InetAddress.getLocalHost().getHostAddress());
-                ipInfo.setContentText("La partie commencera à la connexion du client. "
-                        + "\nVeuillez communiquer votre adresse IP à l'hôte de la partie : \n");
-                ButtonType btnDismiss = new ButtonType("C'est fait merci !");
-                ipInfo.getButtonTypes().setAll(btnDismiss);
-                ipInfo.show();
+                ipAdress = InetAddress.getLocalHost().getHostAddress();
             } catch (Exception e2) {
-
+                ipAdress = "Erreur pas d'accès à l'IP";
             }
+            ipInfo.setHeaderText("Adresse IP : " + ipAdress);
+            btnConnect.setDisable(true);
+            btnConnect.setOpacity(0.2);
             launchRemote();
 
         });

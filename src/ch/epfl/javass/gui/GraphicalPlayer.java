@@ -38,6 +38,11 @@ import javafx.scene.control.Button;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -56,15 +61,15 @@ public class GraphicalPlayer {
 
     private static final ObservableMap<Card, Image> cards = mapCreator(240);
     private static final ObservableMap<Color, Image> trumps = trumps();
-    private static final ObservableMap<MessageId, Image> messages = messages();
+//    private static final ObservableMap<MessageId, Image> messages = messages();
     private static final int TRUMP_SIZE = 101;
     private static final int CARD_WIDTH = 120;
     private static final int CARD_HEIGHT = 180;
     private static final int HANDCARD_WIDTH = 80;
     private static final int HANDCARD_HEIGHT = 120;
-    private static final String TEXT_STYLE = "-fx-font: 16 Optima; -fx-background-color: lightgray;-fx-padding: 5px; -fx-alignment: center;";
+    private static final String TEXT_STYLE = "-fx-font: 16 Optima; -fx-background-color: white;-fx-padding: 5px; -fx-alignment: center;";
     private static final String RECT_STYLE = "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: lightpink; -fx-stroke-width: 5; -fx-opacity: 0.5;";
-    private static final String TRICK_STYLE = "-fx-background-color: whitesmoke; -fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center; ";
+    private static final String TRICK_STYLE = "-fx-background-color: white;-fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center; ";
     private static final String HANDBOX_STYLE = "-fx-background-color: lightgray;\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;";
     private static final String TRICK_NAME_STYLE = "-fx-font: 14 Optima;";
     private static final String NAME_CARD_STYLE = "-fx-padding: 5px; -fx-alignment: center;";
@@ -139,7 +144,6 @@ public class GraphicalPlayer {
             teamTexts[6 + t.ordinal()].textProperty()
                     .bind(Bindings.convert(score.gamePointsProperty(t)));
         }
-        // TODO peut mieux faire
         teamTexts[0] = new Text(map.get(PlayerId.PLAYER_1) + " et "
                 + map.get(PlayerId.PLAYER_3) + " : ");
         teamTexts[1] = new Text(map.get(PlayerId.PLAYER_2) + " et "
@@ -162,49 +166,49 @@ public class GraphicalPlayer {
         GridPane trickPane = new GridPane();
         VBox[] pairs = new VBox[4];
         ImageView trumpImage = new ImageView();
-        StackPane message = new StackPane();
-        ImageView messageImage = new ImageView();
-        message.getChildren().add(messageImage);
-        message.visibleProperty().bind(trick.newTurn());
-        messageImage.setFitHeight(TRUMP_SIZE*2);
-        messageImage.setFitWidth(TRUMP_SIZE*2);
-        messageImage.imageProperty().bind(Bindings.valueAt(messages, messageBean.messageProperty(player)));
-        message.setStyle(HANDBOX_STYLE);
+//        StackPane message = new StackPane();
+//        ImageView messageImage = new ImageView();
+//        message.getChildren().add(messageImage);
+//        message.visibleProperty().bind(trick.newTurn());
+//        messageImage.setFitHeight(TRUMP_SIZE*2);
+//        messageImage.setFitWidth(TRUMP_SIZE*2);
+//        messageImage.imageProperty().bind(Bindings.valueAt(messages, messageBean.messageProperty(player)));
+//        message.setStyle(HANDBOX_STYLE);
         StackPane trumpChoice = new StackPane(trumpChoicePane(trump, trick));
-        HBox messageBox = new HBox();
-        messageBox.setStyle(MESSAGE_STYLE);
-        for (int i = 0; i < MessageId.COUNT; i++) {
-            final int index = i;
-            Button button = new Button();
-            ImageView buttonImage = new ImageView(new Image(MessageId.ALL.get(index).getImage()));
-            buttonImage.setFitHeight(20);
-            buttonImage.setFitWidth(20);
-            button.setGraphic(buttonImage);
-            button.setOnAction(new EventHandler<ActionEvent>() {
-               @Override
-               public void handle(ActionEvent sendMessage) { 
-                   messageBean.setMessage(player, MessageId.ALL.get(index));
-               }
-           });
-            messageBox.getChildren().add(button);
-        }
+//        HBox messageBox = new HBox();
+//        messageBox.setStyle(MESSAGE_STYLE);
+//        for (int i = 0; i < MessageId.COUNT; i++) {
+//            final int index = i;
+//            Button button = new Button();
+//            ImageView buttonImage = new ImageView(new Image(MessageId.ALL.get(index).getImage()));
+//            buttonImage.setFitHeight(20);
+//            buttonImage.setFitWidth(20);
+//            button.setGraphic(buttonImage);
+//            button.setOnAction(new EventHandler<ActionEvent>() {
+//               @Override
+//               public void handle(ActionEvent sendMessage) { 
+//                   messageBean.setMessage(player, MessageId.ALL.get(index));
+//               }
+//           });
+//            messageBox.getChildren().add(button);
+//        }
         trumpImage.imageProperty()
                 .bind(Bindings.valueAt(trumps, trick.ColorProperty()));
         trumpImage.setFitHeight(TRUMP_SIZE);
         trumpImage.setFitWidth(TRUMP_SIZE);
+        
 
         for (int i = 0; i < PlayerId.COUNT; i++)
             pairs[i] = trickCard(trick, player, i, map);
-
         trickPane.add(pairs[0], 1, 2);
         trickPane.add(pairs[1], 2, 0, 1, 3);
         trickPane.add(pairs[2], 1, 0);
         trickPane.add(pairs[3], 0, 0, 1, 3);
         trickPane.add(trumpImage, 1, 1, 1, 1);
         trickPane.add(trumpChoice, 1, 1);
-        trickPane.add(message, 1, 1);
+//        trickPane.add(message, 1, 1);
         
-        trickPane.add(messageBox, 1,3,3,1);
+//        trickPane.add(messageBox, 1,3,3,1);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
         GridPane.setHalignment(trumpChoice, HPos.CENTER);
         trickPane.setStyle(TRICK_STYLE);
