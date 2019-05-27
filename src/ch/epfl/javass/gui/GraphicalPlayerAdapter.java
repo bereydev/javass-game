@@ -41,9 +41,6 @@ public class GraphicalPlayerAdapter implements Player {
         trumpQueue = new ArrayBlockingQueue<>(1);
         cardBean = new CardBean();  
     }
-    public GraphicalPlayerAdapter() {
-        this(null); 
-    }
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
