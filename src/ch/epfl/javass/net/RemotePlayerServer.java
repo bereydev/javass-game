@@ -116,9 +116,10 @@ public final class RemotePlayerServer {
                     w.write(StringSerializer.serializeInt(trump));
                     w.write("\n");
                     w.flush();
-                    
+                    break; 
                 default:
                     System.out.println("Huston we have a problem");
+                    System.exit(1);
                     break;
                 }
             }

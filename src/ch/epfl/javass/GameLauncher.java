@@ -31,7 +31,6 @@ public class GameLauncher extends Application {
 
     private static final String NAME[] = { "Aline", "Bastien", "Colette",
             "David" };
-    private static final int ITTERATIONS = 10_000;
     private static final String DEFAULT_HOST = "localhost";
     private static final int PLAY_TIME = 2; // time expressed in second
     private Random rng = new Random(0);

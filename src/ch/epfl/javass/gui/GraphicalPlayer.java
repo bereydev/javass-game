@@ -35,6 +35,11 @@ import javafx.scene.control.Button;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -54,10 +59,10 @@ public class GraphicalPlayer {
     private static final int CARD_HEIGHT = 180;
     private static final int HANDCARD_WIDTH = 80;
     private static final int HANDCARD_HEIGHT = 120;
-    private static final int TRUMP_SIZE = 101; 
+    private static final int TRUMP_SIZE = 101;
     private static final String TEXT_STYLE = "-fx-font: 16 Optima; -fx-background-color: lightgray;-fx-padding: 5px; -fx-alignment: center;";
     private static final String RECT_STYLE = "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: lightpink; -fx-stroke-width: 5; -fx-opacity: 0.5;";
-    private static final String TRICK_STYLE = "-fx-background-color: whitesmoke; -fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center; ";
+    private static final String TRICK_STYLE = "-fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: gray; -fx-alignment: center; ";
     private static final String HANDBOX_STYLE = "-fx-background-color: lightgray;\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;";
 
     private final Scene scene;
@@ -71,18 +76,16 @@ public class GraphicalPlayer {
             ArrayBlockingQueue<Color> trump) {
         this.player = names.get(player);
         BorderPane borderPane = new BorderPane();
-        Button b = new Button("Help me !"); 
-        borderPane.setCenter(createTrickPane(trick, player, names,trump));
+        Button b = new Button("Help me !");
+        borderPane.setCenter(createTrickPane(trick, player, names, trump));
         borderPane.setTop(createScorePane(score, names));
         borderPane.setBottom(
                 createHandPane(hand, player, cardToPlay, cardBean, b));
         StackPane mainPane = new StackPane();
         mainPane.getChildren().add(borderPane);
-        mainPane.getChildren().add(b); 
+        mainPane.getChildren().add(b);
         StackPane.setAlignment(b, Pos.CENTER_RIGHT);
         mainPane.getChildren().addAll(createWinningPane(score, names));
-        
-
         scene = new Scene(mainPane);
     }
 
@@ -119,7 +122,7 @@ public class GraphicalPlayer {
             teamTexts[6 + t.ordinal()].textProperty()
                     .bind(Bindings.convert(score.gamePointsProperty(t)));
         }
-        //TODO peut mieux faire
+        // TODO peut mieux faire
 
         teamTexts[0] = new Text(map.get(PlayerId.PLAYER_1) + " et "
                 + map.get(PlayerId.PLAYER_3) + " : ");
@@ -140,7 +143,7 @@ public class GraphicalPlayer {
         GridPane trickPane = new GridPane();
         VBox[] pairs = new VBox[4];
         ImageView trumpImage = new ImageView();
-        StackPane trumpChoice = new StackPane(trumpChoicePane(trump,trick)); 
+        StackPane trumpChoice = new StackPane(trumpChoicePane(trump, trick));
         trumpImage.imageProperty()
                 .bind(Bindings.valueAt(trumps, trick.ColorProperty()));
         trumpImage.setFitHeight(TRUMP_SIZE);
@@ -148,18 +151,17 @@ public class GraphicalPlayer {
 
         for (int i = 0; i < PlayerId.COUNT; i++) {
             pairs[i] = trickCard(trick, player, i, map);
-            if( i % 2 == 0)
+            if (i % 2 == 0)
                 trickPane.add(pairs[i], 1, 2 - i);
-            else 
+            else
                 trickPane.add(pairs[i], 3 - i, 0, 1, 3);
         }
 
         trickPane.add(trumpImage, 1, 1, 1, 1);
-        trickPane.add(trumpChoice, 1,1);
+        trickPane.add(trumpChoice, 1, 1);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
         GridPane.setHalignment(trumpChoice, HPos.CENTER);
         trickPane.setStyle(TRICK_STYLE);
-
         return trickPane;
     }
 
@@ -187,7 +189,7 @@ public class GraphicalPlayer {
                 map.get(PlayerId.values()[(player.ordinal() + i) % 4]));
         name.setStyle("-fx-font: 14 Optima;");
         VBox pair;
-        
+
         if (i != 0)
             pair = new VBox(name, pane);
         else
@@ -196,26 +198,27 @@ public class GraphicalPlayer {
         return pair;
     }
 
-    private void imageThrowAnimation(ImageView cardImage, int index ) {
+    private void imageThrowAnimation(ImageView cardImage, int index) {
         Timeline timeline = new Timeline();
-        double travelH = scene.getWidth()/2;
-        double travelV = scene.getHeight()/2;
+        double travelH = scene.getWidth() / 2;
+        double travelV = scene.getHeight() / 2;
         if (index == 0) {
             cardImage.setRotate(-100);
-            Bounds newCardPos = cardImage.localToScene(cardImage.getBoundsInLocal());
-            double xTrans = xCardPos-newCardPos.getMinX();
-            double yTrans = yCardPos-newCardPos.getMinY();
-            cardImage.setScaleX(HANDCARD_HEIGHT/CARD_HEIGHT);
-            cardImage.setScaleY(HANDCARD_WIDTH/CARD_WIDTH);
+            Bounds newCardPos = cardImage
+                    .localToScene(cardImage.getBoundsInLocal());
+            double xTrans = xCardPos - newCardPos.getMinX();
+            double yTrans = yCardPos - newCardPos.getMinY();
+            cardImage.setScaleX(HANDCARD_HEIGHT / CARD_HEIGHT);
+            cardImage.setScaleY(HANDCARD_WIDTH / CARD_WIDTH);
             cardImage.setTranslateX(xTrans);
             cardImage.setTranslateY(yTrans);
         } else if (index == 1) {
-            cardImage.setRotate(-100*travelH/385);
+            cardImage.setRotate(-100 * travelH / 385);
             cardImage.setTranslateX(travelH);
         } else if (index == 2) {
             cardImage.setTranslateY(-travelV);
         } else {
-            cardImage.setRotate(100*travelH/385);
+            cardImage.setRotate(100 * travelH / 385);
             cardImage.setTranslateX(-travelH);
         }
         timeline.getKeyFrames()
@@ -282,11 +285,11 @@ public class GraphicalPlayer {
         Rectangle selectZone = new Rectangle(HANDCARD_WIDTH, HANDCARD_HEIGHT);
         selectZone.setFill(javafx.scene.paint.Color.TRANSPARENT);
         Circle greenCircle = new Circle(4, javafx.scene.paint.Color.LIMEGREEN);
-        StackPane card = new StackPane(cardImage, greenCircle,selectZone);
+        StackPane card = new StackPane(cardImage, greenCircle, selectZone);
         StackPane.setAlignment(greenCircle, Pos.TOP_RIGHT);
         cardImage.imageProperty().bind(
                 Bindings.valueAt(cards, Bindings.valueAt(hand.hand(), i)));
-        
+
         cardImage.setFitWidth(HANDCARD_WIDTH);
         cardImage.setFitHeight(HANDCARD_HEIGHT);
         cardImage.setTranslateX(0);
@@ -322,21 +325,23 @@ public class GraphicalPlayer {
                         Bindings.when(isPlayable).then(false).otherwise(true));
                 selectZone.setOnMouseEntered(e -> {
                     Timeline tl = new Timeline();
-                    tl.getKeyFrames().addAll(
-                            new KeyFrame(Duration.millis(50), "Translation",
+                    tl.getKeyFrames()
+                            .addAll(new KeyFrame(Duration.millis(50),
+                                    "Translation",
                                     new KeyValue(cardImage.translateYProperty(),
                                             -HANDCARD_HEIGHT / 7)));
                     tl.play();
                 });
                 selectZone.setOnMouseExited(e -> {
                     Timeline tl = new Timeline();
-                    tl.getKeyFrames().addAll(
-                            new KeyFrame(Duration.millis(50), "Translation",
-                                    new KeyValue(cardImage.translateYProperty(), 0)));
+                    tl.getKeyFrames().addAll(new KeyFrame(Duration.millis(50),
+                            "Translation",
+                            new KeyValue(cardImage.translateYProperty(), 0)));
                     tl.play();
                 });
                 card.setOnMouseClicked(e -> {
-                    Bounds cardPosition = cardImage.localToScene(cardImage.getBoundsInLocal());
+                    Bounds cardPosition = cardImage
+                            .localToScene(cardImage.getBoundsInLocal());
                     xCardPos = cardPosition.getMinX();
                     yCardPos = cardPosition.getMinY();
                     try {
@@ -345,25 +350,27 @@ public class GraphicalPlayer {
                         throw new Error(e1);
                     }
                 });
-         
+
             });
 
         });
         return card;
     }
-    private GridPane trumpChoicePane(ArrayBlockingQueue<Color> trumpQueue, TrickBean trick) {
-        GridPane pane = new GridPane(); 
-        ImageView[] images = new ImageView[Color.COUNT]; 
-        for(Color c : Color.ALL) {
-            images[c.ordinal()]= new ImageView(GraphicalPlayer.trumps.get(c)); 
+
+    private GridPane trumpChoicePane(ArrayBlockingQueue<Color> trumpQueue,
+            TrickBean trick) {
+        GridPane pane = new GridPane();
+        ImageView[] images = new ImageView[Color.COUNT];
+        for (Color c : Color.ALL) {
+            images[c.ordinal()] = new ImageView(GraphicalPlayer.trumps.get(c));
             images[c.ordinal()].setFitHeight(TRUMP_SIZE);
             images[c.ordinal()].setFitWidth(TRUMP_SIZE);
-            images[c.ordinal()].setOnMouseClicked(event ->{
-              try {
-              trumpQueue.put(c);
-          } catch (InterruptedException e2) {
-              throw new Error(e2);
-          }
+            images[c.ordinal()].setOnMouseClicked(event -> {
+                try {
+                    trumpQueue.put(c);
+                } catch (InterruptedException e2) {
+                    throw new Error(e2);
+                }
             });
         }
         pane.add(images[0], 0, 0);
@@ -371,7 +378,7 @@ public class GraphicalPlayer {
         pane.add(images[2], 1, 0);
         pane.add(images[3], 1, 1);
         pane.visibleProperty().bind(trick.newTurn());
-        return pane; 
+        return pane;
     }
 
     private static final ObservableMap<Card, Image> mapCreator(int quality) {

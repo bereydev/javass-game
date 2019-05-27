@@ -6,7 +6,6 @@
 package ch.epfl.javass.jass;
 
 import ch.epfl.javass.Preconditions;
-import ch.epfl.javass.bits.Bits64;
 import ch.epfl.javass.jass.PackedScore;
 
 public final class Score {
