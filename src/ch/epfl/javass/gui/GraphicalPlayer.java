@@ -4,6 +4,7 @@
 */
 package ch.epfl.javass.gui;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -450,9 +451,9 @@ public class GraphicalPlayer {
             });
         }
         pane.add(images[0], 0, 0);
-        pane.add(images[1], 0, 1);
-        pane.add(images[2], 1, 0);
-        pane.add(images[3], 1, 1);
+        pane.add(images[1], 2, 0);
+        pane.add(images[2], 2, 2);
+        pane.add(images[3], 0, 2);
         pane.visibleProperty().bind(trick.newTurn());
         return pane;
     }
