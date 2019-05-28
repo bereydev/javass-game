@@ -4,10 +4,12 @@
 */
 package ch.epfl.javass.gui;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+
 
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.Card.Color;
@@ -30,12 +32,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
@@ -46,6 +51,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -87,6 +95,7 @@ public class GraphicalPlayer {
             ArrayBlockingQueue<Color> trump, MessageBean messageBean) {
         title = "Javass - " + names.get(player);
         BorderPane borderPane = new BorderPane();
+        AnchorPane jeje = new AnchorPane(); 
         Button b = new Button("Help me !");
         b.setStyle("-fx-background-color:#03A9F4;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;" + 
                 "-fx-background-radius: 10 10 10 10;");
@@ -106,7 +115,21 @@ public class GraphicalPlayer {
         mainPane.getChildren().add(borderPane);
         mainPane.getChildren().add(b);
         StackPane.setAlignment(b, Pos.CENTER_RIGHT);
+        Media media = new Media(new File("images/trump.gif").toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setAutoPlay(true);
+        mediaPlayer.setCycleCount(javafx.scene.media.MediaPlayer.INDEFINITE);
+
+        MediaView mediaView = new MediaView(mediaPlayer);
+        mediaView.setFitHeight(TRUMP_SIZE*2);
+        mediaView.setFitWidth(TRUMP_SIZE*2);
+        jeje.getChildren().add(mediaView); 
+        jeje.setOpacity(0.8);
+        jeje.visibleProperty().bind(trick.newTurn());
+        jeje.setDisable(true);
+        AnchorPane.positionInArea(mediaView, 333, 243, TRUMP_SIZE, TRUMP_SIZE, 0, Insets.EMPTY, HPos.CENTER, VPos.CENTER, true);
         mainPane.getChildren().addAll(createWinningPane(score, names));
+        mainPane.getChildren().add(jeje); 
         scene = new Scene(mainPane);
     }
 
@@ -436,6 +459,7 @@ public class GraphicalPlayer {
             TrickBean trick) {
         GridPane pane = new GridPane();
         ImageView[] images = new ImageView[Color.COUNT];
+        StackPane jeje = new StackPane(); 
         for (Color c : Color.ALL) {
             images[c.ordinal()] = new ImageView(GraphicalPlayer.trumps.get(c));
             images[c.ordinal()].setFitHeight(TRUMP_SIZE);
@@ -449,9 +473,9 @@ public class GraphicalPlayer {
             });
         }
         pane.add(images[0], 0, 0);
-        pane.add(images[1], 0, 1);
-        pane.add(images[2], 1, 0);
-        pane.add(images[3], 1, 1);
+        pane.add(images[1], 2, 0);
+        pane.add(images[2], 2, 2);
+        pane.add(images[3], 0, 2); 
         pane.visibleProperty().bind(trick.newTurn());
         return pane;
     }
