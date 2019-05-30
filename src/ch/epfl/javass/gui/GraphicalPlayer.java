@@ -37,6 +37,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -166,8 +167,11 @@ public class GraphicalPlayer {
                 + map.get(PlayerId.PLAYER_4) + " : ");
         for (int j = 0; j < TeamId.COUNT; j++)
             for (int i = 0; i < 4; i++) {
-                if (i == 3)
-                    scorePane.addRow(j, new Text("/Total : "));
+                if (i == 3) {
+                    Text total = new Text(" / Total : ") ;
+                    scorePane.addRow(j, total);
+                    total.setStyle("-fx-fill: #FF4081;");
+                }
                 scorePane.addRow(j, teamTexts[2 * i + j]);
             }
         scorePane.setStyle(TEXT_STYLE);
