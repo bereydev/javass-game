@@ -14,7 +14,7 @@ public class MessageBean {
     
     public MessageBean( ) {
         for (PlayerId player : PlayerId.ALL)
-            messages.put(player, new SimpleObjectProperty<MessageId>());
+            messages.put(player, new SimpleObjectProperty<MessageId>(null));
     }
     
     public void setMessage(PlayerId player, MessageId newMessage) {

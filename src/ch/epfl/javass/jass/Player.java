@@ -75,7 +75,4 @@ public interface Player {
 
     }
     
-    default void catchMessage(PlayerId player, MessageId message) {
-        
-    }
 }

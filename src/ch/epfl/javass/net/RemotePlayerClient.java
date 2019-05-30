@@ -8,7 +8,6 @@
  */
 package ch.epfl.javass.net;
 
-import ch.epfl.javass.gui.MessageId;
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.CardSet;
 import ch.epfl.javass.jass.Player;
@@ -121,10 +120,6 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
         return card;
     }
     
-    @Override
-    public void catchMessage(PlayerId player,MessageId message) {
-        IOWriteAndCheck(JassCommand.MSG.name(),StringSerializer.serializeInt(player.ordinal()),StringSerializer.serializeInt((message.ordinal())));     
-    }
 
     /**
      * write on the OutputStream the passed strings and check the IOExceptions

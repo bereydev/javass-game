@@ -135,8 +135,6 @@ public final class RemotePlayerServer {
                     w.write("\n");
                     w.flush();
                     break;
-                case MSG:
-                    break;
                     
                 default:
                     System.err.println("Huston we have a problem ! \n I can't read that bro : "+ command);

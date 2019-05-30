@@ -14,7 +14,6 @@ import ch.epfl.javass.jass.Score;
 import ch.epfl.javass.jass.TeamId;
 import ch.epfl.javass.jass.Trick;
 import ch.epfl.javass.jass.TurnState;
-import ch.epfl.javass.net.ChatClient;
 import javafx.application.Platform;
 
 /**
@@ -135,11 +134,6 @@ public class GraphicalPlayerAdapter implements Player {
             trickBean.setNewTurn(false);
         });
         return trump;
-    }
-
-    @Override
-    public void catchMessage(PlayerId player, MessageId message) {
-        Platform.runLater(() -> messageBean.setMessage(player, message));
     }
 
 }

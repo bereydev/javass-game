@@ -27,6 +27,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -44,7 +45,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-public class GameLauncher2 extends Application {
+public class GameLauncher extends Application {
 
     private static final String NAME[] = { "Aline", "Bastien", "Colette",
             "David" };
@@ -64,6 +65,7 @@ public class GameLauncher2 extends Application {
             PlayerId.class);
     private static final int PLAY_TIME = 2; // time expressed in second
     private Random rng = new Random(0);
+    private boolean alreadyConnectRemote = false;
 
     public static void main(String[] args) {
         launch(args);
@@ -84,7 +86,7 @@ public class GameLauncher2 extends Application {
 
         for (PlayerId player : PlayerId.ALL) {
             GridPane playerGrid = new GridPane();
-            Text playerTag = new Text("Joueur " + (player.ordinal() + 1));
+            Label playerTag = new Label("Joueur " + (player.ordinal() + 1));
             playerTag.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
             Label playerName = new Label("Nom du Joueur:");
             TextField playerTextField = new TextField();
@@ -104,9 +106,16 @@ public class GameLauncher2 extends Application {
             btnRemote.setToggleGroup(typeGroup);
             btnSimulate.setToggleGroup(typeGroup);
 
-            if (player == PlayerId.PLAYER_1)
+            if (player == PlayerId.PLAYER_1) {
                 typeGroup.selectToggle(btnHuman);
-            else
+                typeGroup.getToggles().forEach(toggle -> {
+                    Node node = (Node) toggle;
+                    node.setDisable(true);
+                    playerGrid.add(
+                            new Text("Joueur hébergeant la partie de Jass"), 0,
+                            3, 2, 1);
+                });
+            } else
                 typeGroup.selectToggle(btnSimulate);
 
             HBox typeBox = new HBox(btnHuman, btnRemote, btnSimulate);
@@ -185,10 +194,19 @@ public class GameLauncher2 extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         MessageBean messageBean = new MessageBean();
-        
+
         Button btnConnect = new Button("Se connecter ");
         grid.add(btnConnect, 1, 3);
         btnConnect.setOnMouseClicked(e -> {
+            if (alreadyConnectRemote) {
+                Alert connectError = new Alert(AlertType.WARNING);
+                connectError.setTitle("Attention !");
+                connectError.setHeaderText("Serveur déjà lancé");
+                connectError.setContentText("Il semblerai que le joueur distant soit déjà lancé veuillez attendre que la partie se lance \n"+
+                            "Si le problème persiste redémarer le jeu ");
+                connectError.show();
+                return;
+            }
             Alert ipInfo = new Alert(AlertType.INFORMATION);
             ipInfo.setTitle("Information de connexion");
             ipInfo.setContentText(
@@ -204,14 +222,16 @@ public class GameLauncher2 extends Application {
                 ipAdress = "Erreur pas d'accès à l'IP";
             }
             ipInfo.setHeaderText("Adresse IP : " + ipAdress);
-            btnConnect.setDisable(true);
-            btnConnect.setOpacity(0.2);
             launchRemote(messageBean);
 
         });
         Button btnStart = new Button("Lancer le jeu");
         grid.add(btnStart, 0, 3);
         btnStart.setOnMouseClicked(e -> launchGame(messageBean));
+    }
+    
+    private String checkedName(String name, PlayerId player) {
+        return !name.trim().isEmpty() ? name : NAME[player.ordinal()];
     }
 
     private void launchGame(MessageBean messageBean) {
@@ -223,26 +243,31 @@ public class GameLauncher2 extends Application {
             switch (type) {
             case "h":
                 ps.put(player, new GraphicalPlayerAdapter(messageBean));
-                ns.put(player, name);
+                ns.put(player, checkedName(name, player));
                 break;
             case "s":
                 ps.put(player, new PacedPlayer(
                         new MctsPlayer(player, rng.nextInt(), itterations),
                         PLAY_TIME));
-                ns.put(player, name);
+                ns.put(player, checkedName(name, player));
                 break;
             case "r":
                 try {
                     ps.put(player, new RemotePlayerClient(host));
-                    
+
                 } catch (IOException e) {
-                    System.out.println(host);
-                    System.err.println(
-                            "Erreur : Connexion au serveur impossible ou refusée "
+                    Alert connectError = new Alert(AlertType.WARNING);
+                    connectError.setTitle("Attention !");
+                    connectError.setHeaderText("Erreur de Connexion");
+                    connectError.setContentText(
+                            "Connexion au serveur impossible ou refusée "
                                     + "veuillez vérifier les paramètre d'hôte passé "
-                                    + "en paramètre ou désactiver votre anti-virus");
+                                    + "en paramètre ou désactiver votre anti-virus.\n"
+                                    + "Vérifier d'avoir correctement connecté le joueur distant.");
+                    connectError.show();
+                    return;
                 }
-                ns.put(player, name);
+                ns.put(player, checkedName(name, player));
                 break;
 
             default:
@@ -268,9 +293,9 @@ public class GameLauncher2 extends Application {
 
     private void launchRemote(MessageBean messageBean) {
         Player player = new GraphicalPlayerAdapter(messageBean);
-        Thread serverThread = new Thread(() -> {
-            new RemotePlayerServer(player).run();
-        });
+        Thread serverThread = new Thread(
+                () -> new RemotePlayerServer(player).run());
+        alreadyConnectRemote = true;
         serverThread.setDaemon(true);
         serverThread.start();
     }
