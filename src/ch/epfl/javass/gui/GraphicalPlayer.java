@@ -14,7 +14,7 @@ import ch.epfl.javass.jass.Card.Color;
 import ch.epfl.javass.jass.Jass;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
-import ch.epfl.javass.net.ChatClient;
+import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -65,14 +65,15 @@ public class GraphicalPlayer {
     private static final int CARD_HEIGHT = 180;
     private static final int HANDCARD_WIDTH = 80;
     private static final int HANDCARD_HEIGHT = 120;
-    private static final String TEXT_STYLE = "-fx-font: 16 Optima; -fx-background-color: black;-fx-padding: 5px; -fx-alignment: center;";
+    private static final String TEXT_STYLE = "-fx-font: 25 Optima; -fx-background-color: black;-fx-padding: 5px; -fx-alignment: center;";
     private static final String RECT_STYLE = "-fx-arc-width: 20; -fx-arc-height: 20; -fx-fill: transparent; -fx-stroke: lightpink; -fx-stroke-width: 5; -fx-opacity: 0.5;";
     private static final String TRICK_STYLE = "-fx-padding: 5px; -fx-border-width: 3px 0px; -fx-border-style: solid; -fx-border-color: #40C4FF; -fx-alignment: center; ";
     private static final String HANDBOX_STYLE = "-fx-background-color: black;\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;";
-    private static final String TRICK_NAME_STYLE = "-fx-font: 14 Optima;-fx-fill: #FF4081;";
+    private static final String TRICK_NAME_STYLE = "-fx-font: 20 Optima;-fx-fill: #40C4FF;";
     private static final String NAME_CARD_STYLE = "-fx-padding: 5px; -fx-alignment: center;";
-    private static final String TEAM_STYLE = "-fx-font: 16 Optima; -fx-background-color: white;";
-    private static final String MESSAGE_STYLE = "\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;";
+    private static final String TEAM_STYLE = "-fx-font: 25 Optima; -fx-background-color: white;";
+    private static final String MESSAGE_STYLE = "-fx-spacing: 5px;-fx-padding: 5px;-fx-alignment: center;";
+    private static final String HEADER_STYLE = "-fx-alignment: center;-fx-border-radius: 10 10 10 10;-fx-background-color:black;-fx-background-radius: 10 10 10 10;";
     private final Scene scene;
     private double xCardPos;
     private double yCardPos;
@@ -88,12 +89,15 @@ public class GraphicalPlayer {
         title = "Javass - " + names.get(player);
         BorderPane borderPane = new BorderPane();
         Button b = new Button("Help me !");
-        b.setStyle("-fx-background-color:#03A9F4;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;" + 
-                "-fx-background-radius: 10 10 10 10;");
-        b.setOnMousePressed(e -> b.setStyle("-fx-background-color:#FF4081;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;" + 
-                "-fx-background-radius: 10 10 10 10;"));
-        b.setOnMouseReleased(e -> b.setStyle("-fx-background-color:#03A9F4;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;" + 
-                "-fx-background-radius: 10 10 10 10;"));
+        b.setStyle(
+                "-fx-font: 25 Optima; -fx-background-color:#03A9F4;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;"
+                        + "-fx-background-radius: 10 10 10 10;");
+        b.setOnMousePressed(e -> b.setStyle(
+                "-fx-font: 25 Optima; -fx-background-color:#FF4081;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;"
+                        + "-fx-background-radius: 10 10 10 10;"));
+        b.setOnMouseReleased(e -> b.setStyle(
+                "-fx-font: 25 Optima; -fx-background-color:#03A9F4;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;"
+                        + "-fx-background-radius: 10 10 10 10;"));
 
         borderPane.setCenter(
                 createTrickPane(trick, player, names, trump, messageBean));
@@ -182,12 +186,14 @@ public class GraphicalPlayer {
         for (int i = 0; i < MessageId.COUNT; i++) {
             final int index = i;
             Button button = new Button();
+            button.setStyle("-fx-background-color : transparent");
             ImageView buttonImage = new ImageView(
                     new Image(MessageId.ALL.get(index).getImage()));
-            buttonImage.setFitHeight(20);
-            buttonImage.setFitWidth(20);
+            buttonImage.setFitHeight(50);
+            buttonImage.setFitWidth(50);
             button.setGraphic(buttonImage);
             button.setOnMouseClicked(e -> {
+                messageBean.setMessage(player, null);
                 messageBean.setMessage(player, MessageId.ALL.get(index));
             });
             messageBox.getChildren().add(button);
@@ -217,10 +223,11 @@ public class GraphicalPlayer {
         trickPane.add(pairs[3], 0, 0, 1, 3);
         trickPane.add(trumpImage, 1, 1, 1, 1);
         trickPane.add(trumpChoice, 1, 1);
-        trickPane.add(messageBox, 1, 3, 3, 1);
+        trickPane.add(messageBox, 0, 3, 3, 1);
+        GridPane.setHalignment(messageBox, HPos.CENTER);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
         GridPane.setHalignment(trumpChoice, HPos.CENTER);
-        
+
         Background back = new Background(
                 new BackgroundImage(new Image("/playing_set.png"),
                         BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
@@ -237,13 +244,25 @@ public class GraphicalPlayer {
         PlayerId cardPlayer = PlayerId.ALL
                 .get((player.ordinal() + i) % PlayerId.COUNT);
         ImageView messageImage = new ImageView();
-        messageImage.setFitHeight(20);
-        messageImage.setFitWidth(20);
+        messageImage.setFitHeight(50);
+        messageImage.setFitWidth(50);
         messageImage.imageProperty().bind(Bindings.valueAt(messages,
                 messageBean.messageProperty(cardPlayer)));
+        messageImage.imageProperty().addListener((o, oV, nV) -> {
+            messageImage.setVisible(true);
+            FadeTransition ft = new FadeTransition(Duration.millis(500), messageImage);
+            ft.setFromValue(1.0);
+            ft.setToValue(0.3);
+            ft.setCycleCount(6);
+            ft.setAutoReverse(true);
+
+            ft.play();
+            ft.setOnFinished(e -> messageImage.setVisible(false));
+        });
         Text name = new Text(map.get(cardPlayer));
         name.setStyle(TRICK_NAME_STYLE);
         HBox header = new HBox(name, messageImage);
+        header.setStyle(HEADER_STYLE);
         Rectangle rect = new Rectangle(CARD_WIDTH, CARD_HEIGHT);
         rect.setStyle(RECT_STYLE);
         rect.setEffect(new GaussianBlur(4));
