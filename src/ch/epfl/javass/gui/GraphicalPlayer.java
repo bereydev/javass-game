@@ -95,7 +95,6 @@ public class GraphicalPlayer {
             ArrayBlockingQueue<Color> trump, MessageBean messageBean) {
         title = "Javass - " + names.get(player);
         BorderPane borderPane = new BorderPane();
-        AnchorPane jeje = new AnchorPane(); 
         Button b = new Button("Help me !");
         b.setStyle("-fx-background-color:#03A9F4;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;" + 
                 "-fx-background-radius: 10 10 10 10;");
@@ -103,9 +102,8 @@ public class GraphicalPlayer {
                 "-fx-background-radius: 10 10 10 10;"));
         b.setOnMouseReleased(e -> b.setStyle("-fx-background-color:#03A9F4;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;" + 
                 "-fx-background-radius: 10 10 10 10;"));
-
-        borderPane.setCenter(
-                createTrickPane(trick, player, names, trump, messageBean));
+        GridPane trickPane = createTrickPane(trick, player, names, trump, messageBean); 
+        borderPane.setCenter(trickPane); 
         borderPane.setTop(createScorePane(score, names));
 
         borderPane.setBottom(
@@ -115,21 +113,8 @@ public class GraphicalPlayer {
         mainPane.getChildren().add(borderPane);
         mainPane.getChildren().add(b);
         StackPane.setAlignment(b, Pos.CENTER_RIGHT);
-        Media media = new Media(new File("images/trump.gif").toURI().toString());
-        MediaPlayer mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.setAutoPlay(true);
-        mediaPlayer.setCycleCount(javafx.scene.media.MediaPlayer.INDEFINITE);
-
-        MediaView mediaView = new MediaView(mediaPlayer);
-        mediaView.setFitHeight(TRUMP_SIZE*2);
-        mediaView.setFitWidth(TRUMP_SIZE*2);
-        jeje.getChildren().add(mediaView); 
-        jeje.setOpacity(0.8);
-        jeje.visibleProperty().bind(trick.newTurn());
-        jeje.setDisable(true);
-        AnchorPane.positionInArea(mediaView, 333, 243, TRUMP_SIZE, TRUMP_SIZE, 0, Insets.EMPTY, HPos.CENTER, VPos.CENTER, true);
         mainPane.getChildren().addAll(createWinningPane(score, names));
-        mainPane.getChildren().add(jeje); 
+       // mainPane.getChildren().add(anchorPane); 
         scene = new Scene(mainPane);
     }
 
@@ -250,6 +235,19 @@ public class GraphicalPlayer {
                         BackgroundPosition.CENTER, BackgroundSize.DEFAULT));
         trickPane.setBackground(back);
         trickPane.setStyle(TRICK_STYLE);
+        Media media = new Media(new File("images/trump.gif").toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setAutoPlay(true);
+        mediaPlayer.setCycleCount(javafx.scene.media.MediaPlayer.INDEFINITE);
+
+        MediaView mediaView = new MediaView(mediaPlayer);
+        mediaView.setFitHeight(TRUMP_SIZE*2);
+        mediaView.setFitWidth(TRUMP_SIZE*2);
+        StackPane trumpy = new StackPane(mediaView); 
+        trickPane.add(trumpy, 1,1,1,1);
+        trumpy.setOpacity(0.8);
+        trumpy.visibleProperty().bind(trick.newTurn());
+        trumpy.setDisable(true);
         return trickPane;
     }
 
