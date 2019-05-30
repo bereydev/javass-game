@@ -64,6 +64,7 @@ public class GameLauncher extends Application {
     private final Map<PlayerId, IntegerProperty> itterationOfPlayers = new EnumMap<>(
             PlayerId.class);
     private static final int PLAY_TIME = 2; // time expressed in second
+    private static final int FINAL_TRICK_TIME = 2000; //time in millisecond
     private Random rng = new Random(0);
     private boolean alreadyConnectRemote = false;
 
@@ -275,14 +276,12 @@ public class GameLauncher extends Application {
             }
         }
 
-        System.out.println(ns);
-        System.out.println(ps);
         Thread gameThread = new Thread(() -> {
             JassGame g = new JassGame(rng.nextInt(), ps, ns);
             while (!g.isGameOver()) {
                 g.advanceToEndOfNextTrick();
                 try {
-                    Thread.sleep(4000);
+                    Thread.sleep(FINAL_TRICK_TIME);
                 } catch (Exception e) {
                 }
             }
