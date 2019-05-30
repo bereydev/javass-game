@@ -122,14 +122,18 @@ public class GraphicalPlayerAdapter implements Player {
      */
     @Override
     public Color trumpToPlay(CardSet hand) {
-        trickBean.setNewTurn(true);
+        Platform.runLater(() -> {
+            trickBean.setNewTurn(true);
+        });
         Color trump = null;
         try {
             trump = trumpQueue.take();
         } catch (InterruptedException e2) {
             throw new Error(e2);
         }
-        trickBean.setNewTurn(false);
+        Platform.runLater(() -> {
+            trickBean.setNewTurn(false);
+        });
         return trump;
     }
 

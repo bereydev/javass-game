@@ -79,7 +79,7 @@ public class GraphicalPlayer {
     private static final String HANDBOX_STYLE = "-fx-background-color: black;\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;";
     private static final String TRICK_NAME_STYLE = "-fx-font: 14 Optima;-fx-fill: #FF4081;";
     private static final String NAME_CARD_STYLE = "-fx-padding: 5px; -fx-alignment: center;";
-    private static final String TEAM_STYLE = "-fx-font: 16 Optima; -fx-background-color: black;";
+    private static final String TEAM_STYLE = "-fx-font: 16 Optima; -fx-background-color: white;";
     private static final String MESSAGE_STYLE = "\r\n-fx-spacing: 5px;\r\n-fx-padding: 5px;";
     private final Scene scene;
     private double xCardPos;
@@ -475,7 +475,7 @@ public class GraphicalPlayer {
         pane.add(images[0], 0, 0);
         pane.add(images[1], 2, 0);
         pane.add(images[2], 2, 2);
-        pane.add(images[3], 0, 2); 
+        pane.add(images[3], 0, 2);
         pane.visibleProperty().bind(trick.newTurn());
         return pane;
     }

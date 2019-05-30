@@ -62,7 +62,7 @@ public class GameLauncher2 extends Application {
             PlayerId.class);
     private final Map<PlayerId, IntegerProperty> itterationOfPlayers = new EnumMap<>(
             PlayerId.class);
-    private static final int PLAY_TIME = 0; // time expressed in second
+    private static final int PLAY_TIME = 2; // time expressed in second
     private Random rng = new Random(0);
 
     public static void main(String[] args) {
@@ -257,7 +257,7 @@ public class GameLauncher2 extends Application {
             while (!g.isGameOver()) {
                 g.advanceToEndOfNextTrick();
                 try {
-                    Thread.sleep(0);
+                    Thread.sleep(4000);
                 } catch (Exception e) {
                 }
             }
