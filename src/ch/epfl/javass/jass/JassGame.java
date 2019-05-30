@@ -51,9 +51,6 @@ public final class JassGame {
                 .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS
                 || turnState.score()
                         .totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS;
-        if(b)
-            System.out.println(turnState.score()
-                .totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS ? "////////////////////////////////////////": "Team2");
         return b; 
     }
 

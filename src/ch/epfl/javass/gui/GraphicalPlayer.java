@@ -34,6 +34,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -47,9 +48,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -91,17 +97,17 @@ public class GraphicalPlayer {
         BorderPane borderPane = new BorderPane();
         Button b = new Button("Help me !");
         b.setStyle(
-                "-fx-font: 25 Optima; -fx-background-color:#03A9F4;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;"
+                "-fx-background-color:#03A9F4;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;"
                         + "-fx-background-radius: 10 10 10 10;");
         b.setOnMousePressed(e -> b.setStyle(
-                "-fx-font: 25 Optima; -fx-background-color:#FF4081;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;"
+                "-fx-background-color:#FF4081;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;"
                         + "-fx-background-radius: 10 10 10 10;"));
         b.setOnMouseReleased(e -> b.setStyle(
-                "-fx-font: 25 Optima; -fx-background-color:#03A9F4;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;"
+                "-fx-background-color:#03A9F4;-fx-text-fill: white;-fx-border-radius: 10 10 10 10;"
                         + "-fx-background-radius: 10 10 10 10;"));
-
-        borderPane.setCenter(
-                createTrickPane(trick, player, names, trump, messageBean));
+        GridPane trickPane = createTrickPane(trick, player, names, trump,
+                messageBean);
+        borderPane.setCenter(trickPane);
         borderPane.setTop(createScorePane(score, names));
 
         borderPane.setBottom(
@@ -112,6 +118,7 @@ public class GraphicalPlayer {
         mainPane.getChildren().add(b);
         StackPane.setAlignment(b, Pos.CENTER_RIGHT);
         mainPane.getChildren().addAll(createWinningPane(score, names));
+        // mainPane.getChildren().add(anchorPane);
         scene = new Scene(mainPane);
     }
 
@@ -163,8 +170,11 @@ public class GraphicalPlayer {
                 + map.get(PlayerId.PLAYER_4) + " : ");
         for (int j = 0; j < TeamId.COUNT; j++)
             for (int i = 0; i < 4; i++) {
-                if (i == 3)
-                    scorePane.addRow(j, new Text("/Total : "));
+                if (i == 3) {
+                    Text total = new Text(" / Total : ");
+                    scorePane.addRow(j, total);
+                    total.setStyle("-fx-fill: #FF4081;");
+                }
                 scorePane.addRow(j, teamTexts[2 * i + j]);
             }
         scorePane.setStyle(TEXT_STYLE);
@@ -199,6 +209,14 @@ public class GraphicalPlayer {
             });
             messageBox.getChildren().add(button);
         }
+        messageBox.visibleProperty().bind(Bindings.when(trick.newTurn()).then(false).otherwise(true));
+        Label trumpLabel = new Label("Choose your Trump !\nMake Jass great again !");
+        trumpLabel.setTextFill(javafx.scene.paint.Color.web("#FF4081"));
+        trumpLabel.setStyle("-fx-background-color : black;-fx-padding:10px;-fx-border-radius: 10 0 10 0;" + 
+                "-fx-border-color:white;-fx-background-radius: 10 0 10 0;");
+        trumpLabel.setTextAlignment(TextAlignment.CENTER);
+        trumpLabel.setFont(Font.font("Optima", 20));
+        trumpLabel.visibleProperty().bind(trick.newTurn());
         trumpImage.imageProperty()
                 .bind(Bindings.valueAt(trumps, trick.ColorProperty()));
         trumpImage.setFitHeight(TRUMP_SIZE);
@@ -225,9 +243,11 @@ public class GraphicalPlayer {
         trickPane.add(trumpImage, 1, 1, 1, 1);
         trickPane.add(trumpChoice, 1, 1);
         trickPane.add(messageBox, 0, 3, 3, 1);
+        trickPane.add(trumpLabel, 0, 3, 3, 1);
         GridPane.setHalignment(messageBox, HPos.CENTER);
         GridPane.setHalignment(trumpImage, HPos.CENTER);
         GridPane.setHalignment(trumpChoice, HPos.CENTER);
+        GridPane.setHalignment(trumpLabel, HPos.CENTER);
 
         Background back = new Background(
                 new BackgroundImage(new Image("/playing_set.png"),
@@ -235,7 +255,20 @@ public class GraphicalPlayer {
                         BackgroundPosition.CENTER, BackgroundSize.DEFAULT));
         trickPane.setBackground(back);
         trickPane.setStyle(TRICK_STYLE);
+        Media media = new Media(
+                new File("images/trump.gif").toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setAutoPlay(true);
+        mediaPlayer.setCycleCount(javafx.scene.media.MediaPlayer.INDEFINITE);
 
+        MediaView mediaView = new MediaView(mediaPlayer);
+        mediaView.setFitHeight(TRUMP_SIZE * 2);
+        mediaView.setFitWidth(TRUMP_SIZE * 2);
+        StackPane trumpy = new StackPane(mediaView);
+        trickPane.add(trumpy, 1, 1, 1, 1);
+        trumpy.setOpacity(0.8);
+        trumpy.visibleProperty().bind(trick.newTurn());
+        trumpy.setDisable(true);
         return trickPane;
     }
 
@@ -251,14 +284,18 @@ public class GraphicalPlayer {
                 messageBean.messageProperty(cardPlayer)));
         messageImage.imageProperty().addListener((o, oV, nV) -> {
             messageImage.setVisible(true);
-            FadeTransition ft = new FadeTransition(Duration.millis(500), messageImage);
+            FadeTransition ft = new FadeTransition(Duration.millis(500),
+                    messageImage);
             ft.setFromValue(1.0);
             ft.setToValue(0.3);
             ft.setCycleCount(6);
             ft.setAutoReverse(true);
 
             ft.play();
-            ft.setOnFinished(e -> messageImage.setVisible(false));
+            ft.setOnFinished(e -> {
+                messageBean.setMessage(player, null);
+                messageImage.setVisible(false);
+            });
         });
         Text name = new Text(map.get(cardPlayer));
         name.setStyle(TRICK_NAME_STYLE);

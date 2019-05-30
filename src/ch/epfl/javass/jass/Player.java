@@ -2,7 +2,6 @@ package ch.epfl.javass.jass;
 
 import java.util.Map;
 
-import ch.epfl.javass.gui.MessageId;
 import ch.epfl.javass.jass.Card.Color;
 
 /**
