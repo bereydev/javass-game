@@ -1,6 +1,7 @@
 package ch.epfl.javass.gui;
 
 import java.util.Map;
+
 import java.util.concurrent.ArrayBlockingQueue;
 
 import ch.epfl.javass.jass.Card;

@@ -255,9 +255,9 @@ public final class MctsPlayer implements Player {
                     points[c.ordinal()][1]++; 
             }
         for(int i=0; i<points.length; i++) {
-            if(points[i][0]>points[index][0]) 
+            if(points[i][1]>points[index][1]) 
                 index = i;
-            else if(points[i][0]==points[index][0]&&points[i][1]>points[index][1])
+            else if(points[i][1]==points[index][1]&&points[i][0]>points[index][0])
                 index = i; 
         }
         return Color.values()[index];
